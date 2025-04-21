@@ -10,54 +10,33 @@ import { useSelector } from 'react-redux';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useNavigate } from 'react-router-dom';
-
-// Import Icons
-import { FaFireExtinguisher, FaTaxi, FaPlug, FaSkullCrossbones, FaDog, FaBuilding, FaLandmark, FaRegTrashAlt, FaWater, FaWineBottle, FaTree, FaSnowflake, FaBug, FaTimes } from 'react-icons/fa';
+import { FaMapPin, FaTimes } from 'react-icons/fa';
 
 export default function CreateReport({ position, onClose, onSubmit, isSubmitting }) {
   const [address, setAddress] = useState('');
   const [isVerified, setIsVerified] = useState(false);
   const [publishError, setPublishError] = useState(null);
-  const [image, setImage] = useState(null); // State to hold the uploaded image
+  const [image, setImage] = useState(null);
 
   const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
 
   const [formData, setFormData] = useState({
     title: '',
-    category: 'fire', // default category
+    category: 'default',
     content: '',
-    locationName: '',
-    position: { lat: 0, lng: 0 }, // Default position if no valid position is provided
+    position: { lat: 0, lng: 0 },
     fullName: '',
     name: '',
     email: '',
     phoneNumber: '',
-    severity: 5,
-    dateOfIncident: '',
+    dateOfIncident: new Date().toISOString().split('T')[0],
+    icon: 'default', // You can adjust the default icon as needed
+    image: '', // This will hold the image URL after upload
   });
 
-  // Define icon mapping based on categories
-  const categoryIcons = {
-    fire: <FaFireExtinguisher />,
-    ttc: <FaTaxi />,
-    hydro: <FaPlug />,
-    poison: <FaSkullCrossbones />,
-    animal: <FaDog />,
-    building: <FaBuilding />,
-    parks: <FaLandmark />,
-    garbage: <FaRegTrashAlt />,
-    water: <FaWater />,
-    graffiti: <FaWineBottle />,
-    tree: <FaTree />,
-    snow: <FaSnowflake />,
-    health: <FaBug />,
-  };
-
-  // Fetch address based on lat/lng
   useEffect(() => {
     if (currentUser) {
-      console.log('Current User:', currentUser);
       setFormData((prev) => ({
         ...prev,
         fullName: currentUser.username || '',
@@ -91,76 +70,78 @@ export default function CreateReport({ position, onClose, onSubmit, isSubmitting
       };
 
       fetchAddress();
-    } else {
-      console.warn('Position is not available or invalid');
     }
-  }, [currentUser, position]); // Only run when `currentUser` or `position` changes
+  }, [currentUser, position]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file)); // Preview the image
-      setFormData({ ...formData, image: file }); // Save the file in the form data
+      setImage(URL.createObjectURL(file));
+      setFormData({ ...formData, image: file });
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!isVerified) {
       setPublishError('Please verify your submission.');
       return;
     }
-
-    const formDataToSend = new FormData();
-    Object.keys(formData).forEach(key => {
-      if (key !== 'image') {
-        formDataToSend.append(key, formData[key]);
-      }
-    });
-    if (formData.image) {
-      formDataToSend.append('image', formData.image);
-    }
-
+  
+    const dataToSend = {
+      location: {
+        address: address, // <-- ✅ add this line
+        lat: formData.position.lat,
+        lng: formData.position.lng,
+        info: {
+          title: formData.title,
+          description: formData.content,
+          category: formData.category,
+          fullName: formData.fullName,
+          name: formData.name,
+          email: formData.email,
+          phoneNumber: formData.phoneNumber,
+          dateOfIncident: formData.dateOfIncident,
+          icon: formData.icon,
+          image: formData.image,
+        },
+        status: 'pending',
+      },
+      phoneNumber: formData.phoneNumber,
+    };
+    
+  
     try {
-      const res = await fetch('/api/report/create', {
+      const res = await fetch('/api/pin/createPin', {
         method: 'POST',
-        body: formDataToSend,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${currentUser.token}`, // assuming token is stored in currentUser
+        },
+        body: JSON.stringify(dataToSend),
       });
-
-      const text = await res.text();
-      console.log('Response Text:', text);
-
-      let data = {};
-      if (text) {
-        try {
-          data = JSON.parse(text);
-        } catch (error) {
-          throw new Error('Invalid JSON response from server');
-        }
-      }
-
+  
+      const data = await res.json();
+  
       if (!res.ok) {
         setPublishError(data.message || 'Server error occurred');
         return;
       }
-
+  
       setPublishError(null);
-      navigate(`/submitreport`);
+      navigate(`/successfullyCreated`);
     } catch (error) {
-      console.error('Error submitting report:', error);
+      console.error('Error submitting pin:', error);
       setPublishError('Something went wrong. Please try again.');
     }
   };
+  
 
   return (
     <div className="bg-gray-500 bg-opacity-50 flex justify-center items-center z-50 mt-20">
       <div className="bg-white p-6 rounded-lg w-full max-w-2xl shadow-xl relative">
-        {/* Close Button (X) */}
-        <button 
-          onClick={onClose} 
-          className="absolute top-2 right-2 text-xl text-gray-600 hover:text-gray-900"
-        >
+        <button onClick={onClose} className="absolute top-2 right-2 text-xl text-gray-600 hover:text-gray-900">
           <FaTimes />
         </button>
 
@@ -171,31 +152,16 @@ export default function CreateReport({ position, onClose, onSubmit, isSubmitting
           <TextInput type="text" placeholder="Full Name" required value={formData.fullName} onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} />
           <TextInput type="email" placeholder="Email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
           <TextInput type="tel" placeholder="Phone Number" required value={formData.phoneNumber} onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })} />
-          <TextInput type="number" placeholder="Severity (1–10)" min={1} max={10} required value={formData.severity} onChange={(e) => setFormData({ ...formData, severity: parseInt(e.target.value) })} />
           <TextInput type="date" required value={formData.dateOfIncident} onChange={(e) => setFormData({ ...formData, dateOfIncident: e.target.value })} />
           <TextInput type="text" placeholder="Title" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
-          
-          {/* Category Dropdown */}
+
           <Select value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })}>
-            <option value="fire">Fire/Ambulance</option>
-            <option value="ttc">TTC</option>
-            <option value="hydro">Hydro</option>
-            <option value="poison">Poison Centre</option>
-            <option value="animal">Animal Services</option>
-            <option value="building">Building Permits</option>
-            <option value="parks">Parks & Recreation</option>
-            <option value="garbage">Waste Collection</option>
-            <option value="water">Water Main</option>
-            <option value="graffiti">Graffiti Removal</option>
-            <option value="tree">Tree Maintenance</option>
-            <option value="health">Public Health</option>
-            <option value="snow">Snow Removal</option>
+            <option value="default">Pin</option>
           </Select>
 
-          {/* Icon Preview */}
           <div className="flex items-center mt-4">
-            <div className="mr-2">Selected Icon: </div>
-            <div className="text-xl">{categoryIcons[formData.category]}</div>
+            <div className="mr-2">Selected Icon:</div>
+            <div className="text-xl"><FaMapPin /></div>
           </div>
 
           <ReactQuill
@@ -211,7 +177,6 @@ export default function CreateReport({ position, onClose, onSubmit, isSubmitting
             <label htmlFor="verify" className="ml-2 text-sm">I verify that all the information provided is correct.</label>
           </div>
 
-          {/* File Upload Section */}
           <div>
             <input type="file" accept="image/*" onChange={handleImageUpload} className="block w-full text-sm text-gray-700 py-2" />
             {image && (

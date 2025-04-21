@@ -62,7 +62,7 @@ export default function SignUp() {
   };
 
   return (
-    <div className='min-h-screen bg-green-700 dark:bg-gray-900 flex justify-center items-center'>
+    <div className='min-h-screen bg-[#483929ce] dark:bg-gray-900 flex justify-center items-center'>
       <div className="bg-white dark:bg-gray-800 px-6 pb-6 rounded-lg shadow-lg w-full max-w-lg">
         {/* Logo and Title */}
         <Link to='/' className='font-bold text-green-700 dark:text-green-400 text-4xl'>

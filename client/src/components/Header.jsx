@@ -75,27 +75,36 @@ export default function Header() {
           )}
         </Button>
 
+        
+
         {/* Avatar and Dropdown if User is Logged In */}
-        {currentUser ? (
-          <Dropdown
-            arrowIcon={false}
-            inline
-            label={
-              <Avatar
-                alt="user"
-                img={currentUser.profilePicture || '/default-avatar.png'} // Avatar image or fallback
-                rounded
-                sx={{ width: 40, height: 40 }}
-              />
-            }
-          >
-            <Dropdown.Item>
-              <Link to="/profile" className="text-black">Profile</Link>
-            </Dropdown.Item>
-            <Dropdown.Item onClick={handleSignOut} className="text-red-600">
-              Sign Out
-            </Dropdown.Item>
-          </Dropdown>
+
+{currentUser ? (
+  <Dropdown
+    arrowIcon={false}
+    inline
+    label={
+      <Avatar
+        alt="user"
+        img={currentUser.profilePicture || '/default-avatar.png'}
+        rounded
+        className="w-10 h-10"
+      />
+    }
+  >
+    <div className="px-4 py-3">
+      <span className="block text-sm font-medium text-gray-900 dark:text-white">
+        {currentUser.username}
+      </span>
+      <span className="block text-sm text-gray-500 dark:text-gray-400">
+        {currentUser.userType}
+      </span>
+    </div>
+    <Dropdown.Divider />
+    <Dropdown.Item>Profile</Dropdown.Item>
+    <Dropdown.Item>Settings</Dropdown.Item>
+    <Dropdown.Item onClick={handleSignOut} className='text-white bg-red-500 font-bold'>Sign out</Dropdown.Item>
+  </Dropdown>
         ) : (
           // Sign In / Sign Up Button if user is not logged in
           <Link to={location.pathname === '/signin' ? '/signup' : '/signin'}>

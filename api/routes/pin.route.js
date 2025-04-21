@@ -18,3 +18,4 @@ router.get('/getPins', getPins);
 router.put('/updatereport/:reportId/:userId', verifyToken, updatePinStatus);
 
 export default router;
+

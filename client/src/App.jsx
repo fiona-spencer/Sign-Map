@@ -7,6 +7,7 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Map from "./pages/Map";
 import Report from './pages/Report';
+import SuccessfullyCreated from "./pages/SuccessfullyCreated";
 
 // Components
 import Header from "./components/Header";
@@ -42,6 +43,7 @@ function AppWrapper() {
           }
         />
         <Route path="/report" element={<Report />} />
+        <Route path="/successfullyCreated" element={<SuccessfullyCreated />} />
       </Routes>
       <FooterCom />
     </>

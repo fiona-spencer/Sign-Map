@@ -4,20 +4,20 @@ import { Link } from 'react-router-dom';
 import { Button, Carousel } from 'flowbite-react';
 
 export default function Menu() {
-  const [posts, setPosts] = useState([]);
+  const [pins, setPins] = useState([]);
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    const fetchPins = async () => {
       try {
-        const res = await fetch('/api/report/getReports');
+        const res = await fetch('/api/pin/getPin');
         const data = await res.json();
-        setPosts(data.posts);
+        setPins(data.pins); // Assuming the response contains an array of pins in "pins"
       } catch (error) {
-        console.error('Failed to fetch posts:', error);
+        console.error('Failed to fetch pins:', error);
       }
     };
 
-    fetchPosts();
+    fetchPins();
   }, []);
 
   return (
@@ -26,10 +26,10 @@ export default function Menu() {
       <div className="relative bg-[#483929] dark:bg-gray-800 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <h1 className="text-5xl font-bold text-center text-[#c7b098] dark:text-green-300 mb-4">
-            City of Toronto Reporting Map
+            City of Toronto Pin Map
           </h1>
           <p className="text-lg text-center text-[#ddd6d0] dark:text-green-400 mb-6">
-            Pin, report, and stay informed about issues in your neighborhood.
+            Pin, explore, and stay informed about public reports in your neighborhood.
           </p>
         </div>
         <div className="max-w-6xl mx-auto">
@@ -50,9 +50,9 @@ export default function Menu() {
             Log in using your <strong>name, email, password</strong>, or sign in with <strong>Google</strong>.
           </p>
           <ul className="list-disc pl-6 text-sm text-gray-700 dark:text-gray-300">
-            <li><strong>Public</strong>: Browse reports</li>
-            <li><strong>User</strong>: Submit & track personal reports</li>
-            <li><strong>Admin</strong>: Full system/report control</li>
+            <li><strong>Public</strong>: Browse pins</li>
+            <li><strong>User</strong>: Submit & track personal pins</li>
+            <li><strong>Admin</strong>: Full pin/map control</li>
           </ul>
           <div className="mt-4">
             <Link to="/signin">
@@ -61,35 +61,35 @@ export default function Menu() {
           </div>
         </section>
 
-        {/* How to Report */}
+        {/* How to Pin */}
         <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-green-200 dark:border-green-600 hover:shadow-xl transition">
-          <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300 text-center mb-4">How to Submit a Report</h2>
+          <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300 text-center mb-4">How to Submit a Pin</h2>
           <ul className="list-disc pl-6 space-y-1 text-gray-700 dark:text-gray-300">
-            <li>Click on the map to place a pin and start a report</li>
+            <li>Click on the map to place a pin and begin submission</li>
             <li>
-              Or use the <Link to="/report" className="text-green-600 dark:text-green-400 font-medium hover:underline">Report Page</Link>
+              Or use the <Link to="/report" className="text-green-600 dark:text-green-400 font-medium hover:underline">Pin Page</Link>
             </li>
-            <li>Fill in title, category, severity, description, and upload an image if needed</li>
-            <li>Map-based reports autofill coordinates and address</li>
-            <li>You must be logged in to submit a report</li>
+            <li>Fill in title, category, severity, description, and optionally upload an image</li>
+            <li>Map pins auto-fill coordinates and address</li>
+            <li>You must be logged in to submit a pin</li>
           </ul>
         </section>
 
         {/* Search & Filters */}
         <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-green-200 dark:border-green-600 hover:shadow-xl transition">
-          <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300 text-center mb-4">Search & Filter Reports</h2>
+          <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300 text-center mb-4">Search & Filter Pins</h2>
           <ul className="list-disc pl-6 space-y-1 text-gray-700 dark:text-gray-300">
             <li>Search by title, location, or department</li>
             <li>Filter by status: <em>pending</em>, <em>accepted</em>, <em>in-progress</em>, <em>resolved</em>, <em>deleted</em></li>
-            <li>Click on map pins for detailed info</li>
+            <li>Click on map pins for detailed information</li>
           </ul>
         </section>
 
         {/* Datasheet Section */}
         <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-green-200 dark:border-green-600 text-center hover:shadow-xl transition">
-          <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300 mb-2">View All Reports in a Table</h2>
+          <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300 mb-2">View All Pins in a Table</h2>
           <p className="text-gray-700 dark:text-gray-300 mb-4">
-            Use the datasheet to explore all reports in a sortable format.
+            Use the datasheet to explore all pins in a sortable format.
           </p>
           <Link to="/datasheet">
             <Button color="green">View Datasheet</Button>
@@ -100,7 +100,7 @@ export default function Menu() {
         <div className="text-center">
           <Link to="/report">
             <Button color="green" pill>
-              Submit a Report <HiOutlineArrowRight className="ml-2 h-5 w-5" />
+              Submit a Pin <HiOutlineArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
         </div>

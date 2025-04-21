@@ -6,7 +6,7 @@ import pinImage from '../assets/pin.png';
 
 export default function FooterCom() {
   return (
-    <Footer container className="border-t-8 border-emerald-700 bg-[#aee3a6] text-gray-800 dark:bg-gray-900 dark:text-white shadow-md">
+    <Footer container className="border-t-8 border-emerald-700 bg-[#c6d8c3] text-gray-800 dark:bg-gray-900 dark:text-white shadow-md">
       <div className="w-full max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Logo & Title */}
