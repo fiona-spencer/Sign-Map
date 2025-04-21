@@ -1,44 +1,45 @@
-import { Avatar, Button, Dropdown, Navbar } from 'flowbite-react';
+import { Button, Navbar, Dropdown } from 'flowbite-react'; // Import Dropdown from Flowbite
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { signoutSuccess } from '../redux/user/userSlice';
 import { toggleTheme } from '../redux/theme/themeSlice';
 import { FaMoon, FaSun } from 'react-icons/fa';
 import pinImage from '../assets/pin.png';
+import { Avatar } from 'flowbite-react'; // Import Avatar component
 import { useEffect, useState } from 'react';
 
 export default function Header() {
-  const path = useLocation().pathname;
-  const location = useLocation();
-  const navigate = useNavigate();
+  const location = useLocation();  // Get the current path
   const dispatch = useDispatch();
+  const navigate = useNavigate(); // To navigate after sign out
   const { currentUser } = useSelector((state) => state.user);
   const { theme } = useSelector((state) => state.theme);
 
   // Local state to track the toggle button press
   const [isToggled, setIsToggled] = useState(false);
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(location.search);
-  }, [location.search]);
-
-  const handleSignout = async () => {
-    try {
-      const res = await fetch('/api/user/signout', { method: 'POST' });
-      const data = await res.json();
-      if (!res.ok) console.log(data.message);
-      else dispatch(signoutSuccess());
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-
   const handleToggle = () => {
     // Dispatch theme toggle action
     dispatch(toggleTheme());
-
     // Set the local state to track the toggle status
     setIsToggled(!isToggled);
+  };
+
+  // Determine button color based on the current path
+  const getButtonColor = () => {
+    if (location.pathname === '/signin') {
+      return ' text-green-100 bg-green-800 hover:bg-green-700'; // Blue color for Sign In page
+    }
+    if (location.pathname === '/signup') {
+      return 'text-green-800 bg-green-200 hover:bg-green-700'; // Green color for Sign Up page
+    }
+    return 'bg-green-600 hover:bg-green-700'; // Default color
+  };
+
+  // Handle sign out
+  const handleSignOut = () => {
+    dispatch(signoutSuccess());  // Dispatch sign out action
+    navigate('/signin');  // Redirect to Sign In page after signout
   };
 
   return (
@@ -61,10 +62,10 @@ export default function Header() {
       <div className="flex items-center gap-4 md:order-2">
         {/* Theme toggle button */}
         <Button
-          color={theme === 'light' ? "dark" : ""}
+          color={theme === 'light' ? 'dark' : ''}
           className={`w-10 h-10 hidden sm:flex items-center justify-center rounded-full ${
             isToggled ? 'hover:bg-yellow-100 bg-blue-900 bg-white' : 'bg-blue-900 hover:bg-black'
-          } text-white `}
+          } text-white`}
           onClick={handleToggle}
         >
           {theme === 'light' ? (
@@ -74,41 +75,38 @@ export default function Header() {
           )}
         </Button>
 
-        {/* User Dropdown */}
+        {/* Avatar and Dropdown if User is Logged In */}
         {currentUser ? (
           <Dropdown
             arrowIcon={false}
             inline
             label={
               <Avatar
-                alt="User avatar"
-                img={currentUser.profilePicture}
+                alt="user"
+                img={currentUser.profilePicture || '/default-avatar.png'} // Avatar image or fallback
                 rounded
-                className="w-10 h-10"
+                sx={{ width: 40, height: 40 }}
               />
             }
           >
-            <Dropdown.Header>
-              <span className="text-sm font-medium">@{currentUser.username}</span>
-              <span className="text-xs text-gray-500 truncate">{currentUser.email}</span>
-            </Dropdown.Header>
-            <Link to="/dashboard?tab=profile">
-              <Dropdown.Item>Profile</Dropdown.Item>
-            </Link>
-            <Dropdown.Divider />
-            <Dropdown.Item onClick={handleSignout}>Sign out</Dropdown.Item>
+            <Dropdown.Item>
+              <Link to="/profile" className="text-black">Profile</Link>
+            </Dropdown.Item>
+            <Dropdown.Item onClick={handleSignOut} className="text-red-600">
+              Sign Out
+            </Dropdown.Item>
           </Dropdown>
         ) : (
-          <Link to="/signin">
+          // Sign In / Sign Up Button if user is not logged in
+          <Link to={location.pathname === '/signin' ? '/signup' : '/signin'}>
             <Button
-              color="light"
-              pill
-              className="transition hover:bg-emerald-100 text-sm px-4 py-1"
+              className={`transition text-sm px-4 py-1 rounded-md text-white ${getButtonColor()}`}
             >
-              Sign In
+              {location.pathname === '/signin' ? 'Sign Up' : 'Sign In'}
             </Button>
           </Link>
         )}
+
         <Navbar.Toggle className="text-white hover:text-black" />
       </div>
 
@@ -122,11 +120,11 @@ export default function Header() {
           <Navbar.Link
             key={linkPath}
             as="div"
-            active={path === linkPath}
+            active={location.pathname === linkPath}
             className={`text-2xl px-4 py-2 rounded-md transition-all ${
               isToggled
                 ? ''
-                : path === linkPath
+                : location.pathname === linkPath
                 ? 'bg-orange-400 text-white' // active state (clicked)
                 : 'text-white hover:bg-orange-400 dark:hover:bg-orange-400' // default and hover states, with dark mode hover
             }`}
@@ -134,7 +132,7 @@ export default function Header() {
             <Link
               to={linkPath}
               className={`no-underline text-inherit focus:outline-none text-2xl px-4 py-2 rounded-md transition-all
-                ${path === linkPath ? 'bg-orange-400 text-white' : ''} // active state (clicked)
+                ${location.pathname === linkPath ? 'bg-orange-400 text-white' : ''} // active state (clicked)
                 text-white hover:bg-orange-400 dark:hover:bg-orange-400`} // default and hover states, with dark mode hover
             >
               {label}

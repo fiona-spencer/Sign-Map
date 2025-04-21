@@ -18,7 +18,7 @@ export default function SignIn() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.email || !formData.password || !formData.department) {
+    if (!formData.email || !formData.password) {
       return dispatch(signInFailure('Please fill all the fields'));
     }
     try {
@@ -60,8 +60,7 @@ export default function SignIn() {
           TO ISSUE A REPORT
         </div>
         <p className='text-md text-green-600 dark:text-green-300 text-center'>
-          Sign in with your email, password, and department
-          or with Google.
+          Sign in with your email and password or with Google.
         </p>
 
         {/* Sign In Form */}
@@ -85,21 +84,6 @@ export default function SignIn() {
               onChange={handleChange} 
               className="border-green-500 focus:ring-green-500 dark:border-green-400 dark:bg-gray-700 dark:text-white"
             />
-          </div>
-          
-          {/* Department Selection */}
-          <div>
-            <Label className="text-gray-700 dark:text-gray-300" value="Department Type" />
-            <select 
-              id="department" 
-              onChange={handleChange} 
-              className="block w-full p-2 border border-green-500 rounded-md focus:ring-green-500 dark:border-green-400 dark:bg-gray-700 dark:text-white"
-            >
-              <option value="">Select Department</option>
-              <option value="Public">Public</option>
-              <option value="City Staff">City Staff</option>
-              <option value="Admin">Admin</option>
-            </select>
           </div>
 
           {/* Sign In Button */}
