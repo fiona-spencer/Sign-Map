@@ -6,6 +6,7 @@ import Menu from "./pages/Menu";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Map from "./pages/Map";
+import Report from './pages/Report';
 
 // Components
 import Header from "./components/Header";
@@ -40,6 +41,7 @@ function AppWrapper() {
             <Map mapState={localStorage.getItem("mapState") || "off"} />
           }
         />
+        <Route path="/report" element={<Report />} />
       </Routes>
       <FooterCom />
     </>

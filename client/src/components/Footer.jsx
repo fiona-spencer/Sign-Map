@@ -64,7 +64,7 @@ export default function FooterCom() {
                   Issue a Report
                 </Footer.Link>
                 <Footer.Link
-                  href="/departments"
+                  href="/datasheets"
                   className="text-emerald-700 hover:text-emerald-900 dark:text-white dark:hover:text-emerald-400"
                 >
                   Service Departments

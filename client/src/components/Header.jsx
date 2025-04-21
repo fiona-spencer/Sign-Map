@@ -115,7 +115,8 @@ export default function Header() {
         {[
           { path: '/', label: 'About' },
           { path: '/map', label: 'Map' },
-          { path: '/departments', label: 'Data Sheets' },
+          { path: '/report', label: 'Report' },
+          { path: '/datasheets', label: 'Data Sheets' },
         ].map(({ path: linkPath, label }) => (
           <Navbar.Link
             key={linkPath}
