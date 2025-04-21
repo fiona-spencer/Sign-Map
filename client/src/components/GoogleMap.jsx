@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ReactDOMServer from 'react-dom/server';
-import CreateReport from './CreateReport'; // Import the CreateReport component
+// import CreateReport from './CreateReport'; // Import the CreateReport component
 import 'react-quill/dist/quill.snow.css'; // Import Quill CSS
 import { FaSkullCrossbones, FaFireExtinguisher, FaTaxi, FaPlug, FaDog, FaBuilding, FaTree, FaSnowflake, FaRegTrashAlt, FaLandmark, FaBug, FaWineBottle, FaWater } from 'react-icons/fa';
 

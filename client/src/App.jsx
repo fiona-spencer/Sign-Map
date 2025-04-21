@@ -1,30 +1,55 @@
-//Page Directory
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+// Pages
+import Menu from "./pages/Menu";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
+import Map from "./pages/Map";
 
-//Pages
-import Menu from "./pages/Menu"
-import SignIn from "./pages/SignIn"
-import SignUp from "./pages/SignUp"
+// Components
+import Header from "./components/Header";
+import FooterCom from "./components/Footer";
+import Search from "./components/Search";
 
+function AppWrapper() {
+  const location = useLocation();
+  const [mapState, setMapState] = useState("off");
 
+  useEffect(() => {
+    if (location.pathname === "/map") {
+      setMapState("on");
+      localStorage.setItem("mapState", "on");
+    } else {
+      setMapState("off");
+      localStorage.setItem("mapState", "off"); // <-- ensure it's stored!
+    }
+  }, [location.pathname]);
 
-//Components
-import Header from "./components/Header"
-import FooterCom from "./components/Footer"
-import Search from "./components/Search"
+  return (
+    <>
+      <Header />
+      <Search />
+      <Routes>
+        <Route path="/" element={<Menu />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route
+          path="/map"
+          element={
+            <Map mapState={localStorage.getItem("mapState") || "off"} />
+          }
+        />
+      </Routes>
+      <FooterCom />
+    </>
+  );
+}
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Header/>
-      <Search/>
-      <Routes>
-        <Route path="/" element={<Menu/>}/>
-        <Route path="/signin" element={<SignIn/>}/>
-        <Route path="/signup" element={<SignUp/>}/>
-      </Routes>
-      <FooterCom/>
+      <AppWrapper />
     </BrowserRouter>
-  )
+  );
 }
