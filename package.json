@@ -19,13 +19,13 @@
     "@vis.gl/react-google-maps": "^1.5.2",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.7",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.5.0",
     "env": "^0.0.2",
-    "express": "^4.19.1",
+    "express": "^4.21.2",
     "flowbite": "^3.1.2",
     "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
-    "mongoose": "^8.13.0",
+    "mongoose": "^8.13.2",
     "nodeman": "^1.1.2",
     "nodemon": "^3.1.0",
     "react-leaflet": "^5.0.0",
@@ -36,5 +36,13 @@
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fiona-spencer/Sign-Map.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fiona-spencer/Sign-Map/issues"
+  },
+  "homepage": "https://github.com/fiona-spencer/Sign-Map#readme"
 }

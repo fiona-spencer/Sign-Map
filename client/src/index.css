@@ -39,3 +39,16 @@ body {
 .dark .post-content a {
   color: blue;
 }
+
+@keyframes dropPin {
+  0% {
+    transform: translateY(-50vh); /* Start above the screen */
+  }
+  100% {
+    transform: translateY(0); /* End at the normal position */
+  }
+}
+
+.animate-dropPin {
+  animation: dropPin 0.5s ease-out forwards;
+}
