@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Tooltip, Datepicker } from 'flowbite-react';
+import { Button } from 'flowbite-react';
 
 export default function Datasheet() {
   const [pins, setPins] = useState([]);
@@ -46,19 +46,14 @@ export default function Datasheet() {
       const filtered = pins.filter((pin) => {
         const { city, province, streetName } = splitAddress(pin.location.address);
         const status = pin.location.status;
-  
+
         const matchesStatus = filterStatus ? status === filterStatus : true;
         const matchesCity = filterCity ? city.toLowerCase().includes(filterCity.toLowerCase()) : true;
         const matchesProvince = filterProvince ? province.toLowerCase().includes(filterProvince.toLowerCase()) : true;
         const matchesStreetName = filterStreetName ? streetName.toLowerCase().includes(filterStreetName.toLowerCase()) : true;
         const matchesUsername = filterUsername ? pin.createdBy.username.toLowerCase().includes(filterUsername.toLowerCase()) : true;
-  
-        // 🔍 New simple search-style match
-        const matchesDate = filterDate
-  ? pin.createdAt.includes(filterDate)
-  : true;
+        const matchesDate = filterDate ? pin.createdAt.includes(filterDate) : true;
 
-  
         return (
           matchesStatus &&
           matchesCity &&
@@ -68,14 +63,21 @@ export default function Datasheet() {
           matchesDate
         );
       });
-  
+
       setFilteredPins(filtered);
     };
-  
+
     applyFilter();
   }, [filterStatus, filterCity, filterProvince, filterUsername, filterStreetName, filterDate, pins]);
-  
-  
+
+  const handleResetFilters = () => {
+    setFilterStatus('');
+    setFilterCity('');
+    setFilterProvince('');
+    setFilterUsername('');
+    setFilterStreetName('');
+    setFilterDate('');
+  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -127,85 +129,106 @@ export default function Datasheet() {
   };
 
   return (
-    <div className="w-full overflow-x-auto p-6 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md">
+    <div className="w-full overflow-x-auto p-6 bg-[#267b6684] dark:bg-gray-800">
       {/* Filter Section */}
-      <div className="mb-6 p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-300 dark:border-gray-600">
-        <div className="space-y-4">
-          {/* Status Filter */}
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-200"
-            >
-              <option value="">All</option>
-              {uniqueStatuses.map((status) => (
-                <option key={status} value={status}>
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
-                </option>
-              ))}
-            </select>
-          </div>
+{/* Filter Section */}
+<div className="mb-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-300 dark:border-gray-600">
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+    {/* Status Filter */}
+    <div className="flex flex-col">
+      <label className="text-xs md:text-sm lg:text-base font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+      <select
+        value={filterStatus}
+        onChange={(e) => setFilterStatus(e.target.value)}
+        className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-600 text-xs md:text-sm lg:text-base text-gray-800 dark:text-gray-200"
+      >
+        <option value="">All</option>
+        {uniqueStatuses.map((status) => (
+          <option key={status} value={status}>
+            {status.charAt(0).toUpperCase() + status.slice(1)}
+          </option>
+        ))}
+      </select>
+    </div>
 
-          {/* City Filter */}
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City</label>
-            <input
-              type="text"
-              value={filterCity}
-              onChange={(e) => setFilterCity(e.target.value)}
-              className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-200"
-              list="city-suggestions"
-              placeholder="Start typing city name..."
-            />
-            <datalist id="city-suggestions">
-              {uniqueCities.map((city) => (
-                <option key={city} value={city} />
-              ))}
-            </datalist>
-          </div>
+    {/* City Filter */}
+    <div className="flex flex-col">
+      <label className="text-xs md:text-sm lg:text-base font-medium text-gray-700 dark:text-gray-300 mb-1">City</label>
+      <input
+        type="text"
+        value={filterCity}
+        onChange={(e) => setFilterCity(e.target.value)}
+        className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-600 text-xs md:text-sm lg:text-base text-gray-800 dark:text-gray-200"
+        list="city-suggestions"
+        placeholder="Search by City Name"
+      />
+      <datalist id="city-suggestions">
+        {uniqueCities.map((city) => (
+          <option key={city} value={city} />
+        ))}
+      </datalist>
+    </div>
 
-          {/* Province Filter */}
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Province</label>
-            <input
-              type="text"
-              value={filterProvince}
-              onChange={(e) => setFilterProvince(e.target.value)}
-              className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-200"
-              placeholder="Search by Province"
-            />
-          </div>
+    {/* Province Filter */}
+    <div className="flex flex-col">
+      <label className="text-xs md:text-sm lg:text-base font-medium text-gray-700 dark:text-gray-300 mb-1">Province</label>
+      <input
+        type="text"
+        value={filterProvince}
+        onChange={(e) => setFilterProvince(e.target.value)}
+        className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-600 text-xs md:text-sm lg:text-base text-gray-800 dark:text-gray-200"
+        placeholder="Search by Province"
+      />
+    </div>
 
-          {/* Street Name Filter */}
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Street Name</label>
-            <input
-              type="text"
-              value={filterStreetName}
-              onChange={(e) => setFilterStreetName(e.target.value)}
-              className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-200"
-              placeholder="Search by Street Name"
-            />
-          </div>
+    {/* Street Name Filter */}
+    <div className="flex flex-col">
+      <label className="text-xs md:text-sm lg:text-base font-medium text-gray-700 dark:text-gray-300 mb-1">Street Name</label>
+      <input
+        type="text"
+        value={filterStreetName}
+        onChange={(e) => setFilterStreetName(e.target.value)}
+        className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-600 text-xs md:text-sm lg:text-base text-gray-800 dark:text-gray-200"
+        placeholder="Search by Street Name"
+      />
+    </div>
 
-          {/* Username Filter */}
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
-            <input
-              type="text"
-              value={filterUsername}
-              onChange={(e) => setFilterUsername(e.target.value)}
-              className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-200"
-              placeholder="Search by Username"
-            />
-          </div>
+    {/* Username Filter */}
+    <div className="flex flex-col">
+      <label className="text-xs md:text-sm lg:text-base font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
+      <input
+        type="text"
+        value={filterUsername}
+        onChange={(e) => setFilterUsername(e.target.value)}
+        className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-600 text-xs md:text-sm lg:text-base text-gray-800 dark:text-gray-200"
+        placeholder="Search by Username"
+      />
+    </div>
 
-          {/* Date Filter */}
+    {/* Date Filter */}
+    <div className="flex flex-col">
+      <label className="text-xs md:text-sm lg:text-base font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
+      <input
+        type="date"
+        value={filterDate}
+        onChange={(e) => setFilterDate(e.target.value)}
+        className="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-600 text-xs md:text-sm lg:text-base text-gray-800 dark:text-gray-200"
+      />
+    </div>
 
-        </div>
-      </div>
+    {/* Reset Button */}
+    <div className="col-span-1 md:col-span-3 pt-2">
+      <Button
+        onClick={handleResetFilters}
+        className="w-full md:w-auto text-xs md:text-sm lg:text-base py-2 px-4 bg-red-500 text-white hover:bg-red-600 transition-colors"
+      >
+        Reset Filters
+      </Button>
+    </div>
+  </div>
+</div>
+
+
 
       {/* Table Section */}
       <div className="overflow-x-auto bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md border border-gray-300 dark:border-gray-600">
