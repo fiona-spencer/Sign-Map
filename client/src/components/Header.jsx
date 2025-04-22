@@ -101,8 +101,8 @@ export default function Header() {
       </span>
     </div>
     <Dropdown.Divider />
-    <Dropdown.Item>Profile</Dropdown.Item>
-    <Dropdown.Item>Settings</Dropdown.Item>
+    <Dropdown.Item onClick={() => navigate("/profile")}>Profile</Dropdown.Item>
+    <Dropdown.Item onClick={() => navigate("/settings")}>Settings</Dropdown.Item>
     <Dropdown.Item onClick={handleSignOut} className='text-white bg-red-500 font-bold'>Sign out</Dropdown.Item>
   </Dropdown>
         ) : (

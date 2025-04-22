@@ -8,6 +8,10 @@ import SignUp from "./pages/SignUp";
 import Map from "./pages/Map";
 import Report from './pages/Report';
 import SuccessfullyCreated from "./pages/SuccessfullyCreated";
+import Settings from "./pages/Settings";
+import Profile from "./pages/Profile";
+import SearchPage from "./pages/SearchPage";
+import Datasheet from "./pages/Datasheet";
 
 // Components
 import Header from "./components/Header";
@@ -44,6 +48,10 @@ function AppWrapper() {
         />
         <Route path="/report" element={<Report />} />
         <Route path="/successfullyCreated" element={<SuccessfullyCreated />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/search" element={<SearchPage />} />
+        <Route path="/Datasheets" element={<Datasheet />} />
       </Routes>
       <FooterCom />
     </>
