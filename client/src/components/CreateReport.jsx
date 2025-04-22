@@ -139,7 +139,7 @@ export default function CreateReport({ position, onClose, onSubmit, isSubmitting
   
 
   return (
-    <div className="bg-gray-500 bg-opacity-50 flex justify-center items-center z-50 mt-20">
+    <div className=" bg-opacity-50 flex justify-center items-center z-50 mt-20">
       <div className="bg-white p-6 rounded-lg w-full max-w-2xl shadow-xl relative">
         <button onClick={onClose} className="absolute top-2 right-2 text-xl text-gray-600 hover:text-gray-900">
           <FaTimes />

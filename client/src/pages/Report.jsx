@@ -1,18 +1,102 @@
-import React from 'react';
+"use client";
+
+import React, { useEffect, useRef, useState } from 'react';
 import CreateReport from '../components/createReport';
 import {
   Accordion,
   AccordionPanel,
   AccordionTitle,
   AccordionContent,
+  TabItem,
+  Tabs,
 } from 'flowbite-react';
+import { HiClipboardList } from 'react-icons/hi';
+import { MdDashboard } from 'react-icons/md';
+import { HiUserCircle } from 'react-icons/hi';
 
 export default function Report() {
+  const [address, setAddress] = useState('');
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const addressInputRef = useRef(null);
+  const autocompleteRef = useRef(null);
+  const tabsRef = useRef(null);
+  const [activeTab, setActiveTab] = useState(0);
+  const [fileReportData, setFileReportData] = useState(null);
+
+  const apiKey = 'AIzaSyA1wOqcLSGKkhNJQYP9wH06snRuvSJvRJY';
+
+  useEffect(() => {
+    const loadGoogleMapsScript = () => {
+      if (document.querySelector('script[src^="https://maps.googleapis.com/maps/api/js"]')) return;
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=onGoogleMapsLoaded&v=weekly`;
+      script.async = true;
+      document.body.appendChild(script);
+      script.onload = () => setIsMapLoaded(true);
+      script.onerror = () => setIsMapLoaded(false);
+    };
+
+    window.onGoogleMapsLoaded = () => initMap();
+
+    if (!window.google) {
+      loadGoogleMapsScript();
+    } else {
+      setIsMapLoaded(true);
+    }
+
+    return () => {
+      const script = document.querySelector('script[src^="https://maps.googleapis.com/maps/api/js"]');
+      if (script) document.body.removeChild(script);
+      delete window.onGoogleMapsLoaded;
+    };
+  }, [apiKey]);
+
+  const initMap = () => {
+    if (addressInputRef.current) {
+      const autocomplete = new google.maps.places.Autocomplete(addressInputRef.current, {
+        types: ['geocode'],
+        componentRestrictions: { country: 'ca' },
+      });
+
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        if (place && place.formatted_address) {
+          setAddress(place.formatted_address);
+        }
+      });
+
+      autocompleteRef.current = autocomplete;
+    }
+  };
+
+  const handleFileUpload = async (e, type) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const text = await file.text();
+
+    try {
+      if (type === 'json') {
+        const data = JSON.parse(text);
+        setFileReportData(data);
+      } else if (type === 'csv') {
+        const rows = text.split('\n').map(row => row.split(','));
+        const headers = rows.shift();
+        const data = rows.map(row =>
+          Object.fromEntries(row.map((cell, idx) => [headers?.[idx], cell]))
+        );
+        setFileReportData(data);
+      }
+    } catch (err) {
+      alert('Invalid file format');
+      console.error(err);
+    }
+  };
+
   return (
     <div className="bg-[#d1cfcd] dark:bg-[#1d1d22] p-6 px-8 min-h-screen">
-      {/* Instructions Accordion */}
+      {/* Accordion */}
       <Accordion className="mb-8 text-lg">
-        {/* Intro */}
         <AccordionPanel>
           <AccordionTitle className="text-xl font-semibold">Why Create a Report?</AccordionTitle>
           <AccordionContent>
@@ -22,7 +106,6 @@ export default function Report() {
           </AccordionContent>
         </AccordionPanel>
 
-        {/* Fields Required */}
         <AccordionPanel>
           <AccordionTitle className="text-xl font-semibold">Information You Need</AccordionTitle>
           <AccordionContent>
@@ -39,7 +122,6 @@ export default function Report() {
           </AccordionContent>
         </AccordionPanel>
 
-        {/* Best Practices */}
         <AccordionPanel>
           <AccordionTitle className="text-xl font-semibold">Tips for a Good Report</AccordionTitle>
           <AccordionContent>
@@ -52,7 +134,6 @@ export default function Report() {
           </AccordionContent>
         </AccordionPanel>
 
-        {/* What Happens Next */}
         <AccordionPanel>
           <AccordionTitle className="text-xl font-semibold">What Happens After You Submit?</AccordionTitle>
           <AccordionContent>
@@ -66,8 +147,56 @@ export default function Report() {
         </AccordionPanel>
       </Accordion>
 
-      {/* Create Report Form */}
-      <CreateReport />
+      {/* Upload Tabs */}
+      <div className="mt-12">
+        <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Upload or Preview a Report</h2>
+        <Tabs aria-label="Upload Tabs" variant="default" ref={tabsRef} onActiveTabChange={(tab) => setActiveTab(tab)}>
+          <TabItem active title="JSON Upload" icon={HiClipboardList}>
+            <input
+              type="file"
+              accept=".json"
+              onChange={(e) => handleFileUpload(e, 'json')}
+              className="mb-4 text-sm"
+            />
+            {fileReportData && (
+              <pre className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-xs overflow-x-auto">
+                {JSON.stringify(fileReportData, null, 2)}
+              </pre>
+            )}
+          </TabItem>
+
+          <TabItem title="CSV Upload" icon={MdDashboard}>
+            <input
+              type="file"
+              accept=".csv"
+              onChange={(e) => handleFileUpload(e, 'csv')}
+              className="mb-4 text-sm"
+            />
+            {fileReportData && (
+              <pre className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-xs overflow-x-auto">
+                {JSON.stringify(fileReportData, null, 2)}
+              </pre>
+            )}
+          </TabItem>
+
+          <TabItem title="Example Report" icon={HiUserCircle}>
+            <div className="my-6">
+              <label htmlFor="address" className="block text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">Address</label>
+              <input
+                type="text"
+                id="address"
+                ref={addressInputRef}
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-600 text-base text-gray-800 dark:text-gray-200 w-full"
+                placeholder="Enter the address of the incident"
+              />
+            </div>
+
+            <CreateReport address={address} />
+          </TabItem>
+        </Tabs>
+      </div>
     </div>
   );
 }

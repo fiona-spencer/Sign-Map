@@ -2,25 +2,25 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import CreateReport from './createReport';
-import ShowPins from './ShowPins'; // Import ShowPins component
+import ShowPins from './ShowPins';
 import { ReportDetailsCard } from './ReportDetailsCard';
 
 const GoogleMap = ({ apiKey, mapId = '42c8848d94ad7219', center = { lat: 43.7, lng: -79.42 }, zoom = 12 }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
-  const searchInputRef = useRef(null); // Reference for the search input
+  const searchInputRef = useRef(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [markersData, setMarkersData] = useState([]);
   const [markerPosition, setMarkerPosition] = useState(null);
   const [showCreateReportForm, setShowCreateReportForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
-  const [highlightedPin, setHighlightedPin] = useState(null);  // Track the highlighted pin
-  const [address, setAddress] = useState(''); // Store the selected address
+  const [highlightedPin, setHighlightedPin] = useState(null);
+  const [address, setAddress] = useState('');
+  const [placeholder, setPlaceholder] = useState('Search for a place');
 
   const navigate = useNavigate();
 
-  // Load Google Maps API
   useEffect(() => {
     const loadGoogleMapsScript = () => {
       if (document.querySelector('script[src^="https://maps.googleapis.com/maps/api/js"]')) return;
@@ -49,65 +49,58 @@ const GoogleMap = ({ apiKey, mapId = '42c8848d94ad7219', center = { lat: 43.7, l
     };
   }, [apiKey]);
 
-  // Initialize map and set up autocomplete
-const initMap = async () => {
-  if (!mapRef.current) return;
+  const initMap = async () => {
+    if (!mapRef.current) return;
 
-  try {
-    const { Map } = await google.maps.importLibrary('maps');
-    const { AdvancedMarkerElement } = await google.maps.importLibrary('marker');
+    try {
+      const { Map } = await google.maps.importLibrary('maps');
+      const { AdvancedMarkerElement } = await google.maps.importLibrary('marker');
 
-    const map = new Map(mapRef.current, { center, zoom, mapId });
-    mapInstanceRef.current = map;
+      const map = new Map(mapRef.current, { center, zoom, mapId });
+      mapInstanceRef.current = map;
 
-    // Setup the Autocomplete service
-    const autocomplete = new google.maps.places.Autocomplete(searchInputRef.current, {
-      fields: ['place_id', 'geometry', 'name'],
-      types: ['geocode'],
-    });
+      const autocomplete = new google.maps.places.Autocomplete(searchInputRef.current, {
+        fields: ['place_id', 'geometry', 'name'],
+        types: ['geocode'],
+      });
 
-    autocomplete.addListener('place_changed', () => {
-      const place = autocomplete.getPlace();
-      if (place.geometry) {
-        const newLat = place.geometry.location.lat();
-        const newLng = place.geometry.location.lng();
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        if (place.geometry) {
+          const newLat = place.geometry.location.lat();
+          const newLng = place.geometry.location.lng();
 
-        // Set the new marker position
-        setMarkerPosition(new google.maps.LatLng(newLat, newLng));
-
-        // Re-center the map and zoom in closer (you can adjust the zoom value to your preference)
-        map.setCenter({ lat: newLat, lng: newLng });
-        map.setZoom(16); // Adjust zoom level to 16 for a closer view
-
-        // Update the address in state
-        setAddress(place.name);
-      }
-    });
-
-    // Adding click listener for adding custom markers and zooming in closer
-    map.addListener('click', (e) => {
-      setMarkerPosition(e.latLng);
-      setShowCreateReportForm(true);
-
-      // Geocode the position to get the address
-      const geocoder = new google.maps.Geocoder();
-      geocoder.geocode({ location: e.latLng }, (results, status) => {
-        if (status === 'OK' && results[0]) {
-          setAddress(results[0].formatted_address);
+          setMarkerPosition(new google.maps.LatLng(newLat, newLng));
+          map.setCenter({ lat: newLat, lng: newLng });
+          map.setZoom(16);
+          setAddress(place.name);
         }
       });
 
-      // Zoom in closer (you can adjust this value to zoom in as needed)
-      map.setZoom(18);
-    });
-  } catch (error) {
-    console.error('Map initialization error:', error);
-  }
-};
+      map.addListener('click', (e) => {
+        setMarkerPosition(e.latLng);
+        setShowCreateReportForm(true);
 
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ location: e.latLng }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            setAddress(results[0].formatted_address);
+          }
+        });
 
+        map.setZoom(18);
 
-  // Submit new report
+        // Reset the search input and placeholder
+        if (searchInputRef.current) {
+          searchInputRef.current.value = '';
+          searchInputRef.current.placeholder = 'Search for a place';
+        }
+      });
+    } catch (error) {
+      console.error('Map initialization error:', error);
+    }
+  };
+
   const handleCreateMarker = async (reportData) => {
     setIsSubmitting(true);
 
@@ -144,6 +137,16 @@ const initMap = async () => {
     }
   };
 
+  const handleClearAddress = () => {
+    setAddress('');
+    setMarkerPosition(null);
+
+    if (searchInputRef.current) {
+      searchInputRef.current.value = '';
+      searchInputRef.current.placeholder = 'Search for a place';
+    }
+  };
+
   if (!isMapLoaded) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -161,10 +164,31 @@ const initMap = async () => {
         <input
           ref={searchInputRef}
           type="text"
-          placeholder="Search for a place"
+          placeholder={placeholder}
           className="p-2 border border-gray-300 rounded-md w-full"
         />
       </div>
+
+      {/* Button to Create Report */}
+      {address && !showCreateReportForm && (
+  <div className="p-4">
+    <div className="flex flex-wrap gap-4">
+      <button
+        onClick={() => setShowCreateReportForm(true)}
+        className="bg-blue-600 text-white px-6 py-2 rounded-2xl shadow-md hover:bg-blue-700 hover:scale-[1.02] transition-transform duration-200 ease-in-out focus:ring-2 focus:ring-blue-400"
+      >
+        Create Pin at {address}
+      </button>
+      <button
+        onClick={handleClearAddress}
+        className="bg-red-500 text-white px-6 py-2 rounded-2xl shadow-md hover:bg-red-600 hover:scale-[1.02] transition-transform duration-200 ease-in-out focus:ring-2 focus:ring-red-400"
+      >
+        Clear Address
+      </button>
+    </div>
+  </div>
+)}
+
 
       {/* Overlay and Create Report Form */}
       {showCreateReportForm && (
@@ -174,6 +198,7 @@ const initMap = async () => {
             <div>
               <CreateReport
                 position={markerPosition}
+                address={address}
                 onClose={() => setShowCreateReportForm(false)}
                 onSubmit={handleCreateMarker}
                 isSubmitting={isSubmitting}
@@ -188,18 +213,16 @@ const initMap = async () => {
         markersData={markersData}
         mapInstanceRef={mapInstanceRef}
         highlightedPin={highlightedPin}
-        setHighlightedPin={setHighlightedPin}  // Pass state and setter to ShowPins
-        onSelectPin={(pin) => setSelectedReport(pin)} // Update this line
+        setHighlightedPin={setHighlightedPin}
+        onSelectPin={(pin) => setSelectedReport(pin)}
       />
-
 
       {/* Map */}
       <div id="map" ref={mapRef} className="w-full h-[500px]"></div>
 
+      {/* Report Details */}
       <div className="mt-4 p-4 border-t border-gray-300 bg-white dark:bg-gray-800 dark:text-white">
-        
-        <ReportDetailsCard selectedReport={selectedReport}/>
-
+        <ReportDetailsCard selectedReport={selectedReport} />
       </div>
     </div>
   );
