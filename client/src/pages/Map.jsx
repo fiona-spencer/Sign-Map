@@ -22,7 +22,7 @@ export default function Map({ mapState, apiKey, pins }) {
   if (!isReady) return <div>Loading map...</div>;
 
   return (
-    <div className=' bg-[#29a37277] dark:bg-gray-800'>
+    <div className=' bg-transparent dark:bg-gray-800'>
       <GoogleMap apiKey={apiKey} filteredPins={pins} />
     </div>
   );

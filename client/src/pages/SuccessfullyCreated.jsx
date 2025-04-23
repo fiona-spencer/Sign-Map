@@ -12,7 +12,7 @@ export default function SuccessfullyCreated() {
         <FaCheckCircle className="text-green-500 text-5xl mb-4" />
         <h2 className="text-2xl font-semibold mb-2">Report Submitted Successfully!</h2>
         <p className="text-gray-600 mb-6">Thank you for your contribution. Your report has been created and will be reviewed shortly.</p>
-        <Button gradientDuoTone="greenToBlue" onClick={() => navigate('/map')}>
+        <Button gradientDuoTone="greenToBlue" onClick={() => navigate('/datasheets')}>
           Back to Map
         </Button>
       </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Tooltip } from 'flowbite-react';
 import Map from './Map';
-import defaultPinImage from '../assets/default_pin_image.png'
+import defaultPinImage from '../assets/default_pin_image.png';
 
 export default function Datasheet({ apiKey, mapState }) {
   const [pins, setPins] = useState([]);
@@ -74,6 +74,10 @@ export default function Datasheet({ apiKey, mapState }) {
     setFilterUsername('');
     setFilterStreetName('');
     setFilterDate('');
+  };
+
+  const handleShowAllPins = () => {
+    setFilteredPins(pins); // Reset the filters and show all the pins
   };
 
   const getStatusClass = (status) => {
@@ -156,6 +160,13 @@ export default function Datasheet({ apiKey, mapState }) {
             className="w-full md:w-auto text-xs py-2 px-4 bg-red-500 text-white hover:bg-red-600"
           >
             Reset Filters
+          </Button>
+          {/* Show All Pins Button */}
+          <Button
+            onClick={handleShowAllPins}
+            className="w-full md:w-auto text-xs py-2 px-4 bg-green-500 text-white hover:bg-green-600"
+          >
+            Show All Pins
           </Button>
         </div>
       </div>

@@ -14,43 +14,31 @@ const departmentColors = {
   'default': 'bg-blue-500',
 };
 
-const ShowPins = ({ pins: propPins = null, filteredPins, mapInstanceRef, onSelectPin }) => {
+const ShowPins = ({ pins: propPins = null, mapInstanceRef, onSelectPin }) => {
   const [pins, setPins] = useState([]);
   const [highlightedPin, setHighlightedPin] = useState(null);  // Track the highlighted pin
-  const [markers, setMarkers] = useState([]);  // Track the markers on the map
 
   // Log the propPins to the console
   console.log('Prop Pins:', propPins);  // Log the passed pins prop
 
-  // Update pins when propPins changes
   useEffect(() => {
+    // Use propPins directly if they are passed as a prop
     if (propPins && Array.isArray(propPins)) {
       setPins(propPins);
     }
-  }, [propPins]);
+  }, [propPins]);  // Re-run this effect when propPins changes
 
-  // Effect to reset the markers whenever filteredPins or pins changes
-  useEffect(() => {
-    if (mapInstanceRef.current && markers.length > 0) {
-      // Clear existing markers from the map
-      markers.forEach(marker => {
-        marker.setMap(null);  // Remove each marker from the map
-      });
-      setMarkers([]);  // Clear the markers state
-    }
-  }, [filteredPins, pins]);  // Trigger this effect when filteredPins or pins changes
-
-  // Create new markers when pins change
   useEffect(() => {
     if (!mapInstanceRef.current || pins.length === 0 || !window.google) return;
 
-    const newMarkers = pins.map(pin => {
-      const position = { lat: pin.location.lat, lng: pin.location.lng };
-      return createMarker(mapInstanceRef.current, position, pin);
-    });
+    pins.forEach(pin => {
+      // Log the lat and lng of each pin
+      console.log('Pin Lat:', pin.location.lat, 'Pin Lng:', pin.location.lng);
 
-    setMarkers(newMarkers); // Store the newly created markers
-  }, [pins, mapInstanceRef]);  // Re-run this effect when pins or mapInstanceRef changes
+      const position = { lat: pin.location.lat, lng: pin.location.lng };
+      createMarker(mapInstanceRef.current, position, pin);
+    });
+  }, [pins, mapInstanceRef]);
 
   // Function to get the status class for the marker
   const getStatusClass = (status) => {

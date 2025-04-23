@@ -78,7 +78,7 @@ const GoogleMap = ({
 
           setMarkerPosition(new google.maps.LatLng(newLat, newLng));
           map.setCenter({ lat: newLat, lng: newLng });
-          map.setZoom(16);
+          map.setZoom(13);
           setAddress(place.name);
         }
       });
@@ -144,12 +144,75 @@ const GoogleMap = ({
   const handleClearAddress = () => {
     setAddress('');
     setMarkerPosition(null);
-
+  
     if (searchInputRef.current) {
       searchInputRef.current.value = '';
       searchInputRef.current.placeholder = 'Search for a place';
     }
+  
+    // Zoom out when clearing the address
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.setZoom(zoom); // Default zoom level or you can set a custom level here
+      mapInstanceRef.current.setCenter(center); // Reset map center to default
+    }
   };
+
+  const fitBoundsToPins = () => {
+    if (!mapInstanceRef.current) {
+      console.log('Map instance is not available');
+      return;
+    }
+  
+    if (!filteredPins || !Array.isArray(filteredPins) || filteredPins.length === 0) {
+      console.log('No pins available or filteredPins is not an array');
+      return;
+    }
+  
+    const bounds = new google.maps.LatLngBounds();
+  
+    // Loop through all filtered pins and extend the bounds to include each pin's location
+    filteredPins.forEach((pin, index) => {
+      if (pin.location && pin.location.lat && pin.location.lng) {
+        console.log(`Pin ${index}:`, pin.location);
+        bounds.extend(new google.maps.LatLng(pin.location.lat, pin.location.lng));
+      } else {
+        console.log(`Pin ${index} does not have valid position data:`, pin);
+      }
+    });
+  
+    // Adjust the map's viewport to the bounds of all pins
+    if (bounds.isEmpty()) {
+      console.log('Bounds are empty, nothing to fit');
+      return;
+    }
+  
+    console.log('Fitting map to bounds...');
+  
+    // Set padding for the bounds to avoid zooming in too much
+    const padding = 50; // Adjust as needed
+  
+    // Fit the bounds with padding
+    const map = mapInstanceRef.current;
+    map.fitBounds(bounds, padding);
+  
+    // After fitting bounds, check the zoom level and set a minimum zoom level if needed
+    const currentZoom = map.getZoom();
+    const minimumZoom = 12; // Set the minimum zoom level you want
+  
+    // If there's only one pin, set the zoom level to the minimum zoom level
+    if (filteredPins.length === 1 && currentZoom < minimumZoom) {
+      map.setZoom(minimumZoom);
+    }
+  };
+  
+  
+  
+
+  useEffect(() => {
+    if (isMapLoaded) {
+      fitBoundsToPins();
+    }
+  }, [filteredPins, isMapLoaded]);
 
   if (!isMapLoaded) {
     return (
@@ -213,13 +276,12 @@ const GoogleMap = ({
 
       {/* Show Pins */}
       <ShowPins
-  pins={filteredPins} // ← pass filtered pins here
-  mapInstanceRef={mapInstanceRef}
-  highlightedPin={highlightedPin}
-  setHighlightedPin={setHighlightedPin}
-  onSelectPin={(pin) => setSelectedReport(pin)}
-/>
-
+        pins={filteredPins} // ← pass filtered pins here
+        mapInstanceRef={mapInstanceRef}
+        highlightedPin={highlightedPin}
+        setHighlightedPin={setHighlightedPin}
+        onSelectPin={(pin) => setSelectedReport(pin)}
+      />
 
       {/* Map */}
       <div id="map" ref={mapRef} className="w-full h-[500px] rounded-lg"></div>

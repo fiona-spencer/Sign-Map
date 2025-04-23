@@ -90,7 +90,7 @@ export default function Report() {
   };
 
   return (
-    <div className="bg-[#d1cfcd] dark:bg-[#1d1d22] p-6 px-8 min-h-screen">
+    <div className="bg-[#a6a6a680] dark:bg-[#1d1d22] p-6 px-8 min-h-screen">
       {/* Accordion */}
       <Accordion className="mb-8 text-lg">
         <AccordionPanel>
