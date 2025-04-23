@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { Card, Label, TextInput, Button, Modal } from 'flowbite-react';
-import { useState } from 'react';
+import { Card, Label, TextInput, Button, Modal, Alert } from 'flowbite-react';
+import { useEffect, useRef, useState } from 'react';
 import {
   updateStart,
   updateSuccess,
@@ -8,46 +8,98 @@ import {
   deleteUserStart,
   deleteUserSuccess,
   deleteUserFailure,
-  signoutSuccess,
 } from '../redux/user/userSlice';
 import { useNavigate } from 'react-router-dom';
+import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
+import { app } from '../firebase';
+import { CircularProgressbar } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css'
 
 export default function Profile() {
   const { currentUser } = useSelector((state) => state.user);
   const { theme } = useSelector((state) => state.theme);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const filePickerRef = useRef();
 
   const [editMode, setEditMode] = useState(false);
   const [username, setUsername] = useState(currentUser?.username || '');
   const [email, setEmail] = useState(currentUser?.email || '');
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imageFileUrl, setImageFileUrl] = useState(null);
+  const [imageFileUploadingProgress, setImageFileUploadProgress] = useState(null);
+  const [imageFileUploadError, setImageFileUploadError] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImageFileUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const uploadImage = () => {
+    if (!imageFile) return;
+
+    setImageFileUploadError(null);
+    const storage = getStorage(app);
+    const fileName = new Date().getTime() + imageFile.name;
+    const storageRef = ref(storage, fileName);
+    const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setImageFileUploadProgress(progress.toFixed(0));
+      },
+      (error) => {
+        setImageFileUploadError('Could not upload image (File must be less than 2MB)');
+        setImageFileUploadProgress(null);
+        setImageFile(null);
+        setImageFileUrl(null);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setImageFileUrl(downloadURL);
+          setImageFileUploadError(null);
+        });
+      }
+    );
+  };
+
+  useEffect(() => {
+    if (imageFile) {
+      uploadImage();
+    }
+  }, [imageFile]);
 
   const handleSave = async () => {
     if (username === currentUser.username && email === currentUser.email) {
       setEditMode(false);
       return;
     }
-  
+
     dispatch(updateStart());
-  
+
     try {
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // Include cookies if needed
-        body: JSON.stringify({ username, email }),
+        credentials: 'include',
+        body: JSON.stringify({ username, email, profilePicture: imageFileUrl }),
       });
-  
+
       const data = await res.json();
-  
+
       if (!res.ok) {
         throw new Error(data.message || 'Update failed');
       }
-  
+
       dispatch(updateSuccess(data));
       setEditMode(false);
     } catch (err) {
@@ -97,18 +149,50 @@ export default function Profile() {
       </h1>
 
       <Card className="max-w-3xl mx-auto bg-white dark:bg-gray-800 shadow-lg p-8">
-        {/* Avatar + Info */}
+        {/* Avatar Upload */}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          ref={filePickerRef}
+          className="hidden"
+        />
         <div className="flex flex-col items-center space-y-4 mb-8">
-          <img
-            src={currentUser.profilePicture || '/default-avatar.png'}
-            alt="User Avatar"
-            className="w-40 h-40 rounded-full border-4 border-green-500 shadow-md object-cover"
-          />
+        <div className="relative w-40 h-40">
+  <img
+    src={imageFileUrl || currentUser.profilePicture || '/default-avatar.png'}
+    alt="User Avatar"
+    className="w-40 h-40 rounded-full border-4 border-green-500 shadow-md object-cover hover:border-gray-400  hover:border-8 cursor-pointer "
+    onClick={() => filePickerRef.current.click()}
+  />
+
+{imageFileUploadingProgress && imageFileUploadingProgress < 100 && (
+  <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+    <CircularProgressbar
+      value={imageFileUploadingProgress}
+      text={`${imageFileUploadingProgress}%`}
+      strokeWidth={5}
+      styles={{
+        root: { width: '100%', height: '100%' },
+        path: { stroke: '#10B981' },
+        text: { fill: '#10B981', fontSize: '1.5rem' },
+      }}
+    />
+  </div>
+)}
+
+</div>
+
+
+
           <div className="text-center">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               {currentUser.username}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{currentUser.userType}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 p-2">{currentUser.userType}</p>
+            {imageFileUploadError && (
+              <Alert color="failure" className="text-xs">{imageFileUploadError}</Alert>
+            )}
           </div>
         </div>
 
@@ -161,6 +245,7 @@ export default function Profile() {
                 onClick={() => {
                   setUsername(currentUser.username);
                   setEmail(currentUser.email);
+                  setImageFileUrl(currentUser.profilePicture || '');
                   setEditMode(false);
                 }}
               >
@@ -200,6 +285,9 @@ export default function Profile() {
           </div>
         </Modal.Body>
       </Modal>
+
+
     </div>
+
   );
 }
