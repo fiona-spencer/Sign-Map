@@ -1,15 +1,27 @@
 import { useState, useEffect } from 'react';
 import { Card } from 'flowbite-react';
 
+// Helper for status color styling
+const getStatusClass = (status) => {
+  switch (status) {
+    case 'pending': return 'bg-yellow-200 text-yellow-700';
+    case 'accepted': return 'bg-blue-100 text-blue-700';
+    case 'in-progress': return 'bg-orange-100 text-orange-700';
+    case 'resolved': return 'bg-green-100 text-green-700';
+    case 'deleted': return 'bg-red-100 text-red-700';
+    default: return 'bg-gray-100 text-gray-700';
+  }
+};
+
 export default function AllPins() {
-  const [pins, setPins] = useState([]);  // State to store fetched pins
-  const [loading, setLoading] = useState(true);  // Loading state for fetch
-  const [error, setError] = useState(null);  // Error state
+  const [pins, setPins] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchPins = async () => {
       try {
-        const response = await fetch('/api/pin/getPins'); // API call to backend
+        const response = await fetch('/api/pin/getPins');
         if (response.ok) {
           const data = await response.json();
           setPins(data);
@@ -23,89 +35,99 @@ export default function AllPins() {
       }
     };
 
-    fetchPins();  // Call to fetch pins when component mounts
-  }, []); // Empty dependency array ensures this runs only once after initial render
+    fetchPins();
+  }, []);
 
-  // Function to convert HTML to plain text
   const getPlainTextFromHTML = (html) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
     return doc.body.textContent || "";
   };
 
-  // Show loading state
-  if (loading) {
-    return <div className="text-center mt-2 text-gray-700">Loading pins...</div>;
-  }
-
-  // Show error state
-  if (error) {
-    return <div className="text-center mt-2 text-red-500 dark:text-red-400">{error}</div>;
-  }
-
-  // Show message if no pins are available
-  if (!pins || pins.length === 0) {
-    return <div className="text-center mt-2 text-red-500 dark:text-red-400">No pins available.</div>;
-  }
+  if (loading) return <div className="text-center mt-2 text-gray-700">Loading pins...</div>;
+  if (error) return <div className="text-center mt-2 text-red-500 dark:text-red-400">{error}</div>;
+  if (!pins || pins.length === 0) return <div className="text-center mt-2 text-red-500 dark:text-red-400">No pins available.</div>;
 
   return (
-    <div className="flex flex-col justify-start max-w-screen-lg mx-auto">
-      {pins.map((pin) => {
-        // Convert description HTML to plain text
-        const plainTextDescription = getPlainTextFromHTML(pin.location.info.description || "");
-        
-        return (
-          <Card 
-            key={pin._id} 
-            className="w-[78%] mx-auto my-1 shadow-sm hover:border-[#419d71c2] hover:border-4 dark:hover:bg-gray-700 transition-all duration-100"
-          >
-            {/* Title and Status */}
-            <div className="flex justify-between items-start mb-1">
-              <div>
-                <h5 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">
-                  {pin.location.info.title || "No Title"}
-                </h5>
-                <p className="text-xs font-medium text-blue-600 dark:text-blue-300">
-                  Status: {pin.location.status || "Unknown"}
-                </p>
-              </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-w-screen-xl mx-auto p-8 gap-9">
+  {pins.map((pin) => {
+    const description = getPlainTextFromHTML(pin.location?.info?.description || "");
+    const status = pin.location?.status || "Unknown";
+    const statusClass = getStatusClass(status);
+    const imageUrl = pin.location?.info?.image || '/default-image.png';
 
-              {/* User Info - Positioned at the top right */}
-              <div className="text-right">
-                <p className="text-xs font-semibold text-gray-900 dark:text-white">
-                  {pin.createdBy?.username || "N/A"}
-                </p>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  {pin.createdBy?.userType || "N/A"}
-                </p>
-              </div>
-            </div>
+    return (
+      <Card
+        key={pin._id}
+        className="w-full shadow-md hover:border-[#419d71c2] hover:border-4 dark:hover:bg-gray-700 transition-all duration-50"
+      >
+       <div className="flex flex-col space-y-2">
+  {/* Title Row */}
+  <div className="flex items-center justify-between">
+    {/* Contact Name */}
+    <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+      {pin.location?.info?.contactName || "No Title"}
+    </h2>
 
-            {/* Description */}
-            <div className="p-1 border-t border-gray-300 bg-white dark:bg-gray-800 dark:text-white">
-              <div>
-                <label className="block text-xs font-medium mb-1">Description:</label>
-                <textarea
-                  readOnly
-                  value={plainTextDescription || "No description available"}
-                  className="w-full h-12 p-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded resize-none "
-                />
-              </div>
-
-              {/* Location Address */}
-              <p className="text-xs"><strong>Location:</strong> {pin.location.address || "No address available"}</p>
-
-              {/* Date of Incident */}
-              <p className="text-xs"><strong>Date Created:</strong> {new Date(pin.createdAt).toLocaleDateString()}</p>
-
-              {/* Phone Number */}
-              {pin.phoneNumber && (
-                <p className="text-xs"><strong>Phone Number:</strong> {pin.phoneNumber}</p>
-              )}
-            </div>
-          </Card>
-        );
-      })}
+    {/* Created By Section */}
+    <div className="text-xs text-right text-gray-600 dark:text-gray-300 ml-4">
+      <p className="font-semibold text-gray-900 dark:text-white">
+        {pin.createdBy?.username || "N/A"}
+      </p>
+      <p>{pin.createdBy?.userType || "N/A"}</p>
     </div>
+  </div>
+
+  {/* Status Badge */}
+  <div className={`mt-1 inline-block px-2 py-0.5 rounded text-xs font-semibold ${statusClass}`}>
+    {status.charAt(0).toUpperCase() + status.slice(1)}
+
+            {/* User Info */}
+          </div>
+
+          {/* Horizontal Line */}
+          <hr className="border-t border-gray-300 dark:border-gray-600" />
+
+          
+
+          {/* Contact Info */}
+          <div className="text-xs">
+            <p><strong>Contact:</strong> {pin.location?.info?.contactName || "N/A"}</p>
+            <p><strong>Email:</strong> {pin.location?.info?.contactEmail || "N/A"}</p>
+            <p><strong>Phone:</strong> {pin.location?.info?.contactPhoneNumber || "N/A"}</p>
+          </div>
+
+          {/* Address */}
+          <p className="text-xs"><strong>Location:</strong> {pin.location?.address || "No address available"}</p>
+
+          {/* Description */}
+          <div>
+            <label className="block text-xs font-semibold mb-0.5">Description:</label>
+            <textarea
+              readOnly
+              value={description || "No description available"}
+              className="w-full h-20 p-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded resize-none"
+            />
+          </div>
+
+          {/* Image Preview */}
+          <div className="mt-1">
+            <img
+              src={imageUrl}
+              alt="Report"
+              className="w-24 h-24 object-cover rounded border border-gray-200 dark:border-gray-600"
+            />
+          </div>
+
+          {/* Created Date */}
+          <p className="text-[10px] text-gray-500">
+            Created on: {new Date(pin.createdAt).toLocaleDateString()}
+          </p>
+        </div>
+      </Card>
+    );
+  })}
+</div>
+
   );
 }

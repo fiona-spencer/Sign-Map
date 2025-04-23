@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Tooltip } from 'flowbite-react';
+import { Button, Tooltip, Modal } from 'flowbite-react';
 import Map from './Map';
 import defaultPinImage from '../assets/default_pin_image.png';
 
@@ -16,6 +16,7 @@ export default function Datasheet({ apiKey, mapState }) {
   const [filteredPins, setFilteredPins] = useState([]);
   const [uniqueCities, setUniqueCities] = useState([]);
   const [uniqueStatuses, setUniqueStatuses] = useState([]);
+  const [showIntroModal, setShowIntroModal] = useState(true); // Modal visibility
 
   const statusOptions = ['pending', 'accepted', 'in-progress', 'resolved', 'deleted'];
 
@@ -28,6 +29,7 @@ export default function Datasheet({ apiKey, mapState }) {
         setPins(data);
         setFilteredPins(data);
 
+        // Extract unique cities and statuses from the data
         const cities = Array.from(new Set(data.map(pin => pin.location.address.split(',')[1]?.trim())));
         const statuses = Array.from(new Set(data.map(pin => pin.location.status)));
         setUniqueCities(cities);
@@ -77,7 +79,7 @@ export default function Datasheet({ apiKey, mapState }) {
   };
 
   const handleShowAllPins = () => {
-    setFilteredPins(pins); // Reset the filters and show all the pins
+    setFilteredPins(pins);
   };
 
   const getStatusClass = (status) => {
@@ -96,77 +98,53 @@ export default function Datasheet({ apiKey, mapState }) {
     return date.toLocaleDateString('en-US');
   };
 
+  const getImage = (pin) => {
+    return pin.location.info.image || defaultPinImage;
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  const getImage = (pin) => {
-    return pin.location.info.image || defaultPinImage;  // Provide the path to your default image
-  };
-
   return (
     <div className="w-full overflow-x-auto p-6 bg-[#267b6684] dark:bg-gray-800">
+      <Modal show={showIntroModal} onClose={() => setShowIntroModal(false)} size="md" popup>
+        <Modal.Body>
+          <div className="text-center">
+            <h3 className="m-5 text-lg font-semibold text-gray-900 dark:text-white">
+              View all reported pins on the map?
+            </h3>
+            <div className="flex justify-center mt-6">
+              <Button
+                color="success"
+                onClick={() => {
+                  handleShowAllPins();
+                  setShowIntroModal(false);
+                }}
+              >
+                Show All Pins
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
+
       {/* Filter Section */}
       <div className="mb-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-300 dark:border-gray-600">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {/* Status Dropdown */}
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="p-2 border rounded"
-          >
+          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="p-2 border rounded">
             <option value="">Select Status</option>
             {statusOptions.map((status) => (
               <option key={status} value={status}>{status}</option>
             ))}
           </select>
 
-          {/* Other Filters */}
-          <input
-            type="text"
-            placeholder="City"
-            value={filterCity}
-            onChange={(e) => setFilterCity(e.target.value)}
-            className="p-2 border rounded"
-          />
-          <input
-            type="text"
-            placeholder="Province"
-            value={filterProvince}
-            onChange={(e) => setFilterProvince(e.target.value)}
-            className="p-2 border rounded"
-          />
-          <input
-            type="text"
-            placeholder="Address"
-            value={filterStreetName}
-            onChange={(e) => setFilterStreetName(e.target.value)}
-            className="p-2 border rounded"
-          />
-          <input
-            type="text"
-            placeholder="Username"
-            value={filterUsername}
-            onChange={(e) => setFilterUsername(e.target.value)}
-            className="p-2 border rounded"
-          />
-          <input
-            type="date"
-            value={filterDate}
-            onChange={(e) => setFilterDate(e.target.value)}
-            className="p-2 border rounded"
-          />
-          <Button
-            onClick={handleResetFilters}
-            className="w-full md:w-auto text-xs py-2 px-4 bg-red-500 text-white hover:bg-red-600"
-          >
+          <input type="text" placeholder="City" value={filterCity} onChange={(e) => setFilterCity(e.target.value)} className="p-2 border rounded" />
+          <input type="text" placeholder="Province" value={filterProvince} onChange={(e) => setFilterProvince(e.target.value)} className="p-2 border rounded" />
+          <input type="text" placeholder="Address" value={filterStreetName} onChange={(e) => setFilterStreetName(e.target.value)} className="p-2 border rounded" />
+          <input type="text" placeholder="Username" value={filterUsername} onChange={(e) => setFilterUsername(e.target.value)} className="p-2 border rounded" />
+          <input type="date" value={filterDate} onChange={(e) => setFilterDate(e.target.value)} className="p-2 border rounded" />
+          <Button onClick={handleResetFilters} className="w-full md:w-auto text-xs py-2 px-4 bg-red-500 text-white hover:bg-red-600">
             Reset Filters
-          </Button>
-          {/* Show All Pins Button */}
-          <Button
-            onClick={handleShowAllPins}
-            className="w-full md:w-auto text-xs py-2 px-4 bg-green-500 text-white hover:bg-green-600"
-          >
-            Show All Pins
           </Button>
         </div>
       </div>
@@ -176,68 +154,38 @@ export default function Datasheet({ apiKey, mapState }) {
         <table className="min-w-full table-auto border-collapse">
           <thead>
             <tr className="bg-gray-100 dark:bg-gray-600">
-              <th className="px-4 py-2 border text-xs dark:text-gray-300">Pin ID</th>
-              <th className="px-4 py-2 border text-xs dark:text-gray-300">Username</th>
-              <th className="px-4 py-2 border text-xs dark:text-gray-300">Phone Number</th>
-              <th className="px-4 py-2 border text-xs dark:text-gray-300">Address</th>
-              <th className="px-4 py-2 border text-xs dark:text-gray-300">Title</th>
-              <th className="px-4 py-2 border text-xs dark:text-gray-300">Icon</th>
-              <th className="px-4 py-2 border text-xs dark:text-gray-300">Image</th>
-              <th className="px-4 py-2 border text-xs dark:text-gray-300">Status</th>
-              <th className="px-4 py-2 border text-xs dark:text-gray-300">Created At</th>
-              <th className="px-4 py-2 border text-xs dark:text-gray-300">Updated At</th>
-              <th className="px-4 py-2 border text-xs dark:text-gray-300">History</th>
+              <th className="px-2 py-1 border text-xs dark:text-gray-300">Created By</th>
+              <th className="px-2 py-1 border text-xs dark:text-gray-300">Created At</th>
+              <th className="px-2 py-1 border text-xs dark:text-gray-300">Populus ID</th>
+              <th className="px-2 py-1 border text-xs dark:text-gray-300">Contact Name</th>
+              <th className="px-2 py-1 border text-xs dark:text-gray-300">Contact Email</th>
+              <th className="px-2 py-1 border text-xs dark:text-gray-300">Contact Phone</th>
+              <th className="px-2 py-1 border text-xs dark:text-gray-300">Address</th>
+              <th className="px-2 py-1 border text-xs dark:text-gray-300">Status</th>
+              <th className="px-2 py-1 border text-xs dark:text-gray-300">Image</th>
+              <th className="px-2 py-1 border text-xs dark:text-gray-300">File Name</th>
+              <th className="px-2 py-1 border text-xs dark:text-gray-300">History</th>
             </tr>
           </thead>
           <tbody>
             {filteredPins.map((pin, index) => (
               <tr key={pin._id || index} className="hover:bg-gray-100 dark:hover:bg-gray-600">
-                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
-                  <Tooltip content={pin._id} placement="top">
-                    <span className="truncate max-w-[100px] inline-block align-bottom cursor-pointer text-blue-500">
-                      {pin._id.slice(0, 6)}...
-                    </span>
-                  </Tooltip>
-                </td>
-                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
-                  {pin.createdBy?.username || 'N/A'}
-                </td>
-                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
-                  {pin.phoneNumber || 'N/A'}
-                </td>
-                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
-                  {pin.location.address}
-                </td>
-                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
-                  {pin.location.info.title}
-                </td>
-                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
-                  {pin.location.info.icon}
-                </td>
-                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
-                  <img
-                    src={getImage(pin)}
-                    alt="Pin"
-                    className="w-12 h-12 object-cover"
-                  />
-                </td>
-                <td className={`px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600 ${getStatusClass(pin.location.status)}`}>
+                <td className="px-2 py-1 border text-xs font-bold bg-green-300 dark:bg-[#a72929]">{pin.createdBy?.username || 'N/A'}</td>
+                <td className="px-2 py-1 border text-xs font-bold bg-green-200 dark:bg-red-400">{formatDate(pin.createdAt)}</td>
+                <td className="px-2 py-1 border text-xs">{pin.location.info.populusId || 'N/A'}</td>
+                <td className="px-2 py-1 border text-xs">{pin.location.info.contactName || 'N/A'}</td>
+                <td className="px-2 py-1 border text-xs">{pin.location.info.contactEmail || 'N/A'}</td>
+                <td className="px-2 py-1 border text-xs">{pin.location.info.contactPhoneNumber || 'N/A'}</td>
+                <td className="px-2 py-1 border text-xs">{pin.location.address}</td>
+                <td className={`px-2 py-1 border text-xs ${getStatusClass(pin.location.status)}`}>
                   {pin.location.status}
                 </td>
-                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
-                  {formatDate(pin.createdAt)}
+                <td className="px-2 py-1 border text-xs">
+                  <img src={getImage(pin)} alt="Pin" className="w-12 h-12 object-cover" />
                 </td>
-                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
-                  {formatDate(pin.updatedAt)}
-                </td>
-                {/* New History Column */}
-                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
-                  <a
-                    href={`/history/${pin._id}`} // Adjust this URL to your actual history route
-                    className="text-blue-500 hover:underline"
-                  >
-                    View History
-                  </a>
+                <td className="px-2 py-1 border text-xs">{pin.location.info.fileName}</td>
+                <td className="px-2 py-1 border text-xs">
+                  <a href={`/history/${pin._id}`} className="text-blue-500 hover:underline">View History</a>
                 </td>
               </tr>
             ))}

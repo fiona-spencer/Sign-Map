@@ -7,6 +7,9 @@ import { HiUserCircle } from 'react-icons/hi';
 // Assuming `json_upload` and `csv_upload` are actual components, otherwise replace them with the appropriate handling logic
 import JsonUpload from '../components/json_upload'; 
 import CsvUpload from '../components/csv_upload';
+import FileUploadPreview from '../components/FileUploadPreview';
+import ExcelUpload from '../components/ExcelUpload';
+
 
 export default function Report() {
   const [address, setAddress] = useState('');
@@ -67,140 +70,146 @@ export default function Report() {
   const handleFileUpload = async (e, type) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    const text = await file.text();
-
-    try {
-      if (type === 'json') {
-        const data = JSON.parse(text);
-        setFileReportData(data);
-      } else if (type === 'csv') {
-        const rows = text.split('\n').map(row => row.split(','));
-        const headers = rows.shift();
-        const data = rows.map(row =>
-          Object.fromEntries(row.map((cell, idx) => [headers?.[idx], cell]))
-        );
-        setFileReportData(data);
+  
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result;
+      try {
+        if (type === 'json') {
+          const data = JSON.parse(content);
+          setFileReportData(data);
+        } else if (type === 'csv') {
+          const rows = content.split('\n').map(row => row.split(','));
+          const headers = rows.shift();
+          const data = rows.map(row =>
+            Object.fromEntries(row.map((cell, idx) => [headers?.[idx], cell]))
+          );
+          setFileReportData(data);
+        } else if (type === 'excel') {
+          const workbook = XLSX.read(content, { type: 'binary' });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = XLSX.utils.sheet_to_json(sheet);
+          setFileReportData(jsonData);
+        }
+        setError('');
+      } catch (err) {
+        setError('Invalid file format. Please upload a valid JSON, CSV, or Excel file.');
+        setFileReportData(null);
       }
-      setError(''); // Clear any previous error
-    } catch (err) {
-      setError('Invalid file format. Please upload a valid JSON or CSV file.');
-      setFileReportData(null); // Clear file data
+    };
+  
+    if (type === 'excel') {
+      reader.readAsBinaryString(file);
+    } else {
+      reader.readAsText(file);
     }
   };
+  
 
   return (
-    <div className="bg-[#a6a6a680] dark:bg-[#1d1d22] p-6 px-8 min-h-screen">
+    <div className="bg-[#ebe8e8ea] dark:bg-[#1d1d22] p-6 px-8 min-h-screen">
       {/* Accordion */}
-      <Accordion className="mb-8 text-lg">
-        <AccordionPanel>
-          <AccordionTitle className="text-xl font-semibold">Why Create a Report?</AccordionTitle>
-          <AccordionContent>
-            <p className="text-base text-gray-700 dark:text-gray-300">
-              Submitting a report helps local authorities respond faster to public safety issues, infrastructure problems, or disturbances in your area.
-            </p>
-          </AccordionContent>
-        </AccordionPanel>
+      <Accordion className="mb-8 text-lg bg-white dark:bg-[#1d1d22]">
+  <AccordionPanel>
+    <AccordionTitle className="text-xl font-semibold bg-green-500 text-white dark:text-white hover:bg-slate-800 rounded-md px-4 py-2">
+      Why Create a Report?
+    </AccordionTitle>
+    <AccordionContent>
+      <p className="dark:text-gray-300">
+        Submitting a report helps local authorities respond faster to public safety issues, infrastructure problems, or disturbances in your area.
+      </p>
+    </AccordionContent>
+  </AccordionPanel>
 
-        <AccordionPanel>
-          <AccordionTitle className="text-xl font-semibold">Information You Need</AccordionTitle>
-          <AccordionContent>
-            <ul className="list-disc pl-5 text-gray-700 dark:text-gray-300 text-base space-y-2">
-              <li><strong>Address:</strong> Exact location of the incident.</li>
-              <li><strong>Full Name:</strong> For contact and follow-up.</li>
-              <li><strong>Email:</strong> For status updates and confirmation.</li>
-              <li><strong>Phone Number:</strong> Optional, but helpful for urgent matters.</li>
-              <li><strong>Date of Incident:</strong> When it happened.</li>
-              <li><strong>Title:</strong> A short headline of the issue.</li>
-              <li><strong>Description:</strong> Full details, including context.</li>
-              <li><strong>Verification:</strong> A checkbox to confirm accuracy.</li>
-            </ul>
-          </AccordionContent>
-        </AccordionPanel>
+  <AccordionPanel>
+    <AccordionTitle className="text-xl font-semibold bg-green-500 text-white dark:text-white hover:bg-slate-800 rounded-md px-4 py-2">
+      Information You Need
+    </AccordionTitle>
+    <AccordionContent>
+      <ul className="list-disc pl-5 text-gray-700 dark:text-gray-300 text-base space-y-2">
+        <li><strong>Address:</strong> Exact location of the incident.</li>
+        <li><strong>Full Name:</strong> For contact and follow-up.</li>
+        <li><strong>Email:</strong> For status updates and confirmation.</li>
+        <li><strong>Phone Number:</strong> Optional, but helpful for urgent matters.</li>
+        <li><strong>Date of Incident:</strong> When it happened.</li>
+        <li><strong>Title:</strong> A short headline of the issue.</li>
+        <li><strong>Description:</strong> Full details, including context.</li>
+        <li><strong>Verification:</strong> A checkbox to confirm accuracy.</li>
+      </ul>
+    </AccordionContent>
+  </AccordionPanel>
 
-        <AccordionPanel>
-          <AccordionTitle className="text-xl font-semibold">Tips for a Good Report</AccordionTitle>
-          <AccordionContent>
-            <ul className="list-disc pl-5 text-gray-700 dark:text-gray-300 text-base space-y-2">
-              <li>Be as detailed as possible in the description.</li>
-              <li>Include specific times or events if applicable.</li>
-              <li>Stay factual — avoid exaggeration.</li>
-              <li>If you have supporting images or videos, mention them.</li>
-            </ul>
-          </AccordionContent>
-        </AccordionPanel>
+  <AccordionPanel>
+    <AccordionTitle className="text-xl font-semibold bg-green-500 text-white dark:text-white hover:bg-slate-800 rounded-md px-4 py-2">
+      Tips for a Good Report
+    </AccordionTitle>
+    <AccordionContent>
+      <ul className="list-disc pl-5 text-gray-700 dark:text-gray-300 text-base space-y-2">
+        <li>Be as detailed as possible in the description.</li>
+        <li>Include specific times or events if applicable.</li>
+        <li>Stay factual — avoid exaggeration.</li>
+        <li>If you have supporting images or videos, mention them.</li>
+      </ul>
+    </AccordionContent>
+  </AccordionPanel>
 
-        <AccordionPanel>
-          <AccordionTitle className="text-xl font-semibold">What Happens After You Submit?</AccordionTitle>
-          <AccordionContent>
-            <p className="text-base text-gray-700 dark:text-gray-300 mb-2">
-              After submission, our team will review your report and may reach out if more information is needed. Depending on the nature of the report, it may be forwarded to local authorities or city services for resolution.
-            </p>
-            <p className="text-base text-gray-700 dark:text-gray-300">
-              You will receive updates via the contact information you provided.
-            </p>
-          </AccordionContent>
-        </AccordionPanel>
-      </Accordion>
+  <AccordionPanel>
+    <AccordionTitle className="text-xl font-semibold bg-green-500 text-white dark:text-white hover:bg-slate-800 rounded-md px-4 py-2">
+      What Happens After You Submit?
+    </AccordionTitle>
+    <AccordionContent>
+      <p className="text-base text-gray-700 dark:text-gray-300 mb-2">
+        After submission, our team will review your report and may reach out if more information is needed. Depending on the nature of the report, it may be forwarded to local authorities or city services for resolution.
+      </p>
+      <p className="text-base text-gray-700 dark:text-gray-300">
+        You will receive updates via the contact information you provided.
+      </p>
+    </AccordionContent>
+  </AccordionPanel>
+</Accordion>
 
-      {/* Upload Tabs */}
-      <div className="mt-12">
-        <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Upload or Preview a Report</h2>
-        <Tabs aria-label="Upload Tabs" variant="default" ref={tabsRef} onActiveTabChange={(tab) => setActiveTab(tab)}>
-          <TabItem active title="JSON Upload" icon={HiClipboardList}>
-            <input
-              type="file"
-              accept=".json"
-              onChange={(e) => handleFileUpload(e, 'json')}
-              className="mb-4 text-sm"
-            />
+<FileUploadPreview/>
 
-            {fileReportData && (
-              <pre className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-xs overflow-x-auto">
-                {JSON.stringify(fileReportData, null, 2)}
-              </pre>
-            )}
-            {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
+<div className="mt-12">
 
-            <JsonUpload /> {/* Ensure JsonUpload is a valid component */}
-          </TabItem>
+  {/* Tabs Section for File Upload */}
+  <Tabs aria-label="Upload Tabs" variant="default" ref={tabsRef} onActiveTabChange={(tab) => setActiveTab(tab)}>
+    
+    {/* JSON Upload Tab */}
+    <TabItem active={activeTab === 0} title="JSON Upload" icon={HiClipboardList}>
+      <JsonUpload />
+    </TabItem>
 
-          <TabItem title="CSV Upload" icon={MdDashboard}>
-            <input
-              type="file"
-              accept=".csv"
-              onChange={(e) => handleFileUpload(e, 'csv')}
-              className="mb-4 text-sm"
-            />
+    {/* CSV Upload Tab */}
+    <TabItem active={activeTab === 1} title="CSV Upload" icon={MdDashboard}>
+      <CsvUpload />
+    </TabItem>
 
-            {fileReportData && (
-              <pre className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-xs overflow-x-auto">
-                {JSON.stringify(fileReportData, null, 2)}
-              </pre>
-            )}
-            {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
-
-            <CsvUpload /> {/* Ensure CsvUpload is a valid component */}
-          </TabItem>
-
-          <TabItem title="Example Report" icon={HiUserCircle}>
-            <div className="my-6">
-              <label htmlFor="address" className="block text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">Address</label>
-              <input
-                type="text"
-                id="address"
-                ref={addressInputRef}
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                className="p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-600 text-base text-gray-800 dark:text-gray-200 w-full"
-                placeholder="Enter the address of the incident"
-              />
-            </div>
-
-            <CreateReport address={address} />
-          </TabItem>
-        </Tabs>
+    {/* Excel Upload Tab */}
+    <TabItem active={activeTab === 2} title="Excel Upload" icon={HiUserCircle}>
+      <ExcelUpload />
+    </TabItem>
+ 
+    {/* Example Report Tab */}
+    <TabItem title="Example Report" icon={HiUserCircle}>
+      <div className="my-6">
+        <label htmlFor="address" className="block text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">Address</label>
+        <input
+          type="text"
+          id="address"
+          ref={addressInputRef}
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          className="p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-600 text-base text-gray-800 dark:text-gray-200 w-full"
+          placeholder="Enter the address of the incident"
+        />
       </div>
+
+      <CreateReport address={address} />
+    </TabItem>
+  </Tabs>
+</div>
+
     </div>
   );
 }

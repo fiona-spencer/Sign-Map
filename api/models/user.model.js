@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    email: {
+    userEmail: {  // Updated from email to userEmail
       type: String,
       required: true,
       unique: true,
@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema(
     },
     userType: {
       type: String,
-      enum: ['public', 'user','admin'],
+      enum: ['public', 'user', 'admin'],
       required: true,
     },
   },

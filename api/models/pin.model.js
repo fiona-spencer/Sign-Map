@@ -8,10 +8,10 @@ const pinSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  location: {
+   location: {
     address: {
       type: String,
-      required: true // Optional: set to true if always available
+      required: true
     },
     lat: {
       type: Number,
@@ -22,17 +22,9 @@ const pinSchema = new mongoose.Schema({
       required: true
     },
     info: {
-      title: {
-        type: String,
-        required: true
-      },
       description: {
         type: String,
-        required: true
-      },
-      category: {
-        type: String,
-        required: true
+        required: false 
       },
       icon: {
         type: String,
@@ -41,6 +33,32 @@ const pinSchema = new mongoose.Schema({
       image: {
         type: String,
         default: 'https://example.com/default-image.jpg'
+      },
+      populusId: {  // 👈 Newly added field
+        type: String,
+        required: false
+      },
+       // Contact person's name (added)
+       contactName: {
+        type: String,
+        required: false
+      },
+      contactEmail: {
+        type: String,
+        required: true
+      },
+      contactPhoneNumber: {
+        type: String,
+        required: false
+      },
+      assigned: {
+        type: String,
+        required: false
+      },
+      // Contact person's name (added)
+      fileName: {
+        type: String,
+        required: true,
       }
     },
     status: {
@@ -48,10 +66,6 @@ const pinSchema = new mongoose.Schema({
       enum: ['pending', 'accepted', 'in-progress', 'resolved', 'deleted'],
       default: 'pending'
     }
-  },
-  phoneNumber: {
-    type: String,
-    required: false
   }
 }, { timestamps: true });
 

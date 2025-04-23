@@ -24,6 +24,7 @@ const GoogleMap = ({
   const [highlightedPin, setHighlightedPin] = useState(null);
   const [address, setAddress] = useState('');
   const [placeholder, setPlaceholder] = useState('Search for a place');
+  const [resetPinsTrigger, setResetPinsTrigger] = useState(0);
 
   const navigate = useNavigate();
 
@@ -108,25 +109,26 @@ const GoogleMap = ({
 
   const handleCreateMarker = async (reportData) => {
     setIsSubmitting(true);
-
+  
     try {
       const geocoder = new google.maps.Geocoder();
       const latlng = { lat: markerPosition.lat(), lng: markerPosition.lng() };
-
+  
       geocoder.geocode({ location: latlng }, async (results, status) => {
         if (status === 'OK' && results[0]) {
           const locationName = results[0].formatted_address;
-
+  
           const response = await fetch('/api/pin/createPin', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ...reportData, locationName, position: latlng }),
           });
-
+  
           const result = await response.json();
           if (result.success) {
-            // Optionally notify parent or refetch pins here
+            // ✅ Close the form and refresh the pins
             setShowCreateReportForm(false);
+            setResetPinsTrigger(prev => prev + 1); // 🔁 Trigger marker refresh
           } else {
             console.error('Report submission failed:', result);
           }
@@ -140,6 +142,7 @@ const GoogleMap = ({
       setIsSubmitting(false);
     }
   };
+  
 
   const handleClearAddress = () => {
     setAddress('');
@@ -276,12 +279,13 @@ const GoogleMap = ({
 
       {/* Show Pins */}
       <ShowPins
-        pins={filteredPins} // ← pass filtered pins here
-        mapInstanceRef={mapInstanceRef}
-        highlightedPin={highlightedPin}
-        setHighlightedPin={setHighlightedPin}
-        onSelectPin={(pin) => setSelectedReport(pin)}
-      />
+  pins={filteredPins}
+  mapInstanceRef={mapInstanceRef}
+  highlightedPin={highlightedPin}
+  setHighlightedPin={setHighlightedPin}
+  resetPinsTrigger={resetPinsTrigger} // 🔁 Add trigger prop
+  onSelectPin={(pin) => setSelectedReport(pin)}
+/>
 
       {/* Map */}
       <div id="map" ref={mapRef} className="w-full h-[500px] rounded-lg"></div>

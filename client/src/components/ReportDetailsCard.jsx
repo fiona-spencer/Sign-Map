@@ -1,11 +1,23 @@
 import { Card } from "flowbite-react";
 
+// Status-to-color mapping
+const getStatusClass = (status) => {
+  switch (status) {
+    case 'pending': return 'bg-yellow-200 text-yellow-700';
+    case 'accepted': return 'bg-blue-100 text-blue-700';
+    case 'in-progress': return 'bg-orange-100 text-orange-700';
+    case 'resolved': return 'bg-green-100 text-green-700';
+    case 'deleted': return 'bg-red-100 text-red-700';
+    default: return 'bg-gray-100 text-gray-700';
+  }
+};
+
 export function ReportDetailsCard({ selectedReport }) {
   if (!selectedReport) return null;
 
   const descriptionHTML = selectedReport?.location?.info?.description || "";
 
-  // Convert HTML to plain text using DOMParser
+  // Convert HTML to plain text
   const getPlainTextFromHTML = (html) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
@@ -14,20 +26,36 @@ export function ReportDetailsCard({ selectedReport }) {
 
   const plainTextDescription = getPlainTextFromHTML(descriptionHTML);
 
+  // Extract status
+  const status = selectedReport?.location?.status || "Unknown";
+  const statusClass = getStatusClass(status);
+
   return (
     <Card className="max-w-full mx-auto">
       {/* Title and Status */}
-      <div className="flex justify-between items-start  ">
+      <div className="flex justify-between items-start">
         <div>
+          {/* Contact Info */}
           <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            {selectedReport?.location?.info?.title || "No Title"}
+            Contact Information:
           </h5>
-          <p className="text-sm font-semibold text-blue-600 dark:text-blue-300">
-            Status: {selectedReport?.location?.status || "Unknown"}
+          <p className="text-sm font-semibold text-gray-600 dark:text-blue-300">
+            <strong>Name:</strong> {selectedReport?.location?.info?.contactName || "N/A"}
           </p>
+          <p className="text-sm font-semibold text-gray-600 dark:text-blue-300">
+            <strong>Email:</strong> {selectedReport?.location?.info?.contactEmail || "N/A"}
+          </p>
+          <p className="text-sm font-semibold text-gray-600 dark:text-blue-300">
+            <strong>Phone:</strong> {selectedReport?.location?.info?.contactPhoneNumber || "N/A"}
+          </p>
+
+          {/* Status */}
+          <div className={`inline-block mt-2 px-2 py-1 rounded text-sm font-semibold ${statusClass}`}>
+            Status: {status.charAt(0).toUpperCase() + status.slice(1)}
+          </div>
         </div>
 
-        {/* User Info - Positioned at the top right */}
+        {/* User Info */}
         <div className="text-right">
           <p className="font-semibold text-gray-900 dark:text-white">
             {selectedReport?.createdBy?.username || "N/A"}
@@ -55,7 +83,7 @@ export function ReportDetailsCard({ selectedReport }) {
         {/* Date of Incident */}
         <p><strong>Date Created:</strong> {new Date(selectedReport?.createdAt).toLocaleDateString()}</p>
 
-        {/* Phone Number */}
+        {/* Optional Phone Number */}
         {selectedReport?.phoneNumber && (
           <p><strong>Phone Number:</strong> {selectedReport?.phoneNumber}</p>
         )}

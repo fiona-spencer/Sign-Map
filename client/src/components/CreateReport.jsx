@@ -3,8 +3,7 @@ import {
   Alert,
   Button,
   TextInput,
-  Checkbox,
-  Select,
+  Checkbox
 } from 'flowbite-react';
 import { useSelector } from 'react-redux';
 import ReactQuill from 'react-quill';
@@ -17,31 +16,30 @@ export default function CreateReport({ position, onClose, onSubmit, isSubmitting
   const [isVerified, setIsVerified] = useState(false);
   const [publishError, setPublishError] = useState(null);
   const [image, setImage] = useState(null);
-
   const navigate = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
 
   const [formData, setFormData] = useState({
-    title: '',
-    category: 'default',
-    content: '',
+    userEmail: '',
+    userName: '',
     position: { lat: 0, lng: 0 },
-    fullName: '',
-    name: '',
-    email: '',
-    phoneNumber: '',
-    dateOfIncident: new Date().toISOString().split('T')[0],
-    icon: 'default', // You can adjust the default icon as needed
-    image: '', // This will hold the image URL after upload
+    address: '',
+    description: '',
+    icon: 'default',
+    image: '',
+    populusId: '',
+    contactName: '', // Added contactName field
+    contactEmail: '',
+    contactPhoneNumber: '',
+    assigned: ''
   });
 
   useEffect(() => {
     if (currentUser) {
       setFormData((prev) => ({
         ...prev,
-        fullName: currentUser.username || '',
-        name: currentUser.username || '',
-        email: currentUser.email || '',
+        userEmail: currentUser.email || '',
+        userName: currentUser.username || '',
       }));
     }
 
@@ -60,7 +58,7 @@ export default function CreateReport({ position, onClose, onSubmit, isSubmitting
             setAddress(formatted);
             setFormData((prev) => ({
               ...prev,
-              locationName: formatted,
+              address: formatted,
               position: { lat, lng },
             }));
           }
@@ -83,52 +81,53 @@ export default function CreateReport({ position, onClose, onSubmit, isSubmitting
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!isVerified) {
       setPublishError('Please verify your submission.');
       return;
     }
-  
+
     const dataToSend = {
+      createdBy: {
+        userName: formData.userName,
+        userEmail: formData.userEmail
+      },
       location: {
-        address: address, // <-- ✅ add this line
+        address: formData.address,
         lat: formData.position.lat,
         lng: formData.position.lng,
         info: {
-          title: formData.title,
-          description: formData.content,
-          category: formData.category,
-          fullName: formData.fullName,
-          name: formData.name,
-          email: formData.email,
-          phoneNumber: formData.phoneNumber,
-          dateOfIncident: formData.dateOfIncident,
+          description: formData.description,
           icon: formData.icon,
           image: formData.image,
+          populusId: formData.populusId,
+          contactName: formData.contactName, // Added contactName to the data
+          contactEmail: formData.contactEmail,
+          contactPhoneNumber: formData.contactPhoneNumber,
+          assigned: formData.assigned,
+          fileName: "System"
         },
         status: 'pending',
-      },
-      phoneNumber: formData.phoneNumber,
+      }
     };
-    
-  
+
     try {
       const res = await fetch('/api/pin/createPin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${currentUser.token}`, // assuming token is stored in currentUser
+          Authorization: `Bearer ${currentUser.token}`,
         },
         body: JSON.stringify(dataToSend),
       });
-  
+
       const data = await res.json();
-  
+
       if (!res.ok) {
         setPublishError(data.message || 'Server error occurred');
         return;
       }
-  
+
       setPublishError(null);
       navigate(`/successfullyCreated`);
     } catch (error) {
@@ -136,126 +135,145 @@ export default function CreateReport({ position, onClose, onSubmit, isSubmitting
       setPublishError('Something went wrong. Please try again.');
     }
   };
-  
 
   return (
     <div className="bg-opacity-50 flex justify-center items-center z-50 mt-20">
-  <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-2xl shadow-xl relative text-gray-900 dark:text-white">
-    <button onClick={onClose} className="absolute top-2 right-2 text-xl text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
-      <FaTimes />
-    </button>
+      <div className="bg-white dark:bg-gray-800 p-8 rounded-lg w-full max-w-2xl shadow-xl relative text-gray-900 dark:text-white">
+        <button onClick={onClose} className="absolute top-2 right-2 text-xl text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+          <FaTimes />
+        </button>
 
-    <h3 className="text-xl font-semibold text-center mb-4">Create a Report</h3>
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <TextInput
-        type="text"
-        readOnly
-        value={address}
-        className="bg-gray-100 dark:bg-gray-700 dark:text-white"
-        addon="Address"
-      />
-      <TextInput
-        type="text"
-        readOnly
-        value={`${formData.position.lat}, ${formData.position.lng}`}
-        className="bg-gray-100 dark:bg-gray-700 dark:text-white"
-        addon="Lat/Lng"
-      />
-      <TextInput
-        type="text"
-        placeholder="Full Name"
-        required
-        value={formData.fullName}
-        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-        className="dark:bg-gray-700 dark:text-white"
-      />
-      <TextInput
-        type="email"
-        placeholder="Email"
-        required
-        value={formData.email}
-        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-        className="dark:bg-gray-700 dark:text-white"
-      />
-      <TextInput
-        type="tel"
-        placeholder="Phone Number"
-        required
-        value={formData.phoneNumber}
-        onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-        className="dark:bg-gray-700 dark:text-white"
-      />
-      <TextInput
-        type="date"
-        required
-        value={formData.dateOfIncident}
-        onChange={(e) => setFormData({ ...formData, dateOfIncident: e.target.value })}
-        className="dark:bg-gray-700 dark:text-white"
-      />
-      <TextInput
-        type="text"
-        placeholder="Title"
-        required
-        value={formData.title}
-        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-        className="dark:bg-gray-700 dark:text-white"
-      />
+        <h3 className="text-xl font-semibold text-center mb-4">Create a Report</h3>
+        <form onSubmit={handleSubmit} className="space-y-6">
 
-      <Select
-        value={formData.category}
-        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-        className="dark:bg-gray-700 dark:text-white"
-      >
-        <option value="default">Pin</option>
-      </Select>
-
-      <div className="flex items-center mt-4">
-        <div className="mr-2">Selected Icon:</div>
-        <div className="text-xl"><FaMapPin /></div>
-      </div>
-
-      <div className="dark:bg-gray-700 dark:text-white">
-        <ReactQuill
-          theme="snow"
-          placeholder="Enter a description..."
-          value={formData.content}
-          onChange={(value) => setFormData({ ...formData, content: value })}
-          className="h-48 overflow-y-auto text-sm"
-        />
-      </div>
-
-      <div className="flex items-center">
-        <Checkbox checked={isVerified} onChange={(e) => setIsVerified(e.target.checked)} id="verify" />
-        <label htmlFor="verify" className="ml-2 text-sm dark:text-gray-300">
-          I verify that all the information provided is correct.
-        </label>
-      </div>
-
-      <div>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageUpload}
-          className="block w-full text-sm text-gray-700 dark:text-gray-300 py-2"
-        />
-        {image && (
-          <div className="mt-2">
-            <img src={image} alt="Preview" className="max-w-xs max-h-48 object-cover rounded" />
+          {/* User Info */}
+          <div className=" border-b pb-4">
+            <h4 className="text-lg font-semibold flex justify-center m-2">User Info</h4>
+            <TextInput
+              type="email"
+              readOnly
+              value={formData.userEmail}
+              addon="Email"
+              className="dark:bg-gray-700 dark:text-white mb-2"
+            />
+            <TextInput
+              type="text"
+              readOnly
+              value={formData.userName}
+              addon="Name"
+              className="dark:bg-gray-700 dark:text-white"
+            />
           </div>
-        )}
+
+       
+
+          {/* Location Info */}
+          <div className="border-b pb-4">
+          <div className="flex m-2 justify-center items-center">
+            <h4 className="text-lg font-semibold px-2">Location Info</h4>
+              <div className="text-xl text-white bg-red-600 p-2 rounded-lg"><FaMapPin /></div>
+            </div>
+            <TextInput
+              type="text"
+              readOnly
+              value={formData.address}
+              addon="Address"
+              className="dark:bg-gray-700 dark:text-white mb-2"
+            />
+            <TextInput
+              type="text"
+              readOnly
+              value={`${formData.position.lat}, ${formData.position.lng}`}
+              addon="Lat/Lng"
+              className="dark:bg-gray-700 dark:text-white"
+            />
+          
+          </div>
+
+   {/* Contact Info */}
+   <div className="border-b pb-4">
+            <h4 className="text-lg font-semibold flex justify-center m-2">Contact Info</h4>
+            <TextInput
+              type="text"
+              value={formData.contactName}
+              onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
+              placeholder="Contact Name"
+              className="dark:bg-gray-700 dark:text-white mb-2"
+            />
+            
+            <TextInput
+              type="email"
+              value={formData.contactEmail}
+              onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
+              placeholder="Contact Email"
+              className="dark:bg-gray-700 dark:text-white mb-2"
+            />
+            <TextInput
+              type=""
+              value={formData.contactPhoneNumber}
+              onChange={(e) => setFormData({ ...formData, contactPhoneNumber: e.target.value })}
+              placeholder="Contact Phone Number (xxx-xxx-xxxx)"
+              className="dark:bg-gray-700 dark:text-white mb-2"
+            />
+            <TextInput
+              type="text"
+              value={formData.populusId}
+              onChange={(e) => setFormData({ ...formData, populusId: e.target.value })}
+              placeholder="Populus ID"
+              className="dark:bg-gray-700 dark:text-white mb-2"
+            />
+            <TextInput
+              type="text"
+              value={formData.assigned}
+              onChange={(e) => setFormData({ ...formData, assigned: e.target.value })}
+              placeholder="Assigned To"
+              className="dark:bg-gray-700 dark:text-white"
+            />
+          </div>
+
+          {/* Description */}
+          <ReactQuill
+            theme="snow"
+            placeholder="Enter description..."
+            value={formData.description}
+            onChange={(value) => setFormData({ ...formData, description: value })}
+            className="h-48 overflow-y-auto mt-2"
+          />
+
+          {/* Verification */}
+          <div className="flex items-center">
+            <Checkbox checked={isVerified} onChange={(e) => setIsVerified(e.target.checked)} id="verify" />
+            <label htmlFor="verify" className="ml-2 text-sm dark:text-gray-300">
+              I verify that all the information provided is correct.
+            </label>
+          </div>
+
+          {/* Image Upload */}
+          <div>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="block w-full text-sm text-gray-700 dark:text-gray-300 py-2"
+            />
+            {image && (
+              <div className="mt-2">
+                <img src={image} alt="Preview" className="max-w-xs max-h-48 object-cover rounded" />
+              </div>
+            )}
+          </div>
+
+          {/* Submit */}
+          <div className="flex gap-4 justify-between">
+            <Button onClick={onClose} color="gray" outline>Cancel</Button>
+            <Button type="submit" disabled={isSubmitting} gradientDuoTone="greenToBlue">
+              {isSubmitting ? 'Submitting...' : 'Submit Report'}
+            </Button>
+          </div>
+
+          {publishError && <Alert color="failure" className="mt-2">{publishError}</Alert>}
+        </form>
       </div>
-
-      <div className="flex gap-4 justify-between">
-        <Button onClick={onClose} color="gray" outline>Cancel</Button>
-        <Button type="submit" disabled={isSubmitting} gradientDuoTone="greenToBlue">
-          {isSubmitting ? 'Submitting...' : 'Submit Report'}
-        </Button>
-      </div>
-
-      {publishError && <Alert color="failure" className="mt-2">{publishError}</Alert>}
-    </form>
-  </div>
-</div>
-
+    </div>
   );
 }

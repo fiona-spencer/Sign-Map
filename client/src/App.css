@@ -40,3 +40,13 @@
 .read-the-docs {
   color: #888;
 }
+
+.animation-delay-0 {
+  animation-delay: 0s;
+}
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+.animation-delay-400 {
+  animation-delay: 0.4s;
+}
