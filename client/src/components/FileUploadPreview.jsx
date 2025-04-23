@@ -1,5 +1,7 @@
 import { FileInput, Label } from 'flowbite-react';
 import { useState } from 'react';
+import Papa from 'papaparse'; // CSV parser
+import * as XLSX from 'xlsx'; // Excel parser
 
 export default function FileUploadComponent() {
   const [fileName, setFileName] = useState('');
@@ -28,16 +30,18 @@ export default function FileUploadComponent() {
           const data = JSON.parse(content);
           setFileReportData(data);
         } else if (type === 'csv') {
-          const rows = content.split('\n').map((row) => row.split(','));
-          const headers = rows.shift();
-          const data = rows.map((row) =>
-            Object.fromEntries(row.map((cell, idx) => [headers?.[idx], cell]))
-          );
-          setFileReportData(data);
+          // Use PapaParse to parse the CSV file
+          Papa.parse(content, {
+            complete: (result) => {
+              setFileReportData(result.data);
+            },
+            header: true, // Treat the first row as headers
+            skipEmptyLines: true,
+          });
         } else if (type === 'excel') {
           const workbook = XLSX.read(content, { type: 'binary' });
           const sheet = workbook.Sheets[workbook.SheetNames[0]];
-          const jsonData = XLSX.utils.sheet_to_json(sheet);
+          const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 }); // Header as row 1
           setFileReportData(jsonData);
         }
         setError('');
@@ -67,7 +71,7 @@ export default function FileUploadComponent() {
 
   return (
     <div className="flex-col w-full items-center justify-center sm:px-4 md:px-32 lg:px-48">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Preview a File (JSON, CSV, or Excel Files)</h2>
+      <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Preview a File (JSON, CSV, or Excel Files)</h2>
       <Label
         htmlFor="dropzone-file"
         className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
@@ -145,15 +149,15 @@ export default function FileUploadComponent() {
               <table className="min-w-full border-collapse border text-sm border-gray-300 dark:border-gray-600">
                 <thead className="bg-gray-200 dark:bg-gray-800">
                   <tr>
-                    {Object.keys(fileReportData[0] || {}).map((key) => (
-                      <th key={key} className="border px-2 py-1 text-left">{key}</th>
+                    {fileReportData[0]?.map((key, idx) => (
+                      <th key={idx} className="border px-2 py-1 text-left">{key}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {fileReportData.slice(0, 10).map((row, i) => (
+                  {fileReportData.slice(1, 11).map((row, i) => (
                     <tr key={i} className="odd:bg-white even:bg-gray-100 dark:odd:bg-gray-700 dark:even:bg-gray-600">
-                      {Object.values(row).map((val, j) => (
+                      {row.map((val, j) => (
                         <td key={j} className="border px-2 py-1">{val}</td>
                       ))}
                     </tr>
