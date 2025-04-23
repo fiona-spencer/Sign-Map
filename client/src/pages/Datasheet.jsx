@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Tooltip } from 'flowbite-react';
 import Map from './Map';
+import defaultPinImage from '../assets/default_pin_image.png'
 
-export default function Datasheet({ apiKey, mapState}) {
+export default function Datasheet({ apiKey, mapState }) {
   const [pins, setPins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -49,7 +50,7 @@ export default function Datasheet({ apiKey, mapState}) {
         const matchesAddress = filterStreetName ? pin.location.address.toLowerCase().includes(filterStreetName.toLowerCase()) : true;
         const matchesUsername = filterUsername ? pin.createdBy.username.toLowerCase().includes(filterUsername.toLowerCase()) : true;
         const matchesDate = filterDate ? pin.createdAt.includes(filterDate) : true;
-  
+
         return (
           matchesStatus &&
           matchesCity &&
@@ -59,13 +60,13 @@ export default function Datasheet({ apiKey, mapState}) {
           matchesDate
         );
       });
-  
+
       setFilteredPins(filtered);
     };
-  
+
     applyFilter();
   }, [filterStatus, filterCity, filterProvince, filterUsername, filterStreetName, filterDate, pins]);
-  
+
   const handleResetFilters = () => {
     setFilterStatus('');
     setFilterCity('');
@@ -93,6 +94,10 @@ export default function Datasheet({ apiKey, mapState}) {
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
+
+  const getImage = (pin) => {
+    return pin.location.info.image || defaultPinImage;  // Provide the path to your default image
+  };
 
   return (
     <div className="w-full overflow-x-auto p-6 bg-[#267b6684] dark:bg-gray-800">
@@ -159,7 +164,7 @@ export default function Datasheet({ apiKey, mapState}) {
       <div className="overflow-x-auto bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md border border-gray-300 dark:border-gray-600">
         <table className="min-w-full table-auto border-collapse">
           <thead>
-            <tr className="bg-gray-100 dark:bg-gray-600  ">
+            <tr className="bg-gray-100 dark:bg-gray-600">
               <th className="px-4 py-2 border text-xs dark:text-gray-300">Pin ID</th>
               <th className="px-4 py-2 border text-xs dark:text-gray-300">Username</th>
               <th className="px-4 py-2 border text-xs dark:text-gray-300">Phone Number</th>
@@ -170,27 +175,59 @@ export default function Datasheet({ apiKey, mapState}) {
               <th className="px-4 py-2 border text-xs dark:text-gray-300">Status</th>
               <th className="px-4 py-2 border text-xs dark:text-gray-300">Created At</th>
               <th className="px-4 py-2 border text-xs dark:text-gray-300">Updated At</th>
+              <th className="px-4 py-2 border text-xs dark:text-gray-300">History</th>
             </tr>
           </thead>
           <tbody>
             {filteredPins.map((pin, index) => (
-              <tr key={pin._id || index} className='hover:bg-gray-100 dark:hover:bg-gray-600'>
+              <tr key={pin._id || index} className="hover:bg-gray-100 dark:hover:bg-gray-600">
                 <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
                   <Tooltip content={pin._id} placement="top">
-                    <span className="truncate max-w-[100px] inline-block align-bottom cursor-pointer text-blue-500">{pin._id.slice(0, 6)}...</span>
+                    <span className="truncate max-w-[100px] inline-block align-bottom cursor-pointer text-blue-500">
+                      {pin._id.slice(0, 6)}...
+                    </span>
                   </Tooltip>
                 </td>
-                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">{pin.createdBy?.username || 'N/A'}</td>
-                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">{pin.phoneNumber || 'N/A'}</td>
-                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">{pin.location.address}</td>
-                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">{pin.location.info.title}</td>
-                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">{pin.location.info.icon}</td>
                 <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
-                  <img src={pin.location.info.image} alt="Pin" className="w-12 h-12 object-cover" />
+                  {pin.createdBy?.username || 'N/A'}
                 </td>
-                <td className={`px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600 ${getStatusClass(pin.location.status)}`}>{pin.location.status}</td>
-                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">{formatDate(pin.createdAt)}</td>
-                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">{formatDate(pin.updatedAt)}</td>
+                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
+                  {pin.phoneNumber || 'N/A'}
+                </td>
+                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
+                  {pin.location.address}
+                </td>
+                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
+                  {pin.location.info.title}
+                </td>
+                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
+                  {pin.location.info.icon}
+                </td>
+                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
+                  <img
+                    src={getImage(pin)}
+                    alt="Pin"
+                    className="w-12 h-12 object-cover"
+                  />
+                </td>
+                <td className={`px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600 ${getStatusClass(pin.location.status)}`}>
+                  {pin.location.status}
+                </td>
+                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
+                  {formatDate(pin.createdAt)}
+                </td>
+                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
+                  {formatDate(pin.updatedAt)}
+                </td>
+                {/* New History Column */}
+                <td className="px-4 py-2 border text-xs hover:bg-gray-100 dark:hover:bg-gray-600">
+                  <a
+                    href={`/history/${pin._id}`} // Adjust this URL to your actual history route
+                    className="text-blue-500 hover:underline"
+                  >
+                    View History
+                  </a>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -199,7 +236,7 @@ export default function Datasheet({ apiKey, mapState}) {
 
       {/* Map Section */}
       <div className="mt-6">
-      <Map mapState={mapState} apiKey={apiKey} pins={filteredPins} />
+        <Map mapState={mapState} apiKey={apiKey} pins={filteredPins} />
       </div>
     </div>
   );

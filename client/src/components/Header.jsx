@@ -122,8 +122,8 @@ export default function Header() {
       {/* Nav Links */}
       <Navbar.Collapse className="mt-3 md:mt-0">
         {[
-          { path: '/', label: 'About' },
-          { path: '/report', label: 'Report' },
+          { path: '/', label: 'Home' },
+          { path: '/report', label: 'Info' },
           { path: '/datasheets', label: 'Map' },
         ].map(({ path: linkPath, label }) => (
           <Navbar.Link

@@ -1,18 +1,12 @@
-"use client";
-
 import React, { useEffect, useRef, useState } from 'react';
 import CreateReport from '../components/createReport';
-import {
-  Accordion,
-  AccordionPanel,
-  AccordionTitle,
-  AccordionContent,
-  TabItem,
-  Tabs,
-} from 'flowbite-react';
+import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, TabItem, Tabs } from 'flowbite-react';
 import { HiClipboardList } from 'react-icons/hi';
 import { MdDashboard } from 'react-icons/md';
 import { HiUserCircle } from 'react-icons/hi';
+// Assuming `json_upload` and `csv_upload` are actual components, otherwise replace them with the appropriate handling logic
+import JsonUpload from '../components/json_upload'; 
+import CsvUpload from '../components/csv_upload';
 
 export default function Report() {
   const [address, setAddress] = useState('');
@@ -22,6 +16,7 @@ export default function Report() {
   const tabsRef = useRef(null);
   const [activeTab, setActiveTab] = useState(0);
   const [fileReportData, setFileReportData] = useState(null);
+  const [error, setError] = useState('');
 
   const apiKey = 'AIzaSyA1wOqcLSGKkhNJQYP9wH06snRuvSJvRJY';
 
@@ -87,9 +82,10 @@ export default function Report() {
         );
         setFileReportData(data);
       }
+      setError(''); // Clear any previous error
     } catch (err) {
-      alert('Invalid file format');
-      console.error(err);
+      setError('Invalid file format. Please upload a valid JSON or CSV file.');
+      setFileReportData(null); // Clear file data
     }
   };
 
@@ -158,11 +154,15 @@ export default function Report() {
               onChange={(e) => handleFileUpload(e, 'json')}
               className="mb-4 text-sm"
             />
+
             {fileReportData && (
               <pre className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-xs overflow-x-auto">
                 {JSON.stringify(fileReportData, null, 2)}
               </pre>
             )}
+            {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
+
+            <JsonUpload /> {/* Ensure JsonUpload is a valid component */}
           </TabItem>
 
           <TabItem title="CSV Upload" icon={MdDashboard}>
@@ -172,11 +172,15 @@ export default function Report() {
               onChange={(e) => handleFileUpload(e, 'csv')}
               className="mb-4 text-sm"
             />
+
             {fileReportData && (
               <pre className="bg-gray-100 dark:bg-gray-700 p-4 rounded text-xs overflow-x-auto">
                 {JSON.stringify(fileReportData, null, 2)}
               </pre>
             )}
+            {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
+
+            <CsvUpload /> {/* Ensure CsvUpload is a valid component */}
           </TabItem>
 
           <TabItem title="Example Report" icon={HiUserCircle}>
