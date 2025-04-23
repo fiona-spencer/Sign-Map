@@ -15,9 +15,9 @@ export function ReportDetailsCard({ selectedReport }) {
   const plainTextDescription = getPlainTextFromHTML(descriptionHTML);
 
   return (
-    <Card className="max-w-full mx-auto mt-4">
+    <Card className="max-w-full mx-auto">
       {/* Title and Status */}
-      <div className="flex justify-between items-start mb-4">
+      <div className="flex justify-between items-start  ">
         <div>
           <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
             {selectedReport?.location?.info?.title || "No Title"}
@@ -45,7 +45,7 @@ export function ReportDetailsCard({ selectedReport }) {
           <textarea
             readOnly
             value={plainTextDescription || "No description available"}
-            className="w-full h-32 p-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded resize-none"
+            className="w-full h-32 p-2 text-sm bg-black-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded resize-none"
           />
         </div>
 

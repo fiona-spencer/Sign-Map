@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import Menu from "./pages/Menu";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
-import Map from "./pages/Map";
 import Report from './pages/Report';
 import SuccessfullyCreated from "./pages/SuccessfullyCreated";
 import Settings from "./pages/Settings";
@@ -18,19 +17,24 @@ import Header from "./components/Header";
 import FooterCom from "./components/Footer";
 import Search from "./components/Search";
 
-function AppWrapper() {
+function AppWrapper({ apiKey }) {
   const location = useLocation();
   const [mapState, setMapState] = useState("off");
 
   useEffect(() => {
-    if (location.pathname === "/map") {
+    if (location.pathname === "/datasheets") {
       setMapState("on");
       localStorage.setItem("mapState", "on");
     } else {
       setMapState("off");
-      localStorage.setItem("mapState", "off"); // <-- ensure it's stored!
+      localStorage.setItem("mapState", "off");
     }
   }, [location.pathname]);
+
+  // Log mapState whenever it changes
+  useEffect(() => {
+    console.log("Map State:", mapState);
+  }, [mapState]);
 
   return (
     <>
@@ -40,28 +44,28 @@ function AppWrapper() {
         <Route path="/" element={<Menu />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route
-          path="/map"
-          element={
-            <Map mapState={localStorage.getItem("mapState") || "off"} />
-          }
-        />
         <Route path="/report" element={<Report />} />
         <Route path="/successfullyCreated" element={<SuccessfullyCreated />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/search" element={<SearchPage />} />
-        <Route path="/Datasheets" element={<Datasheet />} />
+        <Route
+          path="/datasheets"
+          element={<Datasheet apiKey={apiKey} mapState={mapState} />}
+        />
       </Routes>
       <FooterCom />
     </>
   );
 }
 
+
 export default function App() {
+  const apiKey = "AIzaSyA1wOqcLSGKkhNJQYP9wH06snRuvSJvRJY";
+
   return (
     <BrowserRouter>
-      <AppWrapper />
+      <AppWrapper apiKey={apiKey}/>
     </BrowserRouter>
   );
 }

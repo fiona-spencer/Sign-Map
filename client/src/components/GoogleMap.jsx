@@ -5,12 +5,18 @@ import CreateReport from './createReport';
 import ShowPins from './ShowPins';
 import { ReportDetailsCard } from './ReportDetailsCard';
 
-const GoogleMap = ({ apiKey, mapId = '42c8848d94ad7219', center = { lat: 43.7, lng: -79.42 }, zoom = 12 }) => {
+const GoogleMap = ({
+  apiKey,
+  filteredPins,
+  mapId = '42c8848d94ad7219',
+  center = { lat: 43.7, lng: -79.42 },
+  zoom = 12,
+}) => {
+
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const searchInputRef = useRef(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
-  const [markersData, setMarkersData] = useState([]);
   const [markerPosition, setMarkerPosition] = useState(null);
   const [showCreateReportForm, setShowCreateReportForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -90,7 +96,6 @@ const GoogleMap = ({ apiKey, mapId = '42c8848d94ad7219', center = { lat: 43.7, l
 
         map.setZoom(18);
 
-        // Reset the search input and placeholder
         if (searchInputRef.current) {
           searchInputRef.current.value = '';
           searchInputRef.current.placeholder = 'Search for a place';
@@ -109,7 +114,7 @@ const GoogleMap = ({ apiKey, mapId = '42c8848d94ad7219', center = { lat: 43.7, l
       const latlng = { lat: markerPosition.lat(), lng: markerPosition.lng() };
 
       geocoder.geocode({ location: latlng }, async (results, status) => {
-        if (status === "OK" && results[0]) {
+        if (status === 'OK' && results[0]) {
           const locationName = results[0].formatted_address;
 
           const response = await fetch('/api/pin/createPin', {
@@ -120,8 +125,7 @@ const GoogleMap = ({ apiKey, mapId = '42c8848d94ad7219', center = { lat: 43.7, l
 
           const result = await response.json();
           if (result.success) {
-            const fullReport = { ...reportData, locationName, position: latlng };
-            setMarkersData(prev => [...prev, fullReport]);
+            // Optionally notify parent or refetch pins here
             setShowCreateReportForm(false);
           } else {
             console.error('Report submission failed:', result);
@@ -156,7 +160,7 @@ const GoogleMap = ({ apiKey, mapId = '42c8848d94ad7219', center = { lat: 43.7, l
   }
 
   return (
-    <div className="">
+    <div className="rounded-lg shadow-sm border px-6 bg-[#ffffff7d] pb-6">
       <h3 className="text-xl font-bold p-4">View Toronto Reports</h3>
 
       {/* Search Bar */}
@@ -171,24 +175,23 @@ const GoogleMap = ({ apiKey, mapId = '42c8848d94ad7219', center = { lat: 43.7, l
 
       {/* Button to Create Report */}
       {address && !showCreateReportForm && (
-  <div className="p-4">
-    <div className="flex flex-wrap gap-4">
-      <button
-        onClick={() => setShowCreateReportForm(true)}
-        className="bg-blue-600 text-white px-6 py-2 rounded-2xl shadow-md hover:bg-blue-700 hover:scale-[1.02] transition-transform duration-200 ease-in-out focus:ring-2 focus:ring-blue-400"
-      >
-        Create Pin at {address}
-      </button>
-      <button
-        onClick={handleClearAddress}
-        className="bg-red-500 text-white px-6 py-2 rounded-2xl shadow-md hover:bg-red-600 hover:scale-[1.02] transition-transform duration-200 ease-in-out focus:ring-2 focus:ring-red-400"
-      >
-        Clear Address
-      </button>
-    </div>
-  </div>
-)}
-
+        <div className="p-4">
+          <div className="flex flex-wrap gap-4">
+            <button
+              onClick={() => setShowCreateReportForm(true)}
+              className="bg-blue-600 text-white px-6 py-2 rounded-2xl shadow-md hover:bg-blue-700 hover:scale-[1.02] transition-transform duration-200 ease-in-out focus:ring-2 focus:ring-blue-400"
+            >
+              Create Pin at {address}
+            </button>
+            <button
+              onClick={handleClearAddress}
+              className="bg-red-500 text-white px-6 py-2 rounded-2xl shadow-md hover:bg-red-600 hover:scale-[1.02] transition-transform duration-200 ease-in-out focus:ring-2 focus:ring-red-400"
+            >
+              Clear Address
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Overlay and Create Report Form */}
       {showCreateReportForm && (
@@ -210,18 +213,19 @@ const GoogleMap = ({ apiKey, mapId = '42c8848d94ad7219', center = { lat: 43.7, l
 
       {/* Show Pins */}
       <ShowPins
-        markersData={markersData}
-        mapInstanceRef={mapInstanceRef}
-        highlightedPin={highlightedPin}
-        setHighlightedPin={setHighlightedPin}
-        onSelectPin={(pin) => setSelectedReport(pin)}
-      />
+  pins={filteredPins} // ← pass filtered pins here
+  mapInstanceRef={mapInstanceRef}
+  highlightedPin={highlightedPin}
+  setHighlightedPin={setHighlightedPin}
+  onSelectPin={(pin) => setSelectedReport(pin)}
+/>
+
 
       {/* Map */}
-      <div id="map" ref={mapRef} className="w-full h-[500px]"></div>
+      <div id="map" ref={mapRef} className="w-full h-[500px] rounded-lg"></div>
 
       {/* Report Details */}
-      <div className="mt-4 p-4 border-t border-gray-300 bg-white dark:bg-gray-800 dark:text-white">
+      <div className="mt-4 rounded-xl border-gray-300 bg-transparent dark:text-white dark:bg-emerald-600">
         <ReportDetailsCard selectedReport={selectedReport} />
       </div>
     </div>

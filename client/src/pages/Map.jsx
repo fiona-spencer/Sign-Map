@@ -1,31 +1,29 @@
-import React, { useEffect } from 'react';
-import GoogleMap from "../components/GoogleMap";
+import GoogleMap from '../components/GoogleMap';
+import React, { useState, useEffect } from 'react';
 
-const MAP_STATE = {
-  ON: "on",
-  OFF: "off",
-};
 
-export default function Map({ mapState }) {
+export default function Map({ mapState, apiKey, pins }) {
+  const [isReady, setIsReady] = useState(false);
+
   useEffect(() => {
     const isReloading = sessionStorage.getItem("mapReloading");
 
-    if (mapState === MAP_STATE.OFF) {
-      // Mark that a reload is happening
+    if (mapState === "on" && !isReloading) {
       sessionStorage.setItem("mapReloading", "true");
-
-      // Replace the current page to force a faster reload (without history)
-      window.location.replace(window.location.href); 
+      window.location.reload();
     } else if (isReloading) {
-      // Set the mapState to ON after reload and clean up sessionStorage
-      localStorage.setItem("mapState", MAP_STATE.ON);
       sessionStorage.removeItem("mapReloading");
+      setIsReady(true);
+    } else {
+      setIsReady(true);
     }
   }, [mapState]);
 
+  if (!isReady) return <div>Loading map...</div>;
+
   return (
-    <div>
-      <GoogleMap apiKey="AIzaSyA1wOqcLSGKkhNJQYP9wH06snRuvSJvRJY" />
+    <div className=' bg-[#29a37277] dark:bg-gray-800'>
+      <GoogleMap apiKey={apiKey} filteredPins={pins} />
     </div>
   );
 }

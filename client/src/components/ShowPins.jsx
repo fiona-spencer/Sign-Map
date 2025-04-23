@@ -14,49 +14,68 @@ const departmentColors = {
   'default': 'bg-blue-500',
 };
 
-const ShowPins = ({ mapInstanceRef, onSelectPin }) => {
+const ShowPins = ({ pins: propPins = null, filteredPins, mapInstanceRef, onSelectPin }) => {
   const [pins, setPins] = useState([]);
   const [highlightedPin, setHighlightedPin] = useState(null);  // Track the highlighted pin
+  const [markers, setMarkers] = useState([]);  // Track the markers on the map
 
+  // Log the propPins to the console
+  console.log('Prop Pins:', propPins);  // Log the passed pins prop
+
+  // Update pins when propPins changes
   useEffect(() => {
-    const fetchPins = async () => {
-      try {
-        const response = await fetch('/api/pin/getPins');
-        const data = await response.json();
+    if (propPins && Array.isArray(propPins)) {
+      setPins(propPins);
+    }
+  }, [propPins]);
 
-        if (data && Array.isArray(data)) {
-          setPins(data);
-          console.log('Pins fetched:', data);
-        }
-      } catch (error) {
-        console.error('Error fetching pins:', error);
-      }
-    };
+  // Effect to reset the markers whenever filteredPins or pins changes
+  useEffect(() => {
+    if (mapInstanceRef.current && markers.length > 0) {
+      // Clear existing markers from the map
+      markers.forEach(marker => {
+        marker.setMap(null);  // Remove each marker from the map
+      });
+      setMarkers([]);  // Clear the markers state
+    }
+  }, [filteredPins, pins]);  // Trigger this effect when filteredPins or pins changes
 
-    fetchPins();
-  }, []);
-
+  // Create new markers when pins change
   useEffect(() => {
     if (!mapInstanceRef.current || pins.length === 0 || !window.google) return;
 
-    pins.forEach(pin => {
+    const newMarkers = pins.map(pin => {
       const position = { lat: pin.location.lat, lng: pin.location.lng };
-      createMarker(mapInstanceRef.current, position, pin);
+      return createMarker(mapInstanceRef.current, position, pin);
     });
-  }, [pins, mapInstanceRef]);
+
+    setMarkers(newMarkers); // Store the newly created markers
+  }, [pins, mapInstanceRef]);  // Re-run this effect when pins or mapInstanceRef changes
+
+  // Function to get the status class for the marker
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 'pending': return 'bg-yellow-200 text-black';
+      case 'accepted': return 'bg-blue-500 text-white';
+      case 'in-progress': return 'bg-orange-500 text-white';
+      case 'resolved': return 'bg-green-500 text-white';
+      case 'deleted': return 'bg-red-500 text-white';
+      default: return 'bg-gray-500 text-white';
+    }
+  };
 
   const createMarker = (map, position, pinData) => {
     // Create marker container
     const markerElement = document.createElement('div');
     markerElement.className = 'group relative flex items-center justify-center';
 
-    // Default category background color
-    const category = pinData.location.info.category || 'default';
-    const bgColor = departmentColors[category] || departmentColors['default'];
+    // Get status and corresponding background color from pin.location.status
+    const status = pinData.location.status || 'default'; // Use 'default' if status is undefined
+    const statusClass = getStatusClass(status);
 
     // Icon Only with Tailwind styling (using default icon)
     const iconOnly = document.createElement('div');
-    iconOnly.className = `${bgColor} border-2 border-white text-white rounded-lg p-2 shadow-md`;
+    iconOnly.className = `${statusClass} border-2 border-white text-white rounded-lg p-2 shadow-md`;
     
     // Using the default icon
     const categoryData = iconOptions.find(opt => opt.label === 'default');
@@ -108,7 +127,7 @@ const ShowPins = ({ mapInstanceRef, onSelectPin }) => {
 
       // Change the selected pin's background color to a highlighted state
       const iconElement = marker.getIconElement();
-      iconElement.className = `${bgColor.replace('500', '700')} border-2 border-white text-white rounded-lg p-2 shadow-lg`;  // Highlight color
+      iconElement.className = `${statusClass.replace('200', '700')} border-2 border-white text-white rounded-lg p-2 shadow-lg`;  // Highlight color
 
       // You can also change the icon size here or use a different icon
       marker.setIcon({
