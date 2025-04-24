@@ -61,6 +61,10 @@ const ExcelUpload = () => {
             const fullName = `${row["First Name"] ?? ""} ${row["Last Name"] ?? ""}`.trim();
             let address = `${row["St Num"] ?? ""} ${row["St Name"] ?? ""}, ${row["City (Civic Address)"] ?? ""}, ${row["Province (Civic Address)"] ?? ""} ${row["Postal Code (Civic Address)"] ?? ""}, Canada`;
 
+            // Assign N/A for email and phone if not present
+            const email = row["Preferred Email"] || "N/A";
+            const phone = row["Preferred Phone Number"] || "N/A";
+
             const { lat, lng } = await fetchLatLng(address);
 
             return {
@@ -78,8 +82,8 @@ const ExcelUpload = () => {
                   image: "placeholder.jpg",
                   populusId: row["Populus ID"] || "",
                   contactName: fullName,
-                  contactEmail: row["Preferred Email"] || "",
-                  contactPhoneNumber: row["Preferred Phone Number"] || "",
+                  contactEmail: email,
+                  contactPhoneNumber: phone,
                   assigned: "assigned person",
                   fileName: file.name,
                 },
@@ -100,6 +104,15 @@ const ExcelUpload = () => {
     };
 
     reader.readAsBinaryString(file);
+  };
+
+  const renderCellContent = (value) => {
+    if (!value || value === "N/A") {
+      return (
+        <span className="text-red-500">N/A</span>
+      );
+    }
+    return value;
   };
 
   return (
@@ -143,11 +156,21 @@ const ExcelUpload = () => {
               <tbody>
                 {rows.map((row, idx) => (
                   <tr key={idx} className="hover:bg-gray-50">
-                    <td className="border p-2">{row.location?.info?.populusId}</td>
-                    <td className="border p-2">{row.location?.info?.contactName}</td>
-                    <td className="border p-2">{row.location?.address}</td>
-                    <td className="border p-2">{row.location?.info?.contactPhoneNumber}</td>
-                    <td className="border p-2">{row.location?.info?.contactEmail}</td>
+                    <td className="border p-2">
+                      {renderCellContent(row.location?.info?.populusId)}
+                    </td>
+                    <td className="border p-2">
+                      {renderCellContent(row.location?.info?.contactName)}
+                    </td>
+                    <td className="border p-2">
+                      {renderCellContent(row.location?.address)}
+                    </td>
+                    <td className="border p-2">
+                      {renderCellContent(row.location?.info?.contactPhoneNumber)}
+                    </td>
+                    <td className="border p-2">
+                      {renderCellContent(row.location?.info?.contactEmail)}
+                    </td>
                   </tr>
                 ))}
               </tbody>

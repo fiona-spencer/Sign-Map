@@ -13,6 +13,9 @@ export default function Datasheet({ apiKey, mapState }) {
   const [filterUsername, setFilterUsername] = useState('');
   const [filterStreetName, setFilterStreetName] = useState('');
   const [filterDate, setFilterDate] = useState('');
+  const [filterContactName, setFilterContactName] = useState('');
+  const [filterContactEmail, setFilterContactEmail] = useState('');
+  const [filterContactPhone, setFilterContactPhone] = useState('');
   const [filteredPins, setFilteredPins] = useState([]);
   const [uniqueCities, setUniqueCities] = useState([]);
   const [uniqueStatuses, setUniqueStatuses] = useState([]);
@@ -52,6 +55,9 @@ export default function Datasheet({ apiKey, mapState }) {
         const matchesAddress = filterStreetName ? pin.location.address.toLowerCase().includes(filterStreetName.toLowerCase()) : true;
         const matchesUsername = filterUsername ? pin.createdBy.username.toLowerCase().includes(filterUsername.toLowerCase()) : true;
         const matchesDate = filterDate ? pin.createdAt.includes(filterDate) : true;
+        const matchesContactName = filterContactName ? pin.location.info.contactName.toLowerCase().includes(filterContactName.toLowerCase()) : true;
+        const matchesContactEmail = filterContactEmail ? pin.location.info.contactEmail.toLowerCase().includes(filterContactEmail.toLowerCase()) : true;
+        const matchesContactPhone = filterContactPhone ? pin.location.info.contactPhoneNumber.includes(filterContactPhone) : true;
 
         return (
           matchesStatus &&
@@ -59,7 +65,10 @@ export default function Datasheet({ apiKey, mapState }) {
           matchesProvince &&
           matchesAddress &&
           matchesUsername &&
-          matchesDate
+          matchesDate &&
+          matchesContactName &&
+          matchesContactEmail &&
+          matchesContactPhone
         );
       });
 
@@ -67,7 +76,7 @@ export default function Datasheet({ apiKey, mapState }) {
     };
 
     applyFilter();
-  }, [filterStatus, filterCity, filterProvince, filterUsername, filterStreetName, filterDate, pins]);
+  }, [filterStatus, filterCity, filterProvince, filterUsername, filterStreetName, filterDate, filterContactName, filterContactEmail, filterContactPhone, pins]);
 
   const handleResetFilters = () => {
     setFilterStatus('');
@@ -76,6 +85,9 @@ export default function Datasheet({ apiKey, mapState }) {
     setFilterUsername('');
     setFilterStreetName('');
     setFilterDate('');
+    setFilterContactName('');
+    setFilterContactEmail('');
+    setFilterContactPhone('');
   };
 
   const handleShowAllPins = () => {
@@ -107,6 +119,7 @@ export default function Datasheet({ apiKey, mapState }) {
 
   return (
     <div className="w-full overflow-x-auto p-6 bg-[#267b6684] dark:bg-gray-800">
+      {/* Modal for Introduction */}
       <Modal show={showIntroModal} onClose={() => setShowIntroModal(false)} size="md" popup>
         <Modal.Body>
           <div className="text-center">
@@ -140,9 +153,15 @@ export default function Datasheet({ apiKey, mapState }) {
 
           <input type="text" placeholder="City" value={filterCity} onChange={(e) => setFilterCity(e.target.value)} className="p-2 border rounded" />
           <input type="text" placeholder="Province" value={filterProvince} onChange={(e) => setFilterProvince(e.target.value)} className="p-2 border rounded" />
-          <input type="text" placeholder="Address" value={filterStreetName} onChange={(e) => setFilterStreetName(e.target.value)} className="p-2 border rounded" />
+          <input type="text" placeholder="Street Name" value={filterStreetName} onChange={(e) => setFilterStreetName(e.target.value)} className="p-2 border rounded" />
           <input type="text" placeholder="Username" value={filterUsername} onChange={(e) => setFilterUsername(e.target.value)} className="p-2 border rounded" />
           <input type="date" value={filterDate} onChange={(e) => setFilterDate(e.target.value)} className="p-2 border rounded" />
+
+          {/* New Filters */}
+          <input type="text" placeholder="Contact Name" value={filterContactName} onChange={(e) => setFilterContactName(e.target.value)} className="p-2 border rounded" />
+          <input type="email" placeholder="Contact Email" value={filterContactEmail} onChange={(e) => setFilterContactEmail(e.target.value)} className="p-2 border rounded" />
+          <input type="text" placeholder="Contact Phone Number" value={filterContactPhone} onChange={(e) => setFilterContactPhone(e.target.value)} className="p-2 border rounded" />
+
           <Button onClick={handleResetFilters} className="w-full md:w-auto text-xs py-2 px-4 bg-red-500 text-white hover:bg-red-600">
             Reset Filters
           </Button>
@@ -150,7 +169,7 @@ export default function Datasheet({ apiKey, mapState }) {
       </div>
 
       {/* Table Section */}
-      <div className="overflow-x-auto bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md border border-gray-300 dark:border-gray-600">
+      <div className="overflow-x-auto bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md border border-gray-300 dark:border-gray-600 max-h-96 overflow-y-auto">
         <table className="min-w-full table-auto border-collapse">
           <thead>
             <tr className="bg-gray-100 dark:bg-gray-600">

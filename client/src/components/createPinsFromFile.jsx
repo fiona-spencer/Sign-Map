@@ -2,10 +2,17 @@ import React, { useState } from 'react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
-export default function CreatePinsFromFile({ parsedPins, fileTitle, currentUser, setIsLoading, onSuccess, onError }) {
+export default function CreatePinsFromFile({
+  parsedPins,
+  fileTitle,
+  currentUser,
+  setIsLoading,
+  onSuccess,
+  onError,
+}) {
   const [progress, setProgress] = useState(0);
 
-  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const createPin = async (dataToSend) => {
     const res = await fetch('/api/pin/createPin', {
@@ -22,14 +29,27 @@ export default function CreatePinsFromFile({ parsedPins, fileTitle, currentUser,
     return data;
   };
 
+  const createPinsInBatch = async (pinsToCreate) => {
+    try {
+      const results = await Promise.all(
+        pinsToCreate.map((pin) => createPin(pin))
+      );
+      return results;
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  };
+
   const handleSubmit = async () => {
     let successCount = 0;
     let failCount = 0;
+    const batchSize = 50; // number of pins to process in each batch
+
     setIsLoading(true);
 
-    for (let i = 0; i < parsedPins.length; i++) {
-      const pin = parsedPins[i];
-      const dataToSend = {
+    for (let i = 0; i < parsedPins.length; i += batchSize) {
+      const batch = parsedPins.slice(i, i + batchSize);
+      const dataToSendBatch = batch.map((pin) => ({
         createdBy: {
           userName: currentUser?.username,
           userEmail: currentUser?.email,
@@ -42,18 +62,20 @@ export default function CreatePinsFromFile({ parsedPins, fileTitle, currentUser,
           },
           status: 'pending',
         },
-      };
+      }));
 
       try {
-        await createPin(dataToSend);
-        successCount++;
+        // Process each batch of pins
+        await createPinsInBatch(dataToSendBatch);
+        successCount += batch.length;
+        console.log(`✅ Successfully created ${successCount}/${parsedPins.length}`);
       } catch (error) {
-        console.error(`❌ Failed to create pin ${i + 1}:`, error.message);
-        failCount++;
+        failCount += batch.length;
+        console.error(`❌ Failed to create batch ${i / batchSize + 1}:`, error.message);
       }
 
-      setProgress(Math.round(((i + 1) / parsedPins.length) * 100));
-      await delay(700); // adjust to ~0.7 seconds
+      setProgress(Math.round(((i + batchSize) / parsedPins.length) * 100));
+      await delay(700); // adjust to ~0.7 seconds to avoid rate-limiting
     }
 
     setIsLoading(false);
