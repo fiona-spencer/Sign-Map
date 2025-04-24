@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { HiOutlineArrowRight } from "react-icons/hi";
 import { Link } from 'react-router-dom';
 import { Button, Carousel } from 'flowbite-react';
@@ -14,6 +15,7 @@ import paiImage from '../assets/pai.jpg';
 
 export default function Menu() {
   const [pins, setPins] = useState([]);
+  const { currentUser } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({
     name: '',
     email: '',

@@ -17,6 +17,19 @@ import Header from "./components/Header";
 import FooterCom from "./components/Footer";
 import Search from "./components/Search";
 
+//No User
+import SettingsPage from './components/noType/SettingsPage'
+import ContactSupport from './components/noType/ContactSupport';
+import HelpCenter from "./components/noType/HelpCenter";
+import StartHere from './components/noType/StartHere'
+
+
+//Public
+
+//User
+
+//Admin
+
 function AppWrapper({ apiKey }) {
   const location = useLocation();
   const [mapState, setMapState] = useState("off");
@@ -50,15 +63,29 @@ function AppWrapper({ apiKey }) {
         <Route path="/report" element={<Report />} />
         <Route path="/successfullyCreated" element={<SuccessfullyCreated />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/settings" element={<Settings />} />
         <Route path="/search" element={<SearchPage />} />
         <Route
           path="/datasheets"
           element={<Datasheet apiKey={apiKey} mapState={mapState} />}
         />
+
+
+        {/* No Account */}
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/contactSupport" element={<ContactSupport />} />
+        <Route path="/help" element={<HelpCenter />} />
+        <Route path="/startHere" element={<StartHere />} />
+
+
+
+
       </Routes>
       </div>
-      <FooterCom />
+      <div className="relative bottom-0 left-0 w-full z-50 bg-white shadow">
+  <FooterCom />
+</div>
+
+
     </>
   );
 }
