@@ -52,3 +52,14 @@ body {
 .animate-dropPin {
   animation: dropPin 0.5s ease-out forwards;
 }
+
+
+/* index.css or global.css */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
