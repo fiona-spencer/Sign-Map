@@ -136,14 +136,21 @@ const ShowPins = ({ pins: propPins = null, mapInstanceRef, onSelectPin, resetPin
   };
   return (
     <>
-      {pins.length === 0 && (
-        <div className="fixed bottom-4 right-4 max-w-sm z-50">
-          <Alert color="failure" icon={HiInformationCircle}>
-            No pins found on the map. Please try again or create a new report.
-          </Alert>
-        </div>
-      )}
-    </>
+  {pins.length === 0 ? (
+    <div className="fixed bottom-4 right-4 max-w-sm z-50">
+      <Alert color="failure" icon={HiInformationCircle}>
+        No pins found on the map. Please try again or create a new report.
+      </Alert>
+    </div>
+  ) : (
+    <div className="fixed bottom-4 right-4 max-w-sm z-50">
+      <Alert color="info" icon={HiInformationCircle}>
+        Showing {pins.length} pin{pins.length > 1 ? 's' : ''} on the map.
+      </Alert>
+    </div>
+  )}
+</>
+
   );
 };
 
