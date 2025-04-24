@@ -6,18 +6,44 @@ export const test = (req, res) => {
   res.json({ message: 'API is working!' });
 };
 
-//Create pin
 export const createPin = async (req, res, next) => {
   try {
-    const { location, createdBy } = req.body; // Destructure location and createdBy from body
-    const pin = await Pin.create({
-      location,
-      createdBy: req.user.id, // Attach the authenticated user
-    });
+    const userId = req.user?.id;
 
-    res.status(201).json(pin);
+    if (!userId) {
+      return next(errorHandler(401, 'Unauthorized'));
+    }
+
+    let pinsData = req.body;
+
+    if (!Array.isArray(pinsData)) {
+      pinsData = [pinsData]; // Normalize single pin input
+    }
+
+    const validatedPins = pinsData.map((item) => ({
+      location: item.location,
+      createdBy: userId,
+    }));
+
+    const createdPins = await Pin.insertMany(validatedPins, { ordered: false }); // continue on errors
+
+    res.status(201).json({
+      message: `${createdPins.length} pins created successfully.`,
+      created: createdPins,
+    });
   } catch (err) {
-    next(errorHandler(500, err.message)); // Error handling
+    console.error('Pin creation error:', err);
+
+    // If insertMany fails partially
+    if (err.name === 'BulkWriteError' || err.writeErrors) {
+      return res.status(207).json({
+        message: 'Some pins failed to create.',
+        errorCount: err.writeErrors?.length || 0,
+        errors: err.writeErrors?.map(e => e.errmsg || e.message),
+      });
+    }
+
+    next(errorHandler(500, err.message));
   }
 };
 

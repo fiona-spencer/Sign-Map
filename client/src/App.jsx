@@ -38,8 +38,11 @@ function AppWrapper({ apiKey }) {
 
   return (
     <>
-      <Header />
-      <Search />
+      <div className="fixed top-0 left-0 w-full z-50 bg-white shadow">
+  <Header />
+  <Search />
+</div>
+      <div className="pt-[125px]">
       <Routes>
         <Route path="/" element={<Menu />} />
         <Route path="/signin" element={<SignIn />} />
@@ -54,6 +57,7 @@ function AppWrapper({ apiKey }) {
           element={<Datasheet apiKey={apiKey} mapState={mapState} />}
         />
       </Routes>
+      </div>
       <FooterCom />
     </>
   );

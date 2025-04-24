@@ -21,7 +21,7 @@ const getStatusClass = (status) => {
 
 const ShowPins = ({ pins: propPins = null, mapInstanceRef, onSelectPin, resetPinsTrigger }) => {
   const [pins, setPins] = useState([]);
-  const [highlightedPin, setHighlightedPin] = useState(null);
+  const [pinClicked, setPinClicked] = useState(null); // To track the clicked pin
   const markersRef = useRef([]);
 
   // Load new pins from props
@@ -30,7 +30,7 @@ const ShowPins = ({ pins: propPins = null, mapInstanceRef, onSelectPin, resetPin
       setPins(propPins);
     } else {
       setPins([]);
-      markersRef.current.forEach(marker => marker.setMap(null));
+      markersRef.current.forEach(marker => marker.setMap(null)); // Remove old markers
       markersRef.current = [];
     }
   }, [propPins]);
@@ -44,9 +44,9 @@ const ShowPins = ({ pins: propPins = null, mapInstanceRef, onSelectPin, resetPin
     markersRef.current = [];
 
     // Create new markers
-    pins.forEach(pin => {
+    pins.forEach((pin, index) => {
       const position = { lat: pin.location.lat, lng: pin.location.lng };
-      const marker = createMarker(mapInstanceRef.current, position, pin);
+      const marker = createMarker(mapInstanceRef.current, position, pin, index);
       markersRef.current.push(marker);
     });
   }, [pins, mapInstanceRef]);
@@ -58,7 +58,7 @@ const ShowPins = ({ pins: propPins = null, mapInstanceRef, onSelectPin, resetPin
     markersRef.current = [];
   }, [resetPinsTrigger]);
 
-  const createMarker = (map, position, pinData) => {
+  const createMarker = (map, position, pinData, index) => {
     const markerElement = document.createElement('div');
     markerElement.className = 'group relative flex items-center justify-center';
 
@@ -66,12 +66,13 @@ const ShowPins = ({ pins: propPins = null, mapInstanceRef, onSelectPin, resetPin
     const statusClass = getStatusClass(status);
 
     const iconOnly = document.createElement('div');
-    iconOnly.className = `${statusClass} border-2 border-white text-white rounded-lg p-2 shadow-md`;
+    iconOnly.className = `${statusClass} border-2 border-white text-white rounded-lg p-2 shadow-md transition-all duration-300 ease-in-out`;  // Added transition-duration
 
     const categoryData = iconOptions.find(opt => opt.label === 'default');
     const icon = categoryData ? categoryData.icon : <FaMapPin />;
     iconOnly.innerHTML = ReactDOMServer.renderToString(icon);
 
+    // Tooltip for Title
     const tooltip = document.createElement('div');
     tooltip.className = `
       absolute -top-10 left-1/2 transform -translate-x-1/2 
@@ -93,34 +94,54 @@ const ShowPins = ({ pins: propPins = null, mapInstanceRef, onSelectPin, resetPin
     marker.getIconElement = () => iconOnly;
 
     marker.addListener('click', () => {
+      console.log('Pin clicked:', pinData);
       if (onSelectPin) onSelectPin(pinData);
+    
+      if (pinClicked === index) {
+        setPinClicked(null);
+      } else {
+        setPinClicked(index);
+    
+        markersRef.current.forEach((marker, i) => {
+          const iconEl = marker.getIconElement();
+    
+          if (i !== index) {
+            iconEl.classList.add('opacity-50');
+            iconEl.classList.remove('scale-100');
+            iconEl.classList.add('scale-50');
 
-      if (highlightedPin) {
-        const prevIcon = highlightedPin.getIconElement();
-        prevIcon.className = `${getStatusClass('default')} border-2 border-white text-white rounded-lg p-2 shadow-md`;
-        highlightedPin.setIcon({ url: '', scaledSize: new google.maps.Size(32, 32) });
+          } else {
+            iconEl.classList.add('opacity-100');
+          }
+    
+          iconEl.classList.add('transition-all', 'duration-300', 'ease-in-out');
+        });
       }
-
-      setHighlightedPin(marker);
-
-      const iconEl = marker.getIconElement();
-      iconEl.className = `${statusClass.replace('200', '700')} border-2 border-white text-white rounded-lg p-2 shadow-lg`;
-
-      marker.setIcon({ url: '', scaledSize: new google.maps.Size(40, 40) });
+    
+      // 🔁 Delay reloading only the clicked pin to let animation complete
+        const clickedMarker = markersRef.current[index];
+        if (clickedMarker) {
+          clickedMarker.setMap(null);
+          markersRef.current[index] = null;
+        }
+    
+        const position = { lat: pinData.location.lat, lng: pinData.location.lng };
+        const newMarker = createMarker(mapInstanceRef.current, position, pinData, index);
+        markersRef.current[index] = newMarker;
     });
+    
+    
 
     return marker;
   };
-
   return (
     <>
       {pins.length === 0 && (
-        <div className="fixed  bottom-4 right-4 max-w-sm z-50">
-        <Alert color="failure" icon={ HiInformationCircle }>
-          No pins found on the map. Please try again or create a new report.
-        </Alert>
-      </div>
-      
+        <div className="fixed bottom-4 right-4 max-w-sm z-50">
+          <Alert color="failure" icon={HiInformationCircle}>
+            No pins found on the map. Please try again or create a new report.
+          </Alert>
+        </div>
       )}
     </>
   );

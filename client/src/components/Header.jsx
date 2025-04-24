@@ -45,8 +45,7 @@ export default function Header() {
   return (
     <Navbar
       fluid
-      rounded
-      className={`border-b shadow-md px-4 py-4 ${
+      className={`border-b shadow-md px-4 py-4  ${
         theme === 'dark'
           ? 'bg-gray-900 text-white border-gray-800'
           : 'bg-green-700 text-white border-green-900'

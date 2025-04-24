@@ -78,7 +78,7 @@ export default function Menu() {
   </div>
 
       <div className=''>
-  <div className="p-9 bg-[#463b2fe7] rounded-sm">
+  <div className="p-9 bg-[#463b2fe7]">
   <div className="h-56 sm:h-64 xl:h-96 2xl:h-96 rounded-lg overflow-hidden max-w-[800px] lg:max-w-[1400px] shadow-md border mx-auto">
   <Carousel>
         <div className="flex h-full items-center justify-center bg-green-100 dark:bg-green-900 text-green-900 dark:text-green-200 text-xl font-medium">
@@ -221,7 +221,7 @@ export default function Menu() {
         </div>
       </div>
 {/* Contact Form */}
-<div className="max-w-3xl p-10 bg-gradient-to-tr from-[#727171fa] via-green-00 to-green-500 rounded-2xl shadow-xl m-9">
+<div className="max-w-5xl p-10 bg-gradient-to-tr from-[#727171fa] via-green-00 to-green-500 rounded-2xl shadow-xl m-9 sm:mx-auto">
   <h2 className="text-3xl font-bold text-green-100 mb-4 text-center">Contact Us</h2>
   <p className="text-center text-green-200 mb-6">
     Have a question or need assistance? Feel free to reach out below.
