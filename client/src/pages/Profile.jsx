@@ -148,7 +148,7 @@ export default function Profile() {
   
 
   return (
-<div className='max-w-lg mx-auto p-8 w-full border-4 bg-[#9ca6a344] dark:bg-gray-800 border-gray-500 dark:border-gray-700 m-9 rounded-lg'>
+<div className='max-w-md mx-auto p-8 w-full border-4 bg-[#9c9d9c44] dark:bg-gray-800 border-gray-500 dark:border-gray-700 m-9 rounded-lg'>
   <h1 className='my-7 text-center font-semibold text-3xl text-gray-900 dark:text-white'>Profile</h1>
 
   <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
@@ -234,17 +234,6 @@ export default function Profile() {
       {loading ? 'Loading...' : 'Update'}
     </Button>
 
-    {currentUser.isAdmin && (
-      <Link to={'/create-post'}>
-        <Button
-          type='button'
-          gradientDuoTone='purpleToPink'
-          className='w-full'
-        >
-          Create a post
-        </Button>
-      </Link>
-    )}
   </form>
 
   {/* Footer Actions */}
@@ -252,7 +241,7 @@ export default function Profile() {
     <span onClick={() => setShowModal(true)} className='cursor-pointer font-bold  hover:text-red-500'>
       Delete Account
     </span>
-    <span onClick={handleSignout} className='cursor-pointer font-bold  hover:text-red-500'>
+    <span onClick={handleSignout} className='cursor-pointer font-bold  hover:text-red-500 '>
       Sign Out
     </span>
   </div>

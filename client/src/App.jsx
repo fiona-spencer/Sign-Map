@@ -78,7 +78,7 @@ function AppWrapper({ apiKey }) {
 
 
         {/* No Account */}
-        <Route path="/settings" element={<Profile />} />
+        <Route path="/settings" element={<Profile />}/>
         <Route path="/contactSupport" element={<ContactSupport />} />
         <Route path="/help" element={<HelpCenter />} />
         <Route path="/startHere" element={<StartHere />} />
@@ -99,7 +99,7 @@ function AppWrapper({ apiKey }) {
 
       </Routes>
       </div>
-      <div className="relative bottom-0 left-0 w-full z-50 bg-white shadow">
+      <div className="relative bottom-0 left-0 w-full z-40 bg-white shadow">
   <FooterCom />
 </div>
 

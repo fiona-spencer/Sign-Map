@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Tooltip, Modal } from 'flowbite-react';
+import { CircularProgressbar } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 import Map from './Map';
 import defaultPinImage from '../assets/default_pin_image.png';
 
@@ -48,6 +50,8 @@ export default function Datasheet({ apiKey, mapState }) {
 
   useEffect(() => {
     const applyFilter = () => {
+      setLoading(true);  // Start loading when filtering
+
       const filtered = pins.filter((pin) => {
         const matchesStatus = filterStatus ? pin.location.status === filterStatus : true;
         const matchesCity = filterCity ? pin.location.address.toLowerCase().includes(filterCity.toLowerCase()) : true;
@@ -73,6 +77,7 @@ export default function Datasheet({ apiKey, mapState }) {
       });
 
       setFilteredPins(filtered);
+      setLoading(false); // Stop loading after filtering
     };
 
     applyFilter();
@@ -114,13 +119,37 @@ export default function Datasheet({ apiKey, mapState }) {
     return pin.location.info.image || defaultPinImage;
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return (
+<div className="flex justify-center items-center h-screen">
+      <CircularProgressbar
+        value={0}
+        text="Loading..."
+        strokeWidth={5}
+        styles={{
+          root: {
+            width: '100px', // Increase the size for better visibility
+            height: '100px', // Increase the size for better visibility
+            position: 'absolute', // Absolute positioning so it stays in the center
+          },
+          path: {
+            stroke: `rgba(42, 150, 50, 1)`, // Set stroke opacity to 1 (fully visible)
+          },
+          text: {
+            fill: 'black', // Color for the text
+            fontSize: '16px', // Font size of the "Loading..." text
+            fontWeight: 'bold',
+          },
+        }}
+      />
+    </div>
+  );
+  
   if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="w-full overflow-x-auto p-6 bg-[#267b6684] dark:bg-gray-800">
       {/* Modal for Introduction */}
-      <Modal show={showIntroModal} onClose={() => setShowIntroModal(false)} size="md" popup>
+      {/* <Modal show={showIntroModal} onClose={() => setShowIntroModal(false)} size="md" popup>
         <Modal.Body>
           <div className="text-center">
             <h3 className="m-5 text-lg font-semibold text-gray-900 dark:text-white">
@@ -139,11 +168,10 @@ export default function Datasheet({ apiKey, mapState }) {
             </div>
           </div>
         </Modal.Body>
-      </Modal>
+      </Modal> */}
 
-
-        {/* Map Section */}
-        <div className="mb-6">
+      {/* Map Section */}
+      <div className="mb-6">
         <Map mapState={mapState} apiKey={apiKey} pins={filteredPins} />
       </div>
 
@@ -168,7 +196,6 @@ export default function Datasheet({ apiKey, mapState }) {
           <input type="email" placeholder="Contact Email" value={filterContactEmail} onChange={(e) => setFilterContactEmail(e.target.value)} className="p-2 border rounded" />
           <input type="text" placeholder="Contact Phone Number" value={filterContactPhone} onChange={(e) => setFilterContactPhone(e.target.value)} className="p-2 border rounded" />
 
-
           <Button onClick={handleResetFilters} className="w-full md:w-auto text-xs py-2 px-4 bg-red-500 text-white hover:bg-red-600">
             Reset Filters
           </Button>
@@ -188,7 +215,6 @@ export default function Datasheet({ apiKey, mapState }) {
               <th className="px-2 py-1 border text-xs dark:text-gray-300">Contact Phone</th>
               <th className="px-2 py-1 border text-xs dark:text-gray-300">Address</th>
               <th className="px-2 py-1 border text-xs dark:text-gray-300">Status</th>
-              {/* <th className="px-2 py-1 border text-xs dark:text-gray-300">Image</th> */}
               <th className="px-2 py-1 border text-xs dark:text-gray-300">File Name</th>
               <th className="px-2 py-1 border text-xs dark:text-gray-300">History</th>
             </tr>
@@ -196,8 +222,8 @@ export default function Datasheet({ apiKey, mapState }) {
           <tbody>
             {filteredPins.map((pin, index) => (
               <tr key={pin._id || index} className="hover:bg-gray-100 dark:hover:bg-gray-600">
-                <td className="px-2 py-1 border text-xs  bg-green-300 dark:bg-[#a72929]">{pin.createdBy?.username || 'N/A'}</td>
-                <td className="px-2 py-1 border text-xs  bg-green-200 dark:bg-red-400">{formatDate(pin.createdAt)}</td>
+                <td className="px-2 py-1 border text-xs bg-green-300 dark:bg-[#a72929]">{pin.createdBy?.username || 'N/A'}</td>
+                <td className="px-2 py-1 border text-xs bg-green-200 dark:bg-red-400">{formatDate(pin.createdAt)}</td>
                 <td className="px-2 py-1 border text-xs">{pin.location.info.populusId || 'N/A'}</td>
                 <td className="px-2 py-1 border text-xs">{pin.location.info.contactName || 'N/A'}</td>
                 <td className="px-2 py-1 border text-xs">{pin.location.info.contactEmail || 'N/A'}</td>
@@ -206,9 +232,6 @@ export default function Datasheet({ apiKey, mapState }) {
                 <td className={`px-2 py-1 border text-xs ${getStatusClass(pin.location.status)}`}>
                   {pin.location.status}
                 </td>
-                {/* <td className="px-2 py-1 border text-xs">
-                  <img src={getImage(pin)} alt="Pin" className="w-12 h-12 object-cover" />
-                </td> */}
                 <td className="px-2 py-1 border text-xs">{pin.location.info.fileName}</td>
                 <td className="px-2 py-1 border text-xs">
                   <a href={`/history/${pin._id}`} className="text-blue-500 hover:underline">View History</a>
@@ -218,8 +241,6 @@ export default function Datasheet({ apiKey, mapState }) {
           </tbody>
         </table>
       </div>
-
-    
     </div>
   );
 }

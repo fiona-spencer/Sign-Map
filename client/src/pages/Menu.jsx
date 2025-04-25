@@ -6,10 +6,8 @@ import { Button, Carousel } from 'flowbite-react';
 import cityImage from '../assets/city_image.svg';
 import CNTowerImage from '../assets/CNTower.jpg';
 import nightImage from '../assets/night.jpg';
-import romImage from '../assets/rom.jpg';
 import trinityImage from '../assets/trinity.jpg';
-import streetCarImage from '../assets/street_car.jpg';
-import islandImage from '../assets/center_island.jpg';
+import islandImage from '../assets/toronto_island.jpg';
 import paiImage from '../assets/pai.jpg';
 
 
@@ -83,9 +81,6 @@ export default function Menu() {
   <div className="p-9 bg-[#463b2fe7]">
   <div className="h-56 sm:h-64 xl:h-96 2xl:h-96 rounded-lg overflow-hidden max-w-[800px] lg:max-w-[1400px] shadow-md border mx-auto">
   <Carousel>
-        <div className="flex h-full items-center justify-center bg-green-100 dark:bg-green-900 text-green-900 dark:text-green-200 text-xl font-medium">
-        <img src={streetCarImage} alt="Toronto City" className="h-96 w-full object-cover" />
-        </div>
         <div className="flex h-full items-center justify-center bg-green-200 dark:bg-green-800 text-green-900 dark:text-green-200 text-xl font-medium">
         <img src={CNTowerImage} alt="Toronto City" className="h-96 w-full object-cover" />
         </div>
@@ -97,9 +92,6 @@ export default function Menu() {
         </div>
         <div className="flex h-full items-center justify-center bg-green-300 dark:bg-green-700 text-green-900 dark:text-green-100 text-xl font-medium">
         <img src={nightImage} alt="Toronto City" className="h-96 w-full object-cover" />
-        </div>
-        <div className="flex h-full items-center justify-center bg-green-300 dark:bg-green-700 text-green-900 dark:text-green-100 text-xl font-medium">
-        <img src={romImage} alt="Toronto City" className="h-96 w-full object-cover" />
         </div>
         <div className="flex h-full items-center justify-center bg-green-300 dark:bg-green-700 text-green-900 dark:text-green-100 text-xl font-medium">
         <img src={trinityImage} alt="Toronto City" className="h-96 w-full object-cover" />

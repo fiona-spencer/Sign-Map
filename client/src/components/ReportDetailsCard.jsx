@@ -31,61 +31,53 @@ export function ReportDetailsCard({ selectedReport }) {
   const statusClass = getStatusClass(status);
 
   return (
-    <Card className="max-w-full mx-auto">
+    <Card className="max-w-xl mx-auto h-[auto] shadow-lg space-y-4">
       {/* Title and Status */}
-      <div className="flex justify-between items-start">
-        <div>
-          {/* Contact Info */}
-          <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            Contact Information:
-          </h5>
-          <p className="text-sm font-semibold text-gray-600 dark:text-blue-300">
+      <div className="flex justify-between items-start space-x-4">
+        <div className="flex-1">
+          <p className="text-md font-semibold text-gray-800 dark:text-blue-300">
             <strong>Name:</strong> {selectedReport?.location?.info?.contactName || "N/A"}
           </p>
-          <p className="text-sm font-semibold text-gray-600 dark:text-blue-300">
+          <p className="text-md font-semibold text-gray-800 dark:text-blue-300">
             <strong>Email:</strong> {selectedReport?.location?.info?.contactEmail || "N/A"}
           </p>
-          <p className="text-sm font-semibold text-gray-600 dark:text-blue-300">
+          <p className="text-md font-semibold text-gray-800 dark:text-blue-300">
             <strong>Phone:</strong> {selectedReport?.location?.info?.contactPhoneNumber || "N/A"}
           </p>
 
-          {/* Status */}
-          <div className={`inline-block mt-2 px-2 py-1 rounded text-sm font-semibold ${statusClass}`}>
-            Status: {status.charAt(0).toUpperCase() + status.slice(1)}
-          </div>
+         
         </div>
 
         {/* User Info */}
-        <div className="text-right">
-          <p className="font-semibold text-gray-900 dark:text-white">
+        <div className="text-right flex-2">
+          <p className="text-[10px] font-bold text-gray-500 dark:text-white">
             {selectedReport?.createdBy?.username || "N/A"}
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-[10px] text-gray-600 dark:text-gray-400">
             {selectedReport?.createdBy?.userType || "N/A"}
           </p>
         </div>
       </div>
-
-      <div className="mt-4 p-4 border-t border-gray-300 bg-white dark:bg-gray-800 dark:text-white space-y-4">
-        {/* Description */}
-        <div>
-          <label className="block font-semibold mb-1">Description:</label>
-          <textarea
-            readOnly
-            value={plainTextDescription || "No description available"}
-            className="w-full h-32 p-2 text-sm bg-black-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded resize-none"
-          />
+ {/* Status */}
+ <div className={`inline-block w-full px-2 py-1 rounded text-sm font-semibold ${statusClass}`}>
+            Status: {status.charAt(0).toUpperCase() + status.slice(1)}
+          </div>
+      <div className=" p-2 border-t border-gray-300 bg-white dark:bg-gray-800 dark:text-white space-y-3">
+        {/* Location and Date Created in horizontal layout */}
+        <div className="flex justify-between space-x-2">
+            <div className="inline ">
+             <p className="text-md text-red-700"><strong>Location:</strong></p>
+          <p className="text-md"> {selectedReport?.location?.address || "No address available"}</p>
+            </div>
+            <div className="inline ">
+          <p className="text-md"><strong>Date Created:</strong> </p>
+          <p>{new Date(selectedReport?.createdAt).toLocaleDateString()}</p>
+            </div>
         </div>
-
-        {/* Location Address */}
-        <p><strong>Location:</strong> {selectedReport?.location?.address || "No address available"}</p>
-
-        {/* Date of Incident */}
-        <p><strong>Date Created:</strong> {new Date(selectedReport?.createdAt).toLocaleDateString()}</p>
 
         {/* Optional Phone Number */}
         {selectedReport?.phoneNumber && (
-          <p><strong>Phone Number:</strong> {selectedReport?.phoneNumber}</p>
+          <p className="text-sm"><strong>Phone Number:</strong> {selectedReport?.phoneNumber}</p>
         )}
       </div>
     </Card>
