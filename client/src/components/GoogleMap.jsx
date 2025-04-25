@@ -12,7 +12,6 @@ const GoogleMap = ({
   center = { lat: 43.7, lng: -79.42 },
   zoom = 12,
 }) => {
-
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const searchInputRef = useRef(null);
@@ -25,6 +24,12 @@ const GoogleMap = ({
   const [address, setAddress] = useState('');
   const [placeholder, setPlaceholder] = useState('Search for a place');
   const [resetPinsTrigger, setResetPinsTrigger] = useState(0);
+  const [viewMode, setViewMode] = useState(() => sessionStorage.getItem('viewMode') || 'default');
+  const [showGeoJson, setShowGeoJson] = useState(() => JSON.parse(sessionStorage.getItem('showGeoJson')) || false); // New state for checkbox
+
+  useEffect(() => {
+    localStorage.setItem('mapViewMode', viewMode);
+  }, [viewMode]);
 
   const navigate = useNavigate();
 
@@ -56,6 +61,15 @@ const GoogleMap = ({
     };
   }, [apiKey]);
 
+  const featureStyleFunction = (feature) => {
+    return {
+      fillColor: 'white',
+      fillOpacity: 0.3,
+      strokeWeight: 1,
+    };
+  };
+
+  // Initialize the map and all its features
   const initMap = async () => {
     if (!mapRef.current) return;
 
@@ -63,9 +77,23 @@ const GoogleMap = ({
       const { Map } = await google.maps.importLibrary('maps');
       const { AdvancedMarkerElement } = await google.maps.importLibrary('marker');
 
-      const map = new Map(mapRef.current, { center, zoom, mapId });
+      const map = new Map(mapRef.current, {
+        center,
+        zoom,
+        mapId,
+      });
+
       mapInstanceRef.current = map;
 
+      // 🗺️ KMZ Layer (if applicable)
+      const kmzUrl = 'https://your-server-url/path/to/your-file.kmz'; // Change this to your KMZ file URL
+      const kmzLayer = new google.maps.KmlLayer({
+        url: kmzUrl,
+        suppressInfoWindows: true, // Optionally suppress info windows
+        map: map,
+      });
+
+      // 🔍 Autocomplete
       const autocomplete = new google.maps.places.Autocomplete(searchInputRef.current, {
         fields: ['place_id', 'geometry', 'name'],
         types: ['geocode'],
@@ -84,6 +112,7 @@ const GoogleMap = ({
         }
       });
 
+      // 🖱️ Click Handler for the map
       map.addListener('click', (e) => {
         setMarkerPosition(e.latLng);
         setShowCreateReportForm(true);
@@ -102,33 +131,75 @@ const GoogleMap = ({
           searchInputRef.current.placeholder = 'Search for a place';
         }
       });
+
+      // GeoJSON Layer
+      const geoJsonLayer = new google.maps.Data();
+      geoJsonLayer.loadGeoJson('/toronto_geo.geojson'); // Make sure it's in the public folder
+
+      // Apply feature style to the GeoJSON layer
+      geoJsonLayer.setStyle(featureStyleFunction);
+
+      // Add event listener for clicks on polygons
+      geoJsonLayer.addListener('click', (event) => {
+        const postalCode = event.feature.getProperty('CFSAUID');
+        alert(`Postal Code: ${postalCode}`);
+      });
+
+      // Toggle GeoJSON visibility based on the checkbox
+      if (showGeoJson) {
+        geoJsonLayer.setMap(map);
+      } else {
+        geoJsonLayer.setMap(null);
+      }
+
+      if (viewMode === 'default' || viewMode === 'both') {
+        window.reload();
+      }
+
     } catch (error) {
       console.error('Map initialization error:', error);
     }
   };
 
+  useEffect(() => {
+    initMap();
+  }, [viewMode, showGeoJson]); // Listen to both viewMode and showGeoJson changes
+
+  // Handle GeoJSON visibility toggle
+  const handleGeoJsonToggle = (e) => {
+    const isChecked = e.target.checked;
+    setShowGeoJson(isChecked);
+
+    // Save the state to session storage
+    sessionStorage.setItem('showGeoJson', isChecked.toString());
+
+    // If unchecked, reload the window
+    if (isChecked || !isChecked) {
+      window.location.reload();
+    }
+  };
+
   const handleCreateMarker = async (reportData) => {
     setIsSubmitting(true);
-  
+
     try {
       const geocoder = new google.maps.Geocoder();
       const latlng = { lat: markerPosition.lat(), lng: markerPosition.lng() };
-  
+
       geocoder.geocode({ location: latlng }, async (results, status) => {
         if (status === 'OK' && results[0]) {
           const locationName = results[0].formatted_address;
-  
+
           const response = await fetch('/api/pin/createPin', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ...reportData, locationName, position: latlng }),
           });
-  
+
           const result = await response.json();
           if (result.success) {
-            // ✅ Close the form and refresh the pins
             setShowCreateReportForm(false);
-            setResetPinsTrigger(prev => prev + 1); // 🔁 Trigger marker refresh
+            setResetPinsTrigger(prev => prev + 1);
           } else {
             console.error('Report submission failed:', result);
           }
@@ -142,74 +213,46 @@ const GoogleMap = ({
       setIsSubmitting(false);
     }
   };
-  
 
   const handleClearAddress = () => {
     setAddress('');
     setMarkerPosition(null);
-  
+
     if (searchInputRef.current) {
       searchInputRef.current.value = '';
       searchInputRef.current.placeholder = 'Search for a place';
     }
-  
-    // Zoom out when clearing the address
+
     if (mapInstanceRef.current) {
-      mapInstanceRef.current.setZoom(zoom); // Default zoom level or you can set a custom level here
-      mapInstanceRef.current.setCenter(center); // Reset map center to default
+      mapInstanceRef.current.setZoom(zoom);
+      mapInstanceRef.current.setCenter(center);
     }
   };
 
   const fitBoundsToPins = () => {
-    if (!mapInstanceRef.current) {
-      console.log('Map instance is not available');
-      return;
-    }
-  
-    if (!filteredPins || !Array.isArray(filteredPins) || filteredPins.length === 0) {
-      console.log('No pins available or filteredPins is not an array');
-      return;
-    }
-  
+    if (!mapInstanceRef.current) return;
+    if (!filteredPins || !Array.isArray(filteredPins) || filteredPins.length === 0) return;
+
     const bounds = new google.maps.LatLngBounds();
-  
-    // Loop through all filtered pins and extend the bounds to include each pin's location
-    filteredPins.forEach((pin, index) => {
+
+    filteredPins.forEach((pin) => {
       if (pin.location && pin.location.lat && pin.location.lng) {
-        console.log(`Pin ${index}:`, pin.location);
         bounds.extend(new google.maps.LatLng(pin.location.lat, pin.location.lng));
-      } else {
-        console.log(`Pin ${index} does not have valid position data:`, pin);
       }
     });
-  
-    // Adjust the map's viewport to the bounds of all pins
-    if (bounds.isEmpty()) {
-      console.log('Bounds are empty, nothing to fit');
-      return;
-    }
-  
-    console.log('Fitting map to bounds...');
-  
-    // Set padding for the bounds to avoid zooming in too much
-    const padding = 50; // Adjust as needed
-  
-    // Fit the bounds with padding
+
+    if (bounds.isEmpty()) return;
+
     const map = mapInstanceRef.current;
-    map.fitBounds(bounds, padding);
-  
-    // After fitting bounds, check the zoom level and set a minimum zoom level if needed
+    map.fitBounds(bounds, 50);
+
     const currentZoom = map.getZoom();
-    const minimumZoom = 12; // Set the minimum zoom level you want
-  
-    // If there's only one pin, set the zoom level to the minimum zoom level
+    const minimumZoom = 12;
+
     if (filteredPins.length === 1 && currentZoom < minimumZoom) {
       map.setZoom(minimumZoom);
     }
   };
-  
-  
-  
 
   useEffect(() => {
     if (isMapLoaded) {
@@ -227,9 +270,19 @@ const GoogleMap = ({
 
   return (
     <div className="rounded-lg shadow-sm border px-6 bg-[#ffffff7d] pb-6">
-      <h3 className="text-xl font-bold p-4">View Toronto Reports</h3>
+      <h3 className="text-xl font-bold p-4">View Reports</h3>
 
-      {/* Search Bar */}
+      {/* GeoJSON toggle checkbox */}
+      <div className="mb-4">
+        <label className="mr-4">Show GeoJSON Layer:</label>
+        <input
+          type="checkbox"
+          checked={showGeoJson}
+          onChange={handleGeoJsonToggle}
+          className="p-2 border border-gray-300 rounded-md"
+        />
+      </div>
+
       <div className="p-4">
         <input
           ref={searchInputRef}
@@ -239,19 +292,19 @@ const GoogleMap = ({
         />
       </div>
 
-      {/* Button to Create Report */}
+      {/* Other components */}
       {address && !showCreateReportForm && (
         <div className="p-4">
           <div className="flex flex-wrap gap-4">
             <button
               onClick={() => setShowCreateReportForm(true)}
-              className="bg-blue-600 text-white px-6 py-2 rounded-2xl shadow-md hover:bg-blue-700 hover:scale-[1.02] transition-transform duration-200 ease-in-out focus:ring-2 focus:ring-blue-400"
+              className="bg-blue-600 text-white px-6 py-2 rounded-2xl shadow-md hover:bg-blue-700"
             >
               Create Pin at {address}
             </button>
             <button
               onClick={handleClearAddress}
-              className="bg-red-500 text-white px-6 py-2 rounded-2xl shadow-md hover:bg-red-600 hover:scale-[1.02] transition-transform duration-200 ease-in-out focus:ring-2 focus:ring-red-400"
+              className="bg-red-500 text-white px-6 py-2 rounded-2xl shadow-md hover:bg-red-600"
             >
               Clear Address
             </button>
@@ -259,7 +312,6 @@ const GoogleMap = ({
         </div>
       )}
 
-      {/* Overlay and Create Report Form */}
       {showCreateReportForm && (
         <>
           <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={() => setShowCreateReportForm(false)} />
@@ -277,20 +329,17 @@ const GoogleMap = ({
         </>
       )}
 
-      {/* Show Pins */}
       <ShowPins
-  pins={filteredPins}
-  mapInstanceRef={mapInstanceRef}
-  highlightedPin={highlightedPin}
-  setHighlightedPin={setHighlightedPin}
-  resetPinsTrigger={resetPinsTrigger} // 🔁 Add trigger prop
-  onSelectPin={(pin) => setSelectedReport(pin)}
-/>
+        pins={filteredPins}
+        mapInstanceRef={mapInstanceRef}
+        highlightedPin={highlightedPin}
+        setHighlightedPin={setHighlightedPin}
+        resetPinsTrigger={resetPinsTrigger}
+        onSelectPin={(pin) => setSelectedReport(pin)}
+      />
 
-      {/* Map */}
       <div id="map" ref={mapRef} className="w-full h-[500px] rounded-lg"></div>
 
-      {/* Report Details */}
       <div className="mt-4 rounded-xl border-gray-300 bg-transparent dark:text-white dark:bg-emerald-600">
         <ReportDetailsCard selectedReport={selectedReport} />
       </div>
