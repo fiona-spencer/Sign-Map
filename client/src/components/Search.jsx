@@ -16,22 +16,19 @@ export default function Search() {
 
   return (
     <div className="py-2 flex justify-center items-center gap-4
-      bg-[#173e28] text-white dark:bg-gray-500 dark:text-white
+      bg-[#173e28] text-white dark:bg-green-600 dark:text-white
       transition-colors duration-300">
-      <div className="text-white dark:text-white">Search for a Report</div>
+      <div className="text-white dark:text-white"></div>
       <form onSubmit={handleSubmit} className="flex items-center">
         <TextInput
           type='text'
           placeholder='Search...'
           rightIcon={AiOutlineSearch}
-          className='hidden lg:inline w-96'
+          color="green" // Ensure consistent input field styling
+          className='inline sm:w-[500px] w-full pr-'
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          color="gray" // Ensure consistent input field styling
         />
-        <Button className='w-12 h-10 lg:hidden' color='gray' pill>
-          <AiOutlineSearch />
-        </Button>
       </form>
     </div>
   );

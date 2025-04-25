@@ -22,7 +22,7 @@ export const signup = async (req, res, next) => {
     username,
     email,
     password: hashedPassword,
-    userType, // Now taking userType into account
+    userType, // userType is now taken into account
   });
 
   try {
@@ -52,8 +52,9 @@ export const signin = async (req, res, next) => {
       return next(errorHandler(400, 'Invalid password'));
     }
 
+    // Generate JWT with userType and id
     const token = jwt.sign(
-      { id: validUser._id, userType: validUser.userType }, // Use userType here
+      { id: validUser._id, userType: validUser.userType }, // Include userType here
       process.env.JWT_SECRET
     );
 
@@ -62,7 +63,7 @@ export const signin = async (req, res, next) => {
     res
       .status(200)
       .cookie('access_token', token, { httpOnly: true })
-      .json(rest);
+      .json(rest);  // Send user info excluding password
   } catch (error) {
     next(error);
   }
@@ -78,7 +79,7 @@ export const googleAuth = async (req, res, next) => {
 
     if (user) {
       // If user exists, generate a JWT token and return user data (sign-in)
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      const token = jwt.sign({ id: user._id, userType: user.userType }, process.env.JWT_SECRET); // Include userType
       const { password, ...rest } = user._doc;
 
       return res
@@ -91,7 +92,6 @@ export const googleAuth = async (req, res, next) => {
     }
 
     // If user doesn't exist, proceed with sign-up
-    // Validate userType or fallback to 'public'
     const validUserTypes = ['user', 'public'];
     const finalUserType = validUserTypes.includes(userType) ? userType : 'public';
 
@@ -113,7 +113,8 @@ export const googleAuth = async (req, res, next) => {
     await newUser.save();
 
     // Generate a JWT token for the new user
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+    const token = jwt.sign({ id: newUser._id, userType: newUser.userType }, process.env.JWT_SECRET);
+
     const { password, ...rest } = newUser._doc;
 
     // Send token in a cookie and return user info (excluding password)
@@ -128,10 +129,6 @@ export const googleAuth = async (req, res, next) => {
     next(error);
   }
 };
-
-
-
-
 
 // Sign out a user (clear cookies)
 export const signout = (req, res) => {

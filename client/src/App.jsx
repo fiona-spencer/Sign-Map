@@ -7,7 +7,6 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Report from './pages/Report';
 import SuccessfullyCreated from "./pages/SuccessfullyCreated";
-import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
 import SearchPage from "./pages/SearchPage";
 import Datasheet from "./pages/Datasheet";
@@ -17,11 +16,14 @@ import Header from "./components/Header";
 import FooterCom from "./components/Footer";
 import Search from "./components/Search";
 
+//Settings Navbar
+
 //No User
-import SettingsPage from './components/noType/SettingsPage'
 import ContactSupport from './components/noType/ContactSupport';
 import HelpCenter from "./components/noType/HelpCenter";
 import StartHere from './components/noType/StartHere'
+
+
 
 
 //Public
@@ -29,6 +31,12 @@ import StartHere from './components/noType/StartHere'
 //User
 
 //Admin
+import SubmittedPins from "./components/adminType/SubmittedPins";
+import Database from "./components/adminType/Database";
+import LogPage from "./components/adminType/LogPage";
+import Analytics from "./components/adminType/Analytics";
+
+
 
 function AppWrapper({ apiKey }) {
   const location = useLocation();
@@ -62,7 +70,6 @@ function AppWrapper({ apiKey }) {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/report" element={<Report />} />
         <Route path="/successfullyCreated" element={<SuccessfullyCreated />} />
-        <Route path="/profile" element={<Profile />} />
         <Route path="/search" element={<SearchPage />} />
         <Route
           path="/datasheets"
@@ -71,11 +78,22 @@ function AppWrapper({ apiKey }) {
 
 
         {/* No Account */}
-        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/settings" element={<Profile />} />
         <Route path="/contactSupport" element={<ContactSupport />} />
         <Route path="/help" element={<HelpCenter />} />
         <Route path="/startHere" element={<StartHere />} />
 
+        {/* Public Account */}
+
+        {/* User Account */}
+
+        {/* Admin Account */}
+        <Route path="/database" element={<Database />} />
+        <Route path="/inbox" element={<SubmittedPins />} />
+        <Route path="/logs" element={<LogPage />} />
+        <Route path="/analytics" element={<Analytics />} />
+
+        
 
 
 

@@ -17,7 +17,9 @@ import {
   HiStar,
   HiQuestionMarkCircle,
   HiMenu,
-  HiX
+  HiX,
+  HiPhoneOutgoing,
+  HiDatabase,
 } from "react-icons/hi";
 
 export default function Settings() {
@@ -65,7 +67,7 @@ export default function Settings() {
 
   const sharedItems = [
     { href: "/help", label: "Help Center", icon: HiQuestionMarkCircle },
-    { href: "/contactSupport", label: "Contact Support", icon: HiQuestionMarkCircle },
+    { href: "/contactSupport", label: "Contact Support", icon: HiPhoneOutgoing },
     { href: "/signout", label: "Sign Out", icon: HiArrowSmRight },
   ];
 
@@ -81,6 +83,7 @@ export default function Settings() {
 
     if (userType === 'public') {
       return [
+        { href: "/settings", label: "Profile", icon: HiUser },
         { href: "/signin", label: "Sign In", icon: HiArrowSmRight },
         { href: "/signup", label: "Sign Up", icon: HiTable },
         ...sharedItems,
@@ -89,6 +92,7 @@ export default function Settings() {
 
     if (userType === 'user') {
       return [
+        { href: "/settings", label: "Profile", icon: HiUser },
         { href: "/my-pins", label: "My Pins", icon: HiStar },
         { href: "/favourites", label: "Favourites", icon: HiStar },
         { href: "/updates", label: "Updates", icon: HiChartPie },
@@ -98,9 +102,10 @@ export default function Settings() {
 
     if (userType === 'admin') {
       return [
-        { href: "/submitted", label: "Submitted Markers", icon: HiInbox },
-        { href: "/users", label: "Active Users", icon: HiUser },
+        { href: "/settings", label: "Profile", icon: HiUser },
+        { href: "/inbox", label: "Submitted Markers", icon: HiInbox },
         { href: "/logs", label: "Page Log", icon: HiTable },
+        { href: "/database", label: "Database", icon: HiDatabase },
         { href: "/analytics", label: "Analytics", icon: HiChartPie },
         ...sharedItems,
       ];
@@ -115,7 +120,7 @@ export default function Settings() {
         z-10 bg-white dark:bg-gray-800 text-green-700 dark:text-green-400 shadow-md
         ${isMobile
           ? 'absolute top-[125px] left-0 w-full'
-          : `top-[125px] left-0 ${isFixed ? 'fixed' : 'absolute'} ${sidebarOpen ? 'w-64' : 'w-0'} h-[calc(100vh-125px)] transition-all duration-300 overflow-hidden`
+          : `top-[125px] left-0 ${isFixed ? 'fixed' : 'fixed'} ${sidebarOpen ? 'w-64' : 'w-0'} h-[calc(100vh-125px)] transition-all duration-300 overflow-hidden`
         }
       `}
     >
@@ -125,7 +130,6 @@ export default function Settings() {
           onClick={() => {
             setSidebarOpen(prev => !prev);
             setIsFixed(prev => !prev); // Sidebar fixed/absolute
-            setIsButtonFixed(prev => !prev); // Button fixed/absolute
           }}
           className={`
             ${isButtonFixed ? 'absolute top-[15px] left-3' : 'fixed top-[138px] left-3'}
@@ -140,13 +144,7 @@ export default function Settings() {
         </Button>
       )}
 
-      {/* User Info */}
-      {sidebarOpen && !isMobile && (
-        <div className="p-4 pl-20 text-xs text-gray-700 dark:text-gray-200 border-b border-gray-300 dark:border-gray-600">
-          <p><strong>User:</strong> {username}</p>
-          <p><strong>Role:</strong> {userType || 'Guest'}</p>
-        </div>
-      )}
+      
 
       {/* Mobile View: Dropdown */}
       {isMobile && (
@@ -170,22 +168,35 @@ export default function Settings() {
 )}
 
 
-
       {/* Desktop View: Sidebar */}
       {!isMobile && sidebarOpen && (
-        <Sidebar className="h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 text-sm">
+        <Sidebar className="h-full pt-16 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 text-sm">
           <SidebarItems>
-            <SidebarItemGroup className="space-y-1 px-3 py-2">
-              {menuItems().map((item) => (
-                <SidebarItem
-                  href={item.href}
-                  key={item.label}
-                  icon={item.icon}
-                  className="text-xs px-2 py-1 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors duration-150"
-                >
-                  {item.label}
-                </SidebarItem>
-              ))}
+            {/* User Info */}
+{sidebarOpen && !isMobile && (
+        <div className="text-sm px-3">
+          <p><strong>User:</strong> {username}</p>
+          <p><strong>Role:</strong> {userType || 'Guest'}</p>
+        </div>
+      )}
+
+            <SidebarItemGroup className="px-0 py-5">
+            {menuItems().map((item) => (
+  <SidebarItem
+    href={item.href}
+    key={item.label}
+    className={`text-md py-2 font-bold rounded transition-colors duration-150 
+      ${item.label === 'Sign Out' ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'} 
+      hover:bg-gray-300 dark:hover:bg-gray-700 flex items-center`}
+  >
+    {/* Conditionally style the icon and set its height */}
+    <item.icon className={`${item.label === 'Sign Out' ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'} mr-2 h-5 w-5 inline`} />
+    {item.label}
+  </SidebarItem>
+))}
+
+
+
             </SidebarItemGroup>
           </SidebarItems>
         </Sidebar>

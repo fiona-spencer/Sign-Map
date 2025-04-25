@@ -1,3 +1,4 @@
+import Settings from './Settings';
 import { Alert, Button, Modal, ModalBody, TextInput } from 'flowbite-react';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -147,7 +148,7 @@ export default function Profile() {
   
 
   return (
-<div className='max-w-lg mx-auto p-8 w-full border-2 bg-[#d7dad85c] dark:bg-gray-800 border-gray-300 dark:border-gray-700 m-9 rounded-lg'>
+<div className='max-w-lg mx-auto p-8 w-full border-4 bg-[#9ca6a344] dark:bg-gray-800 border-gray-500 dark:border-gray-700 m-9 rounded-lg'>
   <h1 className='my-7 text-center font-semibold text-3xl text-gray-900 dark:text-white'>Profile</h1>
 
   <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
@@ -298,6 +299,8 @@ export default function Profile() {
       </div>
     </Modal.Body>
   </Modal>
+  {/* Settings Component */}
+  <Settings />
 </div>
 
   );

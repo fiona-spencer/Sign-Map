@@ -4,81 +4,105 @@ import Settings from '../../pages/Settings';
 
 export default function HelpCenter() {
   return (
-    <div className="flex flex-col items-center justify-start p-6 w-full">
-      <h1 className="text-3xl font-semibold text-center mb-4">Help Center</h1>
-      <p className="text-lg mb-6 text-center text-gray-700">
+    <div className="flex flex-col items-center justify-start p-6 w-full bg-[#695f567a] dark:bg-[#6a6e81e4] dark:text-white">
+      <h1 className="text-3xl font-semibold text-center mb-4 pt-16 md:pt-0 dark:text-white">Help Center</h1>
+      <p className="text-lg mb-6 text-center text-gray-700 dark:text-gray-100">
         Welcome to the Help Center! Here are some frequently asked questions (FAQs) to assist you.
       </p>
 
       {/* Accordion for Q&A */}
-      <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-lg">
-        <Accordion>
-          <Accordion.Panel>
-            <Accordion.Title>
-              <h3 className="text-lg font-semibold">How can I reset my password?</h3>
-            </Accordion.Title>
-            <Accordion.Content>
-              <p className="text-sm text-gray-700">
-                To reset your password, click on the "Forgot Password" link on the login page. You will be prompted to enter your registered email address, and we will send you a link to reset your password.
-              </p>
-            </Accordion.Content>
-          </Accordion.Panel>
+      <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg px-6 py-6 sm:pt-16 dark:bg-[#00000085] dark:text-white dark:border-2 dark:border-white">
+        <h2 className="text-base sm:text-lg md:text-xl font-semibold text-center mb-6 dark:text-white">Frequently Asked Questions</h2>
 
-          <Accordion.Panel>
-            <Accordion.Title>
-              <h3 className="text-lg font-semibold">How do I update my profile information?</h3>
-            </Accordion.Title>
-            <Accordion.Content>
-              <p className="text-sm text-gray-700">
-                You can update your profile information by going to your account settings. From there, you can edit your username, email, and other personal details. Don't forget to save your changes.
-              </p>
-            </Accordion.Content>
-          </Accordion.Panel>
+        {/* No Account Accordion */}
+        <div className="mb-6">
+          <h3 className="text-sm sm:text-base md:text-lg font-bold mb-2 dark:text-white">No Account</h3>
+          <Accordion collapseAll>
+            <Accordion.Panel defaultOpen={false}>
+              <Accordion.Title className='md:p-3 py-2'>
+                <h4 className="text-xs sm:text-sm md:text-base font-semibold dark:text-white">How can I reset my password?</h4>
+              </Accordion.Title>
+              <Accordion.Content>
+                <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+                  Click on "Forgot Password" on the login page. Enter your registered email to receive a reset link.
+                </p>
+              </Accordion.Content>
+            </Accordion.Panel>
+          </Accordion>
+        </div>
 
-          <Accordion.Panel>
-            <Accordion.Title>
-              <h3 className="text-lg font-semibold">What should I do if I encounter an error?</h3>
-            </Accordion.Title>
-            <Accordion.Content>
-              <p className="text-sm text-gray-700">
-                If you encounter an error, first try refreshing the page. If the issue persists, clear your browser's cache and cookies. If the problem continues, feel free to contact our support team for further assistance.
-              </p>
-            </Accordion.Content>
-          </Accordion.Panel>
+        {/* Public Account Accordion */}
+        <div className="mb-6">
+          <h3 className="text-sm sm:text-base md:text-lg font-bold mb-2 dark:text-white">Public Account</h3>
+          <Accordion collapseAll>
+            <Accordion.Panel defaultOpen={false}>
+              <Accordion.Title className='md:p-3 py-2'>
+                <h4 className="text-xs sm:text-sm md:text-base font-semibold dark:text-white">How do I update my profile information?</h4>
+              </Accordion.Title>
+              <Accordion.Content>
+                <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+                  Go to your account settings to update your username, email, and other details.
+                </p>
+              </Accordion.Content>
+            </Accordion.Panel>
+          </Accordion>
+        </div>
 
-          <Accordion.Panel>
-            <Accordion.Title>
-              <h3 className="text-lg font-semibold">How do I contact support?</h3>
-            </Accordion.Title>
-            <Accordion.Content>
-              <p className="text-sm text-gray-700">
-                You can contact support by visiting the Contact Support page. Simply fill out the form with your details and message, and our support team will get back to you as soon as possible.
-              </p>
-            </Accordion.Content>
-          </Accordion.Panel>
+        {/* User Account Accordion */}
+        <div className="mb-6">
+          <h3 className="text-sm sm:text-base md:text-lg font-bold mb-2 dark:text-white">User Account</h3>
+          <Accordion collapseAll>
+            <Accordion.Panel defaultOpen={false}>
+              <Accordion.Title className='md:p-3 py-2'>
+                <h4 className="text-xs sm:text-sm md:text-base font-semibold dark:text-white">What should I do if I encounter an error?</h4>
+              </Accordion.Title>
+              <Accordion.Content>
+                <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+                  Try refreshing the page. If it persists, clear your cache or contact support.
+                </p>
+              </Accordion.Content>
+            </Accordion.Panel>
 
-          <Accordion.Panel>
-            <Accordion.Title>
-              <h3 className="text-lg font-semibold">What are the system requirements to use the platform?</h3>
-            </Accordion.Title>
-            <Accordion.Content>
-              <p className="text-sm text-gray-700">
-                Our platform is compatible with modern browsers such as Chrome, Firefox, and Safari. It is recommended to use the latest version of your browser for optimal performance. The platform is also mobile-friendly.
-              </p>
-            </Accordion.Content>
-          </Accordion.Panel>
+            <Accordion.Panel defaultOpen={false}>
+              <Accordion.Title className='md:p-3 py-2'>
+                <h4 className="text-xs sm:text-sm md:text-base font-semibold dark:text-white">How do I contact support?</h4>
+              </Accordion.Title >
+              <Accordion.Content>
+                <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+                  Visit the Contact Support page and fill out the form to get help.
+                </p>
+              </Accordion.Content>
+            </Accordion.Panel>
+          </Accordion>
+        </div>
 
-          <Accordion.Panel>
-            <Accordion.Title>
-              <h3 className="text-lg font-semibold">How do I delete my account?</h3>
-            </Accordion.Title>
-            <Accordion.Content>
-              <p className="text-sm text-gray-700">
-                If you wish to delete your account, go to your account settings and select the "Delete Account" option. Please note that this action is irreversible, and all your data will be permanently deleted.
-              </p>
-            </Accordion.Content>
-          </Accordion.Panel>
-        </Accordion>
+        {/* Admin Account Accordion */}
+        <div>
+          <h3 className="text-sm sm:text-base md:text-lg font-bold mb-2 dark:text-white">Admin Account</h3>
+          <Accordion collapseAll>
+            <Accordion.Panel defaultOpen={false}>
+              <Accordion.Title className='md:p-3 py-2'>
+                <h4 className="text-xs sm:text-sm md:text-base font-semibold dark:text-white">What are the system requirements to use the platform?</h4>
+              </Accordion.Title>
+              <Accordion.Content>
+                <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+                  Use a modern browser like Chrome, Firefox, or Safari. The platform is mobile-friendly.
+                </p>
+              </Accordion.Content>
+            </Accordion.Panel>
+
+            <Accordion.Panel defaultOpen={false}>
+              <Accordion.Title className='md:p-3 py-2'>
+                <h4 className="text-xs sm:text-sm md:text-base font-semibold dark:text-white">How do I delete my account?</h4>
+              </Accordion.Title>
+              <Accordion.Content>
+                <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+                  In account settings, select "Delete Account". This is irreversible and all your data will be lost.
+                </p>
+              </Accordion.Content>
+            </Accordion.Panel>
+          </Accordion>
+        </div>
       </div>
 
       {/* Settings Component */}
