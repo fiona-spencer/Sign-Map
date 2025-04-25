@@ -84,6 +84,7 @@ function AppWrapper({ apiKey }) {
         <Route path="/startHere" element={<StartHere />} />
 
         {/* Public Account */}
+        <Route path="/startHere" element={<StartHere />} />
 
         {/* User Account */}
 

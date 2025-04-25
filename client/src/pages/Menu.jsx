@@ -3,16 +3,20 @@ import { useSelector } from 'react-redux';
 import { HiOutlineArrowRight } from "react-icons/hi";
 import { Link } from 'react-router-dom';
 import { Button, Carousel } from 'flowbite-react';
-import cityImage from '../assets/city_image.svg';
+import cityImage from '../assets/city_image.png';
 import CNTowerImage from '../assets/CNTower.jpg';
 import nightImage from '../assets/night.jpg';
 import trinityImage from '../assets/trinity.jpg';
 import islandImage from '../assets/toronto_island.jpg';
 import paiImage from '../assets/pai.jpg';
+import JsonUpload from '../components/json_upload';
+import { Card } from 'flowbite-react';
+import CNTower from '../assets/CNTower.jpg'
 
 
 export default function Menu() {
   const [pins, setPins] = useState([]);
+  const [hovered, setHovered] = useState(false);
   const { currentUser } = useSelector((state) => state.user);
   const [formData, setFormData] = useState({
     name: '',
@@ -143,77 +147,123 @@ export default function Menu() {
 
       {/* Info Section  */}
       <div className=' bg-[#ddddddec] dark:bg-[#121212c1]'>
-        <div className="max-w-5xl mx-auto px-10 py-10 space-y-10">
+  <div className="max-w-5xl mx-auto px-10 py-10 space-y-10">
 
-          {/* Submit Button */}
-          <div className="flex justify-center items-center text-center">
-            <Link to="/report">
-              <Button
-                color="blue"
-                pill
-                className="text-lg py-3 px-6 flex items-center group transition-all duration-300"
-              >
-                Create Your Custom Map
-                <HiOutlineArrowRight className="ml-2 h-5 w-5 transform transition-transform duration-300 group-hover:translate-x-5" />
-              </Button>
-            </Link>
-          </div>
+    {/* Submit Button */}
+    <div className="flex justify-center items-center text-center">
+      <Link to="/report">
+        <Button
+          color="blue"
+          pill
+          className="text-lg py-3 px-6 flex items-center group transition-all duration-300"
+        >
+          Create Your Custom Map
+          <HiOutlineArrowRight className="ml-2 h-5 w-5 transform transition-transform duration-100 group-hover:translate-x-5" />
+        </Button>
+      </Link>
+    </div>
 
-          {/* Login & Authentication */}
-          <section className="bg-white shadow-lg z-20 dark:bg-gray-800 rounded-lg p-6 hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
-            <h2 className="text-2xl font-semibold  text-green-800 dark:text-green-300 mb-2">Login & Authentication</h2>
-            <p className="mb-2">
-              Log in using your <strong>name, email, password</strong>, or sign in with <strong>Google</strong>.
-            </p>
-            <ul className="list-disc pl-6 text-sm text-gray-700 dark:text-gray-300">
-              <li><strong>Public</strong>: Browse pins</li>
-              <li><strong>User</strong>: Submit & track personal pins</li>
-              <li><strong>Admin</strong>: Full pin/map control</li>
-            </ul>
-            <div className="mt-4">
-              <Link to="/signin">
-                <Button color="blue" className="text-lg py-3 px-6">Sign In or Create Account</Button>
-              </Link>
-            </div>
-          </section>
+    <div className="flex flex-col items-center mt-8">
+      <div
+        className="flex flex-col items-center w-full max-w-xl group"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        <Card
+          className="w-full transition-transform duration-300 ease-in-out group-hover:scale-[1.02]"
+          imgAlt="CN Tower at dusk"
+          imgSrc={CNTower}
+          width={500} height={500}
+        >
 
-          {/* How to Pin */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
-            <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300 text-center mb-4">How to Submit a Pin</h2>
-            <ul className="list-disc pl-6 space-y-1 text-gray-700 dark:text-gray-300">
-              <li>Click on the map to place a pin and begin submission</li>
-              <li>
-                Or use the <Link to="/report" className="text-green-600 dark:text-green-400 font-medium hover:underline">Pin Page</Link>
-              </li>
-              <li>Fill in title, category, severity, description, and optionally upload an image</li>
-              <li>Map pins auto-fill coordinates and address</li>
-              <li>You must be logged in to submit a pin</li>
-            </ul>
-          </section>
+          <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+            Noteworthy technology acquisitions 2021
+          </h5>
+          <p className="font-normal text-gray-700 dark:text-gray-400">
+            Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.
+          </p>
+        </Card>
 
-          {/* Search & Filters */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
-            <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300 text-center mb-4">Search & Filter Pins</h2>
-            <ul className="list-disc pl-6 space-y-1 text-gray-700 dark:text-gray-300">
-              <li>Search by title, location, or department</li>
-              <li>Filter by status: <em>pending</em>, <em>accepted</em>, <em>in-progress</em>, <em>resolved</em>, <em>deleted</em></li>
-              <li>Click on map pins for detailed information</li>
-            </ul>
-          </section>
-
-          {/* Datasheet Section */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
-            <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300 mb-2">View All Pins in a Table</h2>
-            <p className="text-gray-700 dark:text-gray-300 mb-4">
-              Use the datasheet to explore all pins in a sortable format.
-            </p>
-            <Link to="/datasheet">
-              <Button color="dark" className="text-lg py-3 px-6">View Datasheet</Button>
-            </Link>
-          </section>
-
+        {/* Reveal on hover with smooth animation */}
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            hovered ? 'max-h-40 opacity-100 mt-4' : 'max-h-0 opacity-0'
+          } w-full bg-white p-4 rounded-lg shadow-md dark:bg-gray-800`}
+        >
+          Test
         </div>
       </div>
+    </div>
+
+    <section className="relative group rounded-lg p-6 pb-32 min-h-[400px] overflow-hidden transition transform hover:scale-105 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 shadow-lg">
+      <div className="rounded-lg z-10 relative">
+        <h2 className="text-2xl font-semibold text-green-900 dark:text-green-200 mb-2">Login & Authentication</h2>
+        <p className="mb-2 text-gray-800 dark:text-gray-100">
+          Log in using your <strong>name, email, password</strong>, or sign in with <strong>Google</strong>.
+        </p>
+        <ul className="list-disc pl-6 text-sm text-gray-700 dark:text-gray-300">
+          <li><strong>Public</strong>: Browse pins</li>
+          <li><strong>User</strong>: Submit & track personal pins</li>
+          <li><strong>Admin</strong>: Full pin/map control</li>
+        </ul>
+        <div className="mt-4">
+          <Link to="/signin">
+            <Button color="blue" className="text-lg py-3 px-6">Sign In or Create Account</Button>
+          </Link>
+        </div>
+
+        <div className="mt-4 max-h-0 opacity-0 overflow-hidden transition-all duration-500 ease-in-out group-hover:max-h-60 group-hover:opacity-100">
+          <img
+            src={paiImage} // Replace with your image path
+            alt="Login Preview"
+            className="mx-auto w-64 rounded shadow"
+          />
+        </div>
+      </div>
+    </section>
+
+    {/* How to Pin */}
+    <section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
+      <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300 text-center mb-4">How to Submit a Pin</h2>
+      <ul className="list-disc pl-6 space-y-1 text-gray-700 dark:text-gray-300">
+        <li>Click on the map to place a pin and begin submission</li>
+        <li>
+          Or use the <Link to="/report" className="text-green-600 dark:text-green-400 font-medium hover:underline">Pin Page</Link>
+        </li>
+        <li>Fill in title, category, severity, description, and optionally upload an image</li>
+        <li>Map pins auto-fill coordinates and address</li>
+        <li>You must be logged in to submit a pin</li>
+      </ul>
+    </section>
+
+    {/* Search & Filters */}
+    <section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
+      <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300 text-center mb-4">Search & Filter Pins</h2>
+      <ul className="list-disc pl-6 space-y-1 text-gray-700 dark:text-gray-300">
+        <li>Search by title, location, or department</li>
+        <li>Filter by status: <em>pending</em>, <em>accepted</em>, <em>in-progress</em>, <em>resolved</em>, <em>deleted</em></li>
+        <li>Click on map pins for detailed information</li>
+      </ul>
+    </section>
+
+    {/* Datasheet Section */}
+    <section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
+      <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300 mb-2">View All Pins in a Table</h2>
+      <p className="text-gray-700 dark:text-gray-300 mb-4">
+        Use the datasheet to explore all pins in a sortable format.
+      </p>
+      <Link to="/datasheet">
+        <Button color="dark" className="text-lg py-3 px-6">View Datasheet</Button>
+      </Link>
+    </section>
+
+  </div>
+</div>
+
+
+
+
+
 {/* Contact Form */}
 <div className="max-w-5xl p-10 bg-gradient-to-tr from-[#727171fa] via-green-00 to-green-500 rounded-2xl shadow-xl m-9 sm:mx-auto">
   <h2 className="text-3xl font-bold text-green-100 mb-4 text-center">Contact Us</h2>
