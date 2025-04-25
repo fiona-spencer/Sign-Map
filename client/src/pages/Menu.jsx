@@ -3,58 +3,22 @@ import { useSelector } from 'react-redux';
 import { HiOutlineArrowRight } from "react-icons/hi";
 import { Link } from 'react-router-dom';
 import { Button, Carousel } from 'flowbite-react';
-import cityImage from '../assets/city_image.png';
+import cityImage from '../assets/city_image_small.png';
 import CNTowerImage from '../assets/CNTower.jpg';
 import nightImage from '../assets/night.jpg';
 import trinityImage from '../assets/trinity.jpg';
 import islandImage from '../assets/toronto_island.jpg';
 import paiImage from '../assets/pai.jpg';
-import JsonUpload from '../components/json_upload';
-import { Card } from 'flowbite-react';
-import CNTower from '../assets/CNTower.jpg'
+import ContactForm from '../components/contactForm'
+import MapCards from '../components/MapCards';
+import FileCards from '../components/FileCards';
 
 
 export default function Menu() {
   const [pins, setPins] = useState([]);
   const [hovered, setHovered] = useState(false);
   const { currentUser } = useSelector((state) => state.user);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
-  const [formStatus, setFormStatus] = useState('');
 
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
-
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
-
-      if (res.ok) {
-        setFormStatus('Your message has been sent successfully.');
-        setFormData({ name: '', email: '', subject: '', message: '' });
-      } else {
-        setFormStatus('There was an error sending your message. Please try again.');
-      }
-    } catch (error) {
-      setFormStatus('There was an error sending your message. Please try again.');
-    }
-  };
 
   return (
     <div
@@ -147,13 +111,13 @@ export default function Menu() {
 
       {/* Info Section  */}
       <div className=' bg-[#ddddddec] dark:bg-[#121212c1]'>
-  <div className="max-w-5xl mx-auto px-10 py-10 space-y-10">
+  <div className="max-w-7xl mx-auto px-10 py-10 space-y-10">
 
     {/* Submit Button */}
     <div className="flex justify-center items-center text-center">
       <Link to="/report">
         <Button
-          color="blue"
+          color="dark"
           pill
           className="text-lg py-3 px-6 flex items-center group transition-all duration-300"
         >
@@ -163,91 +127,10 @@ export default function Menu() {
       </Link>
     </div>
 
-    <div className="flex flex-col items-center mt-8">
-      <div
-        className="flex flex-col items-center w-full max-w-xl group"
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-      >
-        <Card
-          className="w-full transition-transform duration-300 ease-in-out group-hover:scale-[1.02]"
-          imgAlt="CN Tower at dusk"
-          imgSrc={CNTower}
-          width={500} height={500}
-        >
 
-          <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            Noteworthy technology acquisitions 2021
-          </h5>
-          <p className="font-normal text-gray-700 dark:text-gray-400">
-            Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.
-          </p>
-        </Card>
 
-        {/* Reveal on hover with smooth animation */}
-        <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${
-            hovered ? 'max-h-40 opacity-100 mt-4' : 'max-h-0 opacity-0'
-          } w-full bg-white p-4 rounded-lg shadow-md dark:bg-gray-800`}
-        >
-          Test
-        </div>
-      </div>
-    </div>
-
-    <section className="relative group rounded-lg p-6 pb-32 min-h-[400px] overflow-hidden transition transform hover:scale-105 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 shadow-lg">
-      <div className="rounded-lg z-10 relative">
-        <h2 className="text-2xl font-semibold text-green-900 dark:text-green-200 mb-2">Login & Authentication</h2>
-        <p className="mb-2 text-gray-800 dark:text-gray-100">
-          Log in using your <strong>name, email, password</strong>, or sign in with <strong>Google</strong>.
-        </p>
-        <ul className="list-disc pl-6 text-sm text-gray-700 dark:text-gray-300">
-          <li><strong>Public</strong>: Browse pins</li>
-          <li><strong>User</strong>: Submit & track personal pins</li>
-          <li><strong>Admin</strong>: Full pin/map control</li>
-        </ul>
-        <div className="mt-4">
-          <Link to="/signin">
-            <Button color="blue" className="text-lg py-3 px-6">Sign In or Create Account</Button>
-          </Link>
-        </div>
-
-        <div className="mt-4 max-h-0 opacity-0 overflow-hidden transition-all duration-500 ease-in-out group-hover:max-h-60 group-hover:opacity-100">
-          <img
-            src={paiImage} // Replace with your image path
-            alt="Login Preview"
-            className="mx-auto w-64 rounded shadow"
-          />
-        </div>
-      </div>
-    </section>
-
-    {/* How to Pin */}
-    <section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
-      <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300 text-center mb-4">How to Submit a Pin</h2>
-      <ul className="list-disc pl-6 space-y-1 text-gray-700 dark:text-gray-300">
-        <li>Click on the map to place a pin and begin submission</li>
-        <li>
-          Or use the <Link to="/report" className="text-green-600 dark:text-green-400 font-medium hover:underline">Pin Page</Link>
-        </li>
-        <li>Fill in title, category, severity, description, and optionally upload an image</li>
-        <li>Map pins auto-fill coordinates and address</li>
-        <li>You must be logged in to submit a pin</li>
-      </ul>
-    </section>
-
-    {/* Search & Filters */}
-    <section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
-      <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300 text-center mb-4">Search & Filter Pins</h2>
-      <ul className="list-disc pl-6 space-y-1 text-gray-700 dark:text-gray-300">
-        <li>Search by title, location, or department</li>
-        <li>Filter by status: <em>pending</em>, <em>accepted</em>, <em>in-progress</em>, <em>resolved</em>, <em>deleted</em></li>
-        <li>Click on map pins for detailed information</li>
-      </ul>
-    </section>
-
-    {/* Datasheet Section */}
-    <section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
+{/* Login and Authentication */}
+<section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
       <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300 mb-2">View All Pins in a Table</h2>
       <p className="text-gray-700 dark:text-gray-300 mb-4">
         Use the datasheet to explore all pins in a sortable format.
@@ -257,77 +140,45 @@ export default function Menu() {
       </Link>
     </section>
 
+    {/* Info cards */}
+
+    <div>
+      <a href="/report" className="group flex justify-center items-center pt-4  p-3">
+        <p className="text-5xl font-bold group-hover:bg-[#acdfcbad] group-hover:text-[#1d865cad]  rounded-lg px-8 py-3">File Upload</p>
+        <HiOutlineArrowRight className="ml-2 h-10 w-10 transform transition-transform duration-300 group-hover:translate-x-3 group-hover:text-green-500" />
+      </a>
+      <FileCards />
+
+      <a href="/report" className="group flex justify-center items-center pt-4  p-3">
+        <p className="text-5xl font-bold group-hover:bg-[#acdfcbad] group-hover:text-[#1d865cad]  rounded-lg px-8 py-3">Explore the Map</p>
+        <HiOutlineArrowRight className="ml-2 h-10 w-10 transform transition-transform duration-300 group-hover:translate-x-3 group-hover:text-green-500" />
+      </a>
+      <MapCards />
+    </div>
+    
+
+    {/* Start Here */}
+    <section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
+      <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300 mb-2">View All Pins in a Table</h2>
+      <p className="text-gray-700 dark:text-gray-300 mb-4">
+        Use the datasheet to explore all pins in a sortable format.
+      </p>
+      <Link to="/moreInfo">
+        <Button color="dark" className="text-lg py-3 px-6">View Datasheet</Button>
+      </Link>
+    </section>
+
   </div>
 </div>
 
 
 
-
-
+<div className='items-center justify-center flex'>
 {/* Contact Form */}
-<div className="max-w-5xl p-10 bg-gradient-to-tr from-[#727171fa] via-green-00 to-green-500 rounded-2xl shadow-xl m-9 sm:mx-auto">
-  <h2 className="text-3xl font-bold text-green-100 mb-4 text-center">Contact Us</h2>
-  <p className="text-center text-green-200 mb-6">
-    Have a question or need assistance? Feel free to reach out below.
-  </p>
-
-  <form onSubmit={handleFormSubmit} className="space-y-5">
-    <div className="flex flex-col space-y-4">
-      <input
-        type="text"
-        name="name"
-        value={formData.name}
-        onChange={handleFormChange}
-        placeholder="Your Name"
-        className="p-4 bg-green-100 text-black border border-green-600 w-full rounded-lg"
-        required
-      />
-      <input
-        type="email"
-        name="email"
-        value={formData.email}
-        onChange={handleFormChange}
-        placeholder="Email"
-        className="p-4 bg-green-100 text-black border border-green-600 w-full rounded-lg"
-        required
-      />
-    </div>
-
-    <input
-      type="text"
-      name="subject"
-      value={formData.subject}
-      onChange={handleFormChange}
-      placeholder="Subject"
-      className="p-4 bg-green-100 text-black border border-green-600 w-full rounded-lg"
-      required
-    />
-
-    <textarea
-      name="message"
-      value={formData.message}
-      onChange={handleFormChange}
-      placeholder="Your Message"
-      className="p-4 bg-green-100 text-black border border-green-600 w-full rounded-lg"
-      rows="6"
-      required
-    />
-
-    <div className="text-center">
-      <Button
-        type="submit"
-        color="green" 
-        className="text-green-800 text-lg w-full font-semibold bg-green-500 dark:bg-green-500 "
-      >
-        Send Message
-      </Button>
-    </div>
-  </form>
-
-  {formStatus && (
-    <p className="mt-4 text-center text-green-100">{formStatus}</p>
-  )}
+<ContactForm/>
 </div>
+
+
 
 
 

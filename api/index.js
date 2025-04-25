@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth.route.js';
 import userRoutes from './routes/user.route.js';
 import pinRoutes from './routes/pin.route.js';
+import emailRoutes from './routes/email.route.js'
 import cookieParser from 'cookie-parser';
 import path from 'path';
 
@@ -30,6 +31,7 @@ app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/pin', pinRoutes);
+app.use('/api/email', emailRoutes);
 
 app.use(express.static(path.join(__dirname, '/client/dist')));
 
