@@ -1,23 +1,23 @@
-let googleMapsScriptLoading = null;
+// loadGoogleMap.js
+let googleMapsScriptLoaded = false;
 
 export const loadGoogleMapsScript = (apiKey) => {
-  if (window.google && window.google.maps) {
-    return Promise.resolve();
-  }
+  return new Promise((resolve, reject) => {
+    if (googleMapsScriptLoaded) {
+      return resolve(); // If already loaded, resolve immediately.
+    }
 
-  if (googleMapsScriptLoading) {
-    return googleMapsScriptLoading; // Prevent multiple loading
-  }
-
-  googleMapsScriptLoading = new Promise((resolve, reject) => {
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMap`;
     script.async = true;
-    script.defer = true;
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error('Failed to load Google Maps script'));
-    document.head.appendChild(script);
-  });
+    script.onload = () => {
+      googleMapsScriptLoaded = true;
+      resolve();
+    };
+    script.onerror = () => {
+      reject(new Error("Failed to load Google Maps script"));
+    };
 
-  return googleMapsScriptLoading;
+    document.body.appendChild(script);
+  });
 };

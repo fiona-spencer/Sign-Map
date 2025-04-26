@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 // Pages
 import Menu from "./pages/Menu";
@@ -15,107 +16,96 @@ import Datasheet from "./pages/Datasheet";
 import Header from "./components/Header";
 import FooterCom from "./components/Footer";
 import Search from "./components/Search";
+import TestPdf from './components/TestPdf';
 
 //Settings Navbar
-
 //No User
 import ContactSupport from './components/noType/ContactSupport';
 import HelpCenter from "./components/noType/HelpCenter";
 import StartHere from './components/noType/StartHere'
 
-
-
-
 //Public
-
 //User
-
 //Admin
 import SubmittedPins from "./components/adminType/SubmittedPins";
 import Database from "./components/adminType/Database";
 import LogPage from "./components/adminType/LogPage";
 import Analytics from "./components/adminType/Analytics";
 
+import GoogleMapTest from './pages/GoogleMapTest'
 
+// Redux actions
+import { setMapState } from "./redux/global/globalSlice"; // Import the global slice action
 
 function AppWrapper({ apiKey }) {
   const location = useLocation();
-  const [mapState, setMapState] = useState("off");
+  const dispatch = useDispatch();
+  const mapState = useSelector((state) => state.global.mapState); // Access mapState from Redux
 
   useEffect(() => {
-    if (location.pathname === "/datasheets") {
-      setMapState("on");
-      localStorage.setItem("mapState", "on");
-    } else {
-      setMapState("off");
-      localStorage.setItem("mapState", "off");
+    const newMapState = location.pathname === "/datasheets" ? "on" : "off";
+    if (newMapState !== mapState) {
+      dispatch(setMapState(newMapState)); // Dispatch the action to update mapState in the Redux store
     }
-  }, [location.pathname]);
+  }, [location.pathname, mapState, dispatch]);
 
   // Log mapState whenever it changes
   useEffect(() => {
     console.log("Map State:", mapState);
   }, [mapState]);
 
+
   return (
     <>
       <div className="fixed top-0 left-0 w-full z-50 bg-white shadow">
-  <Header />
-  <Search />
-</div>
+        <Header />
+        <Search />
+      </div>
       <div className="pt-[125px]">
-      <Routes>
-        <Route path="/" element={<Menu />} />
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/report" element={<Report />} />
-        <Route path="/successfullyCreated" element={<SuccessfullyCreated />} />
-        <Route path="/search" element={<SearchPage />} />
-        <Route
-          path="/datasheets"
-          element={<Datasheet apiKey={apiKey} mapState={mapState} />}
-        />
+        <Routes>
+          <Route path="/" element={<Menu />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/report" element={<Report />} />
+          <Route path="/successfullyCreated" element={<SuccessfullyCreated />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route
+            path="/datasheets"
+            element={<Datasheet apiKey={apiKey} />}
+          />
 
+          {/* No Account */}
+          <Route path="/settings" element={<Profile />}/>
+          <Route path="/contactSupport" element={<ContactSupport />} />
+          <Route path="/help" element={<HelpCenter />} />
+          <Route path="/startHere" element={<StartHere />} />
 
-        {/* No Account */}
-        <Route path="/settings" element={<Profile />}/>
-        <Route path="/contactSupport" element={<ContactSupport />} />
-        <Route path="/help" element={<HelpCenter />} />
-        <Route path="/startHere" element={<StartHere />} />
+          {/* Public Account */}
+          <Route path="/startHere" element={<StartHere />} />
+          <Route path="/googleTest" element={<GoogleMapTest apiKey={apiKey} />} />
 
-        {/* Public Account */}
-        <Route path="/startHere" element={<StartHere />} />
+          {/* User Account */}
 
-        {/* User Account */}
-
-        {/* Admin Account */}
-        <Route path="/database" element={<Database />} />
-        <Route path="/inbox" element={<SubmittedPins />} />
-        <Route path="/logs" element={<LogPage />} />
-        <Route path="/analytics" element={<Analytics />} />
-
-        
-
-
-
-      </Routes>
+          {/* Admin Account */}
+          <Route path="/database" element={<Database />} />
+          <Route path="/inbox" element={<SubmittedPins />} />
+          <Route path="/logs" element={<LogPage />} />
+          <Route path="/analytics" element={<Analytics />} />
+        </Routes>
       </div>
       <div className="relative bottom-0 left-0 w-full z-40 bg-white shadow">
-  <FooterCom />
-</div>
-
-
+        <FooterCom />
+      </div>
     </>
   );
 }
 
-
 export default function App() {
-  const apiKey = "AIzaSyA1wOqcLSGKkhNJQYP9wH06snRuvSJvRJY";
+  const apiKey = import.meta.env.VITE_API_KEY;
 
   return (
     <BrowserRouter>
-      <AppWrapper apiKey={apiKey}/>
+      <AppWrapper apiKey={apiKey} />
     </BrowserRouter>
   );
 }

@@ -2,7 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { FaMapPin } from 'react-icons/fa';
 import { Alert } from 'flowbite-react';
-import { HiInformationCircle } from "react-icons/hi";
+import { HiInformationCircle } from 'react-icons/hi';
+import { useSelector } from 'react-redux';
 
 const iconOptions = [
   { label: 'default', icon: <FaMapPin /> },
@@ -19,30 +20,31 @@ const getStatusClass = (status) => {
   }
 };
 
-const ShowPins = ({ pins: propPins = null, mapInstanceRef, onSelectPin, resetPinsTrigger }) => {
+const ShowPins = ({ mapInstanceRef, onSelectPin, resetPinsTrigger }) => {
+  const { filteredPins } = useSelector((state) => state.global); // Accessing Redux state
   const [pins, setPins] = useState([]);
   const [pinClicked, setPinClicked] = useState(null); // To track the clicked pin
   const markersRef = useRef([]);
 
-  // Load new pins from props
+  // Load new pins from Redux state
   useEffect(() => {
-    if (Array.isArray(propPins) && propPins.length > 0) {
-      setPins(propPins);
+    if (Array.isArray(filteredPins) && filteredPins.length > 0) {
+      setPins(filteredPins);
     } else {
       setPins([]);
       markersRef.current.forEach(marker => marker.setMap(null)); // Remove old markers
       markersRef.current = [];
     }
-  }, [propPins]);
+  }, [filteredPins]);
 
   // Add pins to map
   useEffect(() => {
     if (!mapInstanceRef.current || pins.length === 0 || !window.google) return;
-
+  
     // Clean up old markers
     markersRef.current.forEach(marker => marker.setMap(null));
     markersRef.current = [];
-
+  
     // Create new markers
     pins.forEach((pin, index) => {
       const position = { lat: pin.location.lat, lng: pin.location.lng };
@@ -109,7 +111,6 @@ const ShowPins = ({ pins: propPins = null, mapInstanceRef, onSelectPin, resetPin
             iconEl.classList.add('opacity-50');
             iconEl.classList.remove('scale-100');
             iconEl.classList.add('scale-50');
-
           } else {
             iconEl.classList.add('opacity-100');
           }
@@ -119,38 +120,36 @@ const ShowPins = ({ pins: propPins = null, mapInstanceRef, onSelectPin, resetPin
       }
     
       // 🔁 Delay reloading only the clicked pin to let animation complete
-        const clickedMarker = markersRef.current[index];
-        if (clickedMarker) {
-          clickedMarker.setMap(null);
-          markersRef.current[index] = null;
-        }
+      const clickedMarker = markersRef.current[index];
+      if (clickedMarker) {
+        clickedMarker.setMap(null);
+        markersRef.current[index] = null;
+      }
     
-        const position = { lat: pinData.location.lat, lng: pinData.location.lng };
-        const newMarker = createMarker(mapInstanceRef.current, position, pinData, index);
-        markersRef.current[index] = newMarker;
+      const position = { lat: pinData.location.lat, lng: pinData.location.lng };
+      const newMarker = createMarker(mapInstanceRef.current, position, pinData, index);
+      markersRef.current[index] = newMarker;
     });
-    
-    
 
     return marker;
   };
+
   return (
     <>
-  {pins.length === 0 ? (
-    <div className="fixed bottom-4 right-4 max-w-sm z-50">
-      <Alert color="failure" icon={HiInformationCircle}>
-        No pins found on the map. Please try again or create a new report.
-      </Alert>
-    </div>
-  ) : (
-    <div className="fixed bottom-4 right-4 max-w-sm z-50">
-      <Alert color="info" icon={HiInformationCircle}>
-        Showing {pins.length} pin{pins.length > 1 ? 's' : ''} on the map.
-      </Alert>
-    </div>
-  )}
-</>
-
+      {pins.length === 0 ? (
+        <div className="fixed bottom-4 right-4 max-w-sm z-50">
+          <Alert color="failure" icon={HiInformationCircle}>
+            No pins found on the map. Please try again or create a new report.
+          </Alert>
+        </div>
+      ) : (
+        <div className="fixed bottom-4 right-4 max-w-sm z-50">
+          <Alert color="info" icon={HiInformationCircle}>
+            Showing {pins.length} pin{pins.length > 1 ? 's' : ''} on the map.
+          </Alert>
+        </div>
+      )}
+    </>
   );
 };
 

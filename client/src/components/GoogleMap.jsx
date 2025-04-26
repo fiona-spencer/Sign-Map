@@ -1,104 +1,144 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import 'react-quill/dist/quill.snow.css';
 import CreateReport from './createReport';
 import ShowPins from './ShowPins';
 import { ReportDetailsCard } from './ReportDetailsCard';
-import { Alert, Button } from 'flowbite-react';
+import { Alert } from 'flowbite-react';
 import { HiX } from 'react-icons/hi';
+import MapToPdf from './MapToPdf';
+import { Button, Modal } from 'flowbite-react';
 
-const GoogleMap = ({
-  apiKey,
-  filteredPins,
-  mapId = '42c8848d94ad7219',
-  center = { lat: 43.7, lng: -79.42 },
-  zoom = 12,
-}) => {
+const GoogleMap = ({ apiKey, mapId = '42c8848d94ad7219', center = { lat: 43.7, lng: -79.42 },
+  zoom = 12, }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const searchInputRef = useRef(null);
+
+  const { filteredPins, mapState } = useSelector((state) => state.global);
+
+  const defaultCenter = mapState?.center || { lat: 43.7, lng: -79.42 };
+  const defaultZoom = mapState?.zoom || 12;
+
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [markerPosition, setMarkerPosition] = useState(null);
   const [showCreateReportForm, setShowCreateReportForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
-  const [highlightedPin, setHighlightedPin] = useState(null);
   const [address, setAddress] = useState('');
   const [placeholder, setPlaceholder] = useState('Search for a place');
   const [resetPinsTrigger, setResetPinsTrigger] = useState(0);
   const [viewMode, setViewMode] = useState(() => sessionStorage.getItem('viewMode') || 'default');
-  const [showGeoJson, setShowGeoJson] = useState(() => JSON.parse(sessionStorage.getItem('showGeoJson')) || false); // New state for checkbox
+  const [showGeoJson, setShowGeoJson] = useState(() => JSON.parse(sessionStorage.getItem('showGeoJson')) || false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('mapViewMode', viewMode);
+    // localStorage.setItem('initMap', 'true');
   }, [viewMode]);
 
-  const navigate = useNavigate();
+  // const toggleModal = () => {
+  //   setIsModalOpen(!isModalOpen);
+  // };
 
   useEffect(() => {
-    const loadGoogleMapsScript = () => {
-      if (document.querySelector('script[src^="https://maps.googleapis.com/maps/api/js"]')) return;
-
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&loading=async&libraries=places&callback=onGoogleMapsLoaded&v=weekly`;
-      script.async = true;
-      document.body.appendChild(script);
-
-      script.onload = () => setIsMapLoaded(true);
-      script.onerror = () => setIsMapLoaded(false);
+    const initMap = () => {
+      if (!mapRef.current) {
+        console.error("Map container not found.");
+        return;
+      }
+  
+      try {
+        const map = new google.maps.Map(mapRef.current, {
+          center: defaultCenter,
+          zoom: defaultZoom,
+          mapId,
+        });
+  
+        mapInstanceRef.current = map;
+        setIsMapLoaded(true); // mark map as loaded
+      } catch (error) {
+        console.error("Map initialization error:", error);
+      }
     };
-
-    window.onGoogleMapsLoaded = () => initMap();
-
-    if (!window.google) {
-      loadGoogleMapsScript();
+  
+    const loadGoogleScript = () => {
+      const existingScript = document.querySelector('script[src^="https://maps.googleapis.com/maps/api/js"]');
+      if (existingScript) {
+        existingScript.addEventListener('load', initMap);
+        return;
+      }
+  
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMap`;      
+      script.async = true;
+      script.defer = true;
+      script.onload = initMap;
+      script.onerror = () => {
+        console.error('Failed to load Google Maps script.');
+        setIsMapLoaded(false);
+      };
+  
+      document.body.appendChild(script);
+    };
+  
+    if (!window.google?.maps) {
+      loadGoogleScript();
     } else {
-      setIsMapLoaded(true);
+      initMap();
     }
-
+  
     return () => {
-      const script = document.querySelector('script[src^="https://maps.googleapis.com/maps/api/js"]');
-      if (script) document.body.removeChild(script);
-      delete window.onGoogleMapsLoaded;
+      const scriptToRemove = document.querySelector('script[src^="https://maps.googleapis.com/maps/api/js"]');
+      if (scriptToRemove && scriptToRemove.parentNode) {
+        scriptToRemove.parentNode.removeChild(scriptToRemove);
+      }
+      delete window.initMap;
     };
   }, [apiKey]);
 
-  const featureStyleFunction = (feature) => {
-    return {
-      fillColor: 'black',
-      fillOpacity: 0.1,
-      strokeWeight: 1,
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.async = true;
+    document.body.appendChild(script);
+  
+    window.initMap = () => {
+      setIsMapLoaded(true);
+      initMap();
     };
-  };
 
-  // Initialize the map and all its features
+    script.onerror = () => {
+      setIsMapLoaded(false);
+      console.error('Failed to load Google Maps script.');
+    };
+  
+    return () => {
+      const scriptToRemove = document.querySelector('script[src^="https://maps.googleapis.com/maps/api/js"]');
+      if (scriptToRemove && scriptToRemove.parentNode === document.body) {
+        document.body.removeChild(scriptToRemove);
+      }
+      delete window.initMap;
+    };
+  }, [apiKey]);
+
+  const featureStyleFunction = (feature) => ({
+    fillColor: 'black',
+    fillOpacity: 0.1,
+    strokeWeight: 1,
+  });
+
   const initMap = async () => {
     if (!mapRef.current) return;
 
     try {
       const { Map } = await google.maps.importLibrary('maps');
       const { AdvancedMarkerElement } = await google.maps.importLibrary('marker');
-
-      const map = new Map(mapRef.current, {
-        center,
-        zoom,
-        mapId,
-      });
-
+      const map = new Map(mapRef.current, { center: defaultCenter, zoom: defaultZoom, mapId });
+      
       mapInstanceRef.current = map;
 
-      // 🗺️ KMZ Layer (if applicable)
-      const kmzUrl = 'https://your-server-url/path/to/your-file.kmz'; // Change this to your KMZ file URL
-      const kmzLayer = new google.maps.KmlLayer({
-        url: kmzUrl,
-        suppressInfoWindows: true, // Optionally suppress info windows
-        map: map,
-      });
-
-      // 🔍 Autocomplete
       const autocomplete = new google.maps.places.Autocomplete(searchInputRef.current, {
         fields: ['place_id', 'geometry', 'name'],
         types: ['geocode'],
@@ -109,7 +149,6 @@ const GoogleMap = ({
         if (place.geometry) {
           const newLat = place.geometry.location.lat();
           const newLng = place.geometry.location.lng();
-
           setMarkerPosition(new google.maps.LatLng(newLat, newLng));
           map.setCenter({ lat: newLat, lng: newLng });
           map.setZoom(13);
@@ -117,7 +156,6 @@ const GoogleMap = ({
         }
       });
 
-      // 🖱️ Click Handler for the map
       map.addListener('click', (e) => {
         setMarkerPosition(e.latLng);
         setShowCreateReportForm(true);
@@ -130,45 +168,23 @@ const GoogleMap = ({
         });
 
         map.setZoom(18);
-
         if (searchInputRef.current) {
           searchInputRef.current.value = '';
           searchInputRef.current.placeholder = 'Search for a place';
         }
       });
 
-      // GeoJSON Layer
       const geoJsonLayer = new google.maps.Data();
-      geoJsonLayer.loadGeoJson('/toronto_geo.geojson'); // Make sure it's in the public folder
-
-      // Apply feature style to the GeoJSON layer
+      geoJsonLayer.loadGeoJson('/toronto_geo.geojson');
       geoJsonLayer.setStyle(featureStyleFunction);
 
-      // Add event listener for clicks on polygons
       geoJsonLayer.addListener('click', (event) => {
         const postalCode = event.feature.getProperty('CFSAUID');
-        // Set the alert message
-        if (postalCode) {
-          setAlertMessage(`Postal Code: ${postalCode}`);
-        } else {
-          setAlertMessage('Postal Code not found.');
-        }
-    
-        // Make the alert visible
+        setAlertMessage(postalCode ? `Postal Code: ${postalCode}` : 'Postal Code not found.');
         setAlertVisible(true);
       });
 
-      // Toggle GeoJSON visibility based on the checkbox
-      if (showGeoJson) {
-        geoJsonLayer.setMap(map);
-      } else {
-        geoJsonLayer.setMap(null);
-      }
-
-      if (viewMode === 'default' || viewMode === 'both') {
-        window.reload();
-      }
-
+      geoJsonLayer.setMap(showGeoJson ? map : null);
     } catch (error) {
       console.error('Map initialization error:', error);
     }
@@ -176,21 +192,37 @@ const GoogleMap = ({
 
   useEffect(() => {
     initMap();
-  }, [viewMode, showGeoJson]); // Listen to both viewMode and showGeoJson changes
+  }, [isModalOpen, viewMode, showGeoJson]);
 
-  // Handle GeoJSON visibility toggle
   const handleGeoJsonToggle = (e) => {
     const isChecked = e.target.checked;
     setShowGeoJson(isChecked);
-
-    // Save the state to session storage
+    window.location.reload(); 
     sessionStorage.setItem('showGeoJson', isChecked.toString());
+  };
 
-    // If unchecked, reload the window
-    if (isChecked || !isChecked) {
-      window.location.reload();
+  const fitBoundsToPins = () => {
+    if (!mapInstanceRef.current || !filteredPins?.length) return;
+    const bounds = new google.maps.LatLngBounds();
+
+    filteredPins.forEach((pin) => {
+      if (pin.location?.lat && pin.location?.lng) {
+        bounds.extend(new google.maps.LatLng(pin.location.lat, pin.location.lng));
+      }
+    });
+
+    if (!bounds.isEmpty()) {
+      mapInstanceRef.current.fitBounds(bounds, 50);
+      const currentZoom = mapInstanceRef.current.getZoom();
+      if (filteredPins.length === 1 && currentZoom < 12) {
+        mapInstanceRef.current.setZoom(12);
+      }
     }
   };
+
+  useEffect(() => {
+    if (isMapLoaded) fitBoundsToPins();
+  }, [filteredPins, isMapLoaded]);
 
   const handleCreateMarker = async (reportData) => {
     setIsSubmitting(true);
@@ -242,51 +274,23 @@ const GoogleMap = ({
     }
   };
 
-  const fitBoundsToPins = () => {
-    if (!mapInstanceRef.current) return;
-    if (!filteredPins || !Array.isArray(filteredPins) || filteredPins.length === 0) return;
-
-    const bounds = new google.maps.LatLngBounds();
-
-    filteredPins.forEach((pin) => {
-      if (pin.location && pin.location.lat && pin.location.lng) {
-        bounds.extend(new google.maps.LatLng(pin.location.lat, pin.location.lng));
-      }
-    });
-
-    if (bounds.isEmpty()) return;
-
-    const map = mapInstanceRef.current;
-    map.fitBounds(bounds, 50);
-
-    const currentZoom = map.getZoom();
-    const minimumZoom = 12;
-
-    if (filteredPins.length === 1 && currentZoom < minimumZoom) {
-      map.setZoom(minimumZoom);
-    }
-  };
-
-  useEffect(() => {
-    if (isMapLoaded) {
-      fitBoundsToPins();
-    }
-  }, [filteredPins, isMapLoaded]);
-
-  if (!isMapLoaded) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p>Loading map...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="rounded-lg shadow-sm border px-6 bg-[#ffffff7d] pb-6">
+      {/* Button to open modal
+      <Modal show={!isModalOpen}>
+        <Modal.Header>Welcome to the Page</Modal.Header>
+        <Modal.Body>
+          <p>This is the page you're trying to enter. Please click Enter to proceed.</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={toggleModal} className="bg-green-600 text-white hover:bg-green-700">
+            Enter
+          </Button>
+        </Modal.Footer>
+      </Modal> */}
+      
       <h3 className="text-xl font-bold p-4">View Reports</h3>
- {/* Conditionally render the Flowbite alert */}
 
-      {/* GeoJSON toggle checkbox */}
       <div className="mb-4">
         <label className="mr-4">Show GeoJSON Layer:</label>
         <input
@@ -305,24 +309,22 @@ const GoogleMap = ({
           className="p-2 border border-gray-300 rounded-md w-full"
         />
       </div>
+
       {alertVisible && (
-        <Alert
-          className="fixed bottom-20 right-4 z-50"
-          color="warning" // You can change the color (e.g., 'success', 'danger', 'warning', 'info')
-          // Close the alert on click
-        >
+        <Alert className="fixed bottom-20 right-4 z-50" color="warning">
           {alertMessage}
           <button
-          onClick={() => setAlertVisible(false)} 
-          type="button"
-          className="ml-5 rounded-lg border border-cyan-700 bg-transparent px-2 py-1.5 text-center text-xs font-medium text-cyan-700 hover:bg-cyan-800 hover:text-white focus:ring-4 focus:ring-cyan-300 dark:border-cyan-800 dark:text-cyan-800 dark:hover:text-white"
-        >
-          <HiX className='h-2 w-2'/>
-        </button>
+            onClick={() => setAlertVisible(false)}
+            type="button"
+            className="ml-5 rounded-lg border border-cyan-700 bg-transparent px-2 py-1.5 text-center text-xs font-medium text-cyan-700 hover:bg-cyan-800 hover:text-white"
+          >
+            <HiX className="w-4 h-4" />
+          </button>
         </Alert>
       )}
-      {/* Other components */}
-      {address && !showCreateReportForm && (
+
+        {/* Other components */}
+        {address && !showCreateReportForm && (
         <div className="p-4">
           <div className="flex flex-wrap gap-4">
             <button
@@ -341,7 +343,7 @@ const GoogleMap = ({
         </div>
       )}
 
-      {showCreateReportForm && (
+{showCreateReportForm && (
         <>
           <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={() => setShowCreateReportForm(false)} />
           <div className="fixed inset-0 justify-center items-start z-50 pt-20 overflow-y-auto pb-16">
@@ -357,18 +359,12 @@ const GoogleMap = ({
           </div>
         </>
       )}
-
-      <ShowPins
-        pins={filteredPins}
+<ShowPins
         mapInstanceRef={mapInstanceRef}
-        highlightedPin={highlightedPin}
-        setHighlightedPin={setHighlightedPin}
-        resetPinsTrigger={resetPinsTrigger}
         onSelectPin={(pin) => setSelectedReport(pin)}
+        resetPinsTrigger={resetPinsTrigger}
       />
-
-      <div id="map" ref={mapRef} className="w-full h-[500px] rounded-lg"></div>
-
+      <div ref={mapRef} style={{ height: '500px', width: '100%' }} className="my-4" />
       <div className="mt-4 rounded-xl border-gray-300 bg-transparent dark:text-white dark:bg-emerald-600">
         <ReportDetailsCard selectedReport={selectedReport} />
       </div>

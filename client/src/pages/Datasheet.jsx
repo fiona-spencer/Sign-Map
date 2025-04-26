@@ -3,9 +3,10 @@ import { Button, Datepicker } from 'flowbite-react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import Map from './Map';
-import defaultPinImage from '../assets/default_pin_image.png';
+import { useSelector, useDispatch } from 'react-redux';
+import { setFilteredPins } from '../redux/global/globalSlice'; // Import action
 
-export default function Datasheet({ apiKey, mapState }) {
+export default function Datasheet({ apiKey }) {
   const [pins, setPins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,7 +18,9 @@ export default function Datasheet({ apiKey, mapState }) {
   const [filterContactName, setFilterContactName] = useState('');
   const [filterContactEmail, setFilterContactEmail] = useState('');
   const [filterContactPhone, setFilterContactPhone] = useState('');
-  const [filteredPins, setFilteredPins] = useState([]);
+
+  const filteredPins = useSelector((state) => state.global.filteredPins); // Access filteredPins from Redux store
+  const dispatch = useDispatch();
 
   const statusOptions = ['pending', 'accepted', 'in-progress', 'resolved', 'deleted'];
 
@@ -28,7 +31,7 @@ export default function Datasheet({ apiKey, mapState }) {
         if (!response.ok) throw new Error('Failed to fetch pins');
         const data = await response.json();
         setPins(data);
-        setFilteredPins(data);
+        dispatch(setFilteredPins(data)); // Dispatch action to store the pins in Redux
       } catch (error) {
         setError(error.message);
       } finally {
@@ -36,44 +39,43 @@ export default function Datasheet({ apiKey, mapState }) {
       }
     };
     fetchPins();
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     const applyFilter = () => {
       setLoading(true);
 
       const filtered = pins.filter((pin) => {
-        const matchesStatus = filterStatus ? pin.location.status === filterStatus : true;
+        // Safe property access with optional chaining (?.)
+        const matchesStatus = filterStatus ? pin?.location?.status === filterStatus : true;
 
-        const parsedPostalCode = (() => {
-          const match = pin.location.address.match(/\b[A-Z]\d[A-Z] ?\d[A-Z]\d\b/i);
-          return match ? match[0] : '';
-        })();
+        // Safely extract postal code if present
+        const parsedPostalCode = pin?.location?.address?.match(/\b[A-Z]\d[A-Z] ?\d[A-Z]\d\b/i)?.[0] || '';
 
         const matchesPostalCode = filterPostalCode
-          ? parsedPostalCode?.toLowerCase().includes(filterPostalCode.toLowerCase())
+          ? parsedPostalCode.toLowerCase().includes(filterPostalCode.toLowerCase())
           : true;
 
         const matchesAddress = filterStreetName
-          ? pin.location.address.toLowerCase().includes(filterStreetName.toLowerCase())
+          ? pin?.location?.address?.toLowerCase().includes(filterStreetName.toLowerCase())
           : true;
 
         const matchesUsername = filterUsername
-          ? pin.createdBy.username.toLowerCase().includes(filterUsername.toLowerCase())
+          ? pin?.createdBy?.username?.toLowerCase().includes(filterUsername.toLowerCase())
           : true;
 
-        const matchesDate = filterDate ? pin.createdAt.includes(filterDate) : true;
+        const matchesDate = filterDate ? pin?.createdAt?.includes(filterDate) : true;
 
         const matchesContactName = filterContactName
-          ? pin.location.info.contactName.toLowerCase().includes(filterContactName.toLowerCase())
+          ? pin?.location?.info?.contactName?.toLowerCase().includes(filterContactName.toLowerCase())
           : true;
 
         const matchesContactEmail = filterContactEmail
-          ? pin.location.info.contactEmail.toLowerCase().includes(filterContactEmail.toLowerCase())
+          ? pin?.location?.info?.contactEmail?.toLowerCase().includes(filterContactEmail.toLowerCase())
           : true;
 
         const matchesContactPhone = filterContactPhone
-          ? pin.location.info.contactPhoneNumber.includes(filterContactPhone)
+          ? pin?.location?.info?.contactPhoneNumber?.includes(filterContactPhone)
           : true;
 
         return (
@@ -88,7 +90,7 @@ export default function Datasheet({ apiKey, mapState }) {
         );
       });
 
-      setFilteredPins(filtered);
+      dispatch(setFilteredPins(filtered)); // Update filteredPins in Redux store
       setLoading(false);
     };
 
@@ -102,7 +104,8 @@ export default function Datasheet({ apiKey, mapState }) {
     filterContactName,
     filterContactEmail,
     filterContactPhone,
-    pins
+    pins,
+    dispatch
   ]);
 
   const handleResetFilters = () => {
@@ -165,7 +168,7 @@ export default function Datasheet({ apiKey, mapState }) {
     <div className="w-full overflow-x-auto p-6 bg-[#267b6684] dark:bg-gray-800">
       {/* Map Section */}
       <div className="mb-6">
-        <Map mapState={mapState} apiKey={apiKey} pins={filteredPins} />
+        <Map apiKey={apiKey} />
       </div>
 
       {/* Filter Section */}
@@ -202,15 +205,14 @@ export default function Datasheet({ apiKey, mapState }) {
             className="p-2 border rounded"
           />
 
-<Datepicker
-  value={filterDate}
-  onSelectedDateChanged={(date) => {
-    const formattedDate = date?.toISOString().split('T')[0]; // YYYY-MM-DD format
-    setFilterDate(formattedDate);
-  }}
-  className="w-full p-1 border rounded bg-gray-100"
-/>
-
+          <Datepicker
+            value={filterDate}
+            onSelectedDateChanged={(date) => {
+              const formattedDate = date?.toISOString().split('T')[0]; // YYYY-MM-DD format
+              setFilterDate(formattedDate);
+            }}
+            className="w-full p-1 border rounded bg-gray-100"
+          />
 
           <input
             type="text"
@@ -265,17 +267,17 @@ export default function Datasheet({ apiKey, mapState }) {
           <tbody>
             {filteredPins.map((pin, index) => (
               <tr key={pin._id || index} className="hover:bg-gray-100 dark:hover:bg-gray-600">
-                <td className="px-2 py-1 border text-xs bg-green-300 dark:bg-[#a72929]">{pin.createdBy?.username || 'N/A'}</td>
-                <td className="px-2 py-1 border text-xs bg-green-200 dark:bg-red-400">{formatDate(pin.createdAt)}</td>
-                <td className="px-2 py-1 border text-xs">{pin.location.info.populusId || 'N/A'}</td>
-                <td className="px-2 py-1 border text-xs">{pin.location.info.contactName || 'N/A'}</td>
-                <td className="px-2 py-1 border text-xs">{pin.location.info.contactEmail || 'N/A'}</td>
-                <td className="px-2 py-1 border text-xs">{pin.location.info.contactPhoneNumber || 'N/A'}</td>
-                <td className="px-2 py-1 border text-xs overflow-hidden whitespace-nowrap w-8">{pin.location.address}</td>
-                <td className={`px-2 py-1 border text-xs ${getStatusClass(pin.location.status)}`}>
-                  {pin.location.status}
+                <td className="px-2 py-1 border text-xs bg-green-300 dark:bg-[#a72929]">{pin?.createdBy?.username || 'N/A'}</td>
+                <td className="px-2 py-1 border text-xs bg-green-200 dark:bg-red-400">{formatDate(pin?.createdAt)}</td>
+                <td className="px-2 py-1 border text-xs">{pin?.location?.info?.populusId || 'N/A'}</td>
+                <td className="px-2 py-1 border text-xs">{pin?.location?.info?.contactName || 'N/A'}</td>
+                <td className="px-2 py-1 border text-xs">{pin?.location?.info?.contactEmail || 'N/A'}</td>
+                <td className="px-2 py-1 border text-xs">{pin?.location?.info?.contactPhoneNumber || 'N/A'}</td>
+                <td className="px-2 py-1 border text-xs overflow-hidden whitespace-nowrap w-8">{pin?.location?.address}</td>
+                <td className={`px-2 py-1 border text-xs ${getStatusClass(pin?.location?.status)}`}>
+                  {pin?.location?.status}
                 </td>
-                <td className="px-2 py-1 border text-xs">{pin.location.info.fileName}</td>
+                <td className="px-2 py-1 border text-xs">{pin?.location?.info?.fileName}</td>
                 <td className="px-2 py-1 border text-xs">
                   <a href={`/history/${pin._id}`} className="text-blue-500 hover:underline">View History</a>
                 </td>

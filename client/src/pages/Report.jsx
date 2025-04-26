@@ -19,7 +19,7 @@ export default function Report() {
   const [fileReportData, setFileReportData] = useState(null);
   const [error, setError] = useState('');
 
-  const apiKey = 'AIzaSyA1wOqcLSGKkhNJQYP9wH06snRuvSJvRJY';
+  const apiKey = import.meta.env.VITE_API_KEY;
 
   useEffect(() => {
     const loadGoogleMapsScript = () => {
@@ -34,11 +34,13 @@ export default function Report() {
 
     window.onGoogleMapsLoaded = () => initMap();
 
-    if (!window.google) {
-      loadGoogleMapsScript();
-    } else {
-      setIsMapLoaded(true);
-    }
+    // if (!window.google) {
+    //   loadGoogleMapsScript();
+    // } else {
+    //   setIsMapLoaded(true);
+    // }
+
+    // loadGoogleMapsScript();
 
     return () => {
       const script = document.querySelector('script[src^="https://maps.googleapis.com/maps/api/js"]');

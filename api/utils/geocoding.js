@@ -1,7 +1,7 @@
 import pLimit from 'p-limit';
 
 export const fetchLatLng = async (address) => {
-  const apiKey = 'AIzaSyA1wOqcLSGKkhNJQYP9wH06snRuvSJvRJY'; // Replace with your API key
+  const apiKey = import.meta.env.VITE_API_KEY; // Replace with your API key
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms)); // Helper function for delay
 
   // Helper function to fetch geocode data for a single address
