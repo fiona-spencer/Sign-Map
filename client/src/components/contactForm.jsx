@@ -32,15 +32,37 @@ export default function ContactForm() {
       subject,
       text: `From: ${name} (${email})\nSubject: ${subject}\n\n${message}`,
       html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-          <h2 style="color: #333;">New Contact Form Submission</h2>
-          <p><strong>From:</strong> ${name} (${email})</p>
-          <p><strong>Subject:</strong> ${subject}</p>
-          <div style="margin-top: 20px; padding: 10px; border-left: 3px solid #3498db;">
-            ${message.replace(/\n/g, '<br>')}
-          </div>
-        </div>
+
+    <div style="font-family: Arial, sans-serif; font-size: 16px; line-height: 1.8; padding: 20px; background-color: #ffffff; border: 2px solid #ddd; border-radius: 10px; max-width: 600px; margin: auto;">
+      <div style="text-align: center; margin: 20px;">
+        <!-- Embedded image with CID -->
+        <h1 style="color: #2c3e50; font-size: 28px; margin: 0;">Sign Map</h1>
+        <p style="color: #777; margin-top: 5px;">You've received a new contact form submission</p>
+      </div>
+
+      <p><strong>From:</strong> ${name} (${email})</p>
+      <p><strong>Subject:</strong> ${subject}</p>
+      <div style="margin-top: 20px; padding: 15px; border-left: 4px solid #3498db; background-color: #ffffff;">
+        ${message.replace(/\n/g, '<br>')}
+      </div>
+
+      <p style="margin-top: 30px; text-align: center;">
+        Visit us at 
+      </p>
+      <p style="margin-top: 30px; text-align: center;">
+        <a href="http://localhost:5173" style="display: inline-block; background-color: #3498db; color: #fff; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+          Visit Sign Map Website
+        </a>
+      </p>
+    </div>
       `,
+      attachments: [
+        {
+          filename: 'pin.png',
+          path: '/Users/fiona_spencer/Desk/MY-PROJECTS/Sign-Map/client/src/assets/pin.png',  // Provide the full path to the image
+          cid: 'unique@nodemailer.com'  // The CID must match the "cid" in the HTML img tag
+        }
+      ]
     };
 
     try {

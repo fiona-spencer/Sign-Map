@@ -4,6 +4,8 @@ import 'react-quill/dist/quill.snow.css';
 import CreateReport from './createReport';
 import ShowPins from './ShowPins';
 import { ReportDetailsCard } from './ReportDetailsCard';
+import { Alert, Button } from 'flowbite-react';
+import { HiX } from 'react-icons/hi';
 
 const GoogleMap = ({
   apiKey,
@@ -26,6 +28,9 @@ const GoogleMap = ({
   const [resetPinsTrigger, setResetPinsTrigger] = useState(0);
   const [viewMode, setViewMode] = useState(() => sessionStorage.getItem('viewMode') || 'default');
   const [showGeoJson, setShowGeoJson] = useState(() => JSON.parse(sessionStorage.getItem('showGeoJson')) || false); // New state for checkbox
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
 
   useEffect(() => {
     localStorage.setItem('mapViewMode', viewMode);
@@ -63,8 +68,8 @@ const GoogleMap = ({
 
   const featureStyleFunction = (feature) => {
     return {
-      fillColor: 'white',
-      fillOpacity: 0.3,
+      fillColor: 'black',
+      fillOpacity: 0.1,
       strokeWeight: 1,
     };
   };
@@ -142,7 +147,15 @@ const GoogleMap = ({
       // Add event listener for clicks on polygons
       geoJsonLayer.addListener('click', (event) => {
         const postalCode = event.feature.getProperty('CFSAUID');
-        alert(`Postal Code: ${postalCode}`);
+        // Set the alert message
+        if (postalCode) {
+          setAlertMessage(`Postal Code: ${postalCode}`);
+        } else {
+          setAlertMessage('Postal Code not found.');
+        }
+    
+        // Make the alert visible
+        setAlertVisible(true);
       });
 
       // Toggle GeoJSON visibility based on the checkbox
@@ -271,6 +284,7 @@ const GoogleMap = ({
   return (
     <div className="rounded-lg shadow-sm border px-6 bg-[#ffffff7d] pb-6">
       <h3 className="text-xl font-bold p-4">View Reports</h3>
+ {/* Conditionally render the Flowbite alert */}
 
       {/* GeoJSON toggle checkbox */}
       <div className="mb-4">
@@ -291,7 +305,22 @@ const GoogleMap = ({
           className="p-2 border border-gray-300 rounded-md w-full"
         />
       </div>
-
+      {alertVisible && (
+        <Alert
+          className="fixed bottom-20 right-4 z-50"
+          color="warning" // You can change the color (e.g., 'success', 'danger', 'warning', 'info')
+          // Close the alert on click
+        >
+          {alertMessage}
+          <button
+          onClick={() => setAlertVisible(false)} 
+          type="button"
+          className="ml-5 rounded-lg border border-cyan-700 bg-transparent px-2 py-1.5 text-center text-xs font-medium text-cyan-700 hover:bg-cyan-800 hover:text-white focus:ring-4 focus:ring-cyan-300 dark:border-cyan-800 dark:text-cyan-800 dark:hover:text-white"
+        >
+          <HiX className='h-2 w-2'/>
+        </button>
+        </Alert>
+      )}
       {/* Other components */}
       {address && !showCreateReportForm && (
         <div className="p-4">

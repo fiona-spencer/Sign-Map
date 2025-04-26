@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Tooltip, Modal } from 'flowbite-react';
+import { Button, Datepicker } from 'flowbite-react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import Map from './Map';
@@ -10,8 +10,7 @@ export default function Datasheet({ apiKey, mapState }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterStatus, setFilterStatus] = useState('');
-  const [filterCity, setFilterCity] = useState('');
-  const [filterProvince, setFilterProvince] = useState('');
+  const [filterPostalCode, setFilterPostalCode] = useState('');
   const [filterUsername, setFilterUsername] = useState('');
   const [filterStreetName, setFilterStreetName] = useState('');
   const [filterDate, setFilterDate] = useState('');
@@ -19,9 +18,6 @@ export default function Datasheet({ apiKey, mapState }) {
   const [filterContactEmail, setFilterContactEmail] = useState('');
   const [filterContactPhone, setFilterContactPhone] = useState('');
   const [filteredPins, setFilteredPins] = useState([]);
-  const [uniqueCities, setUniqueCities] = useState([]);
-  const [uniqueStatuses, setUniqueStatuses] = useState([]);
-  const [showIntroModal, setShowIntroModal] = useState(true); // Modal visibility
 
   const statusOptions = ['pending', 'accepted', 'in-progress', 'resolved', 'deleted'];
 
@@ -33,12 +29,6 @@ export default function Datasheet({ apiKey, mapState }) {
         const data = await response.json();
         setPins(data);
         setFilteredPins(data);
-
-        // Extract unique cities and statuses from the data
-        const cities = Array.from(new Set(data.map(pin => pin.location.address.split(',')[1]?.trim())));
-        const statuses = Array.from(new Set(data.map(pin => pin.location.status)));
-        setUniqueCities(cities);
-        setUniqueStatuses(statuses);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -50,23 +40,45 @@ export default function Datasheet({ apiKey, mapState }) {
 
   useEffect(() => {
     const applyFilter = () => {
-      setLoading(true);  // Start loading when filtering
+      setLoading(true);
 
       const filtered = pins.filter((pin) => {
         const matchesStatus = filterStatus ? pin.location.status === filterStatus : true;
-        const matchesCity = filterCity ? pin.location.address.toLowerCase().includes(filterCity.toLowerCase()) : true;
-        const matchesProvince = filterProvince ? pin.location.address.toLowerCase().includes(filterProvince.toLowerCase()) : true;
-        const matchesAddress = filterStreetName ? pin.location.address.toLowerCase().includes(filterStreetName.toLowerCase()) : true;
-        const matchesUsername = filterUsername ? pin.createdBy.username.toLowerCase().includes(filterUsername.toLowerCase()) : true;
+
+        const parsedPostalCode = (() => {
+          const match = pin.location.address.match(/\b[A-Z]\d[A-Z] ?\d[A-Z]\d\b/i);
+          return match ? match[0] : '';
+        })();
+
+        const matchesPostalCode = filterPostalCode
+          ? parsedPostalCode?.toLowerCase().includes(filterPostalCode.toLowerCase())
+          : true;
+
+        const matchesAddress = filterStreetName
+          ? pin.location.address.toLowerCase().includes(filterStreetName.toLowerCase())
+          : true;
+
+        const matchesUsername = filterUsername
+          ? pin.createdBy.username.toLowerCase().includes(filterUsername.toLowerCase())
+          : true;
+
         const matchesDate = filterDate ? pin.createdAt.includes(filterDate) : true;
-        const matchesContactName = filterContactName ? pin.location.info.contactName.toLowerCase().includes(filterContactName.toLowerCase()) : true;
-        const matchesContactEmail = filterContactEmail ? pin.location.info.contactEmail.toLowerCase().includes(filterContactEmail.toLowerCase()) : true;
-        const matchesContactPhone = filterContactPhone ? pin.location.info.contactPhoneNumber.includes(filterContactPhone) : true;
+
+        const matchesContactName = filterContactName
+          ? pin.location.info.contactName.toLowerCase().includes(filterContactName.toLowerCase())
+          : true;
+
+        const matchesContactEmail = filterContactEmail
+          ? pin.location.info.contactEmail.toLowerCase().includes(filterContactEmail.toLowerCase())
+          : true;
+
+        const matchesContactPhone = filterContactPhone
+          ? pin.location.info.contactPhoneNumber.includes(filterContactPhone)
+          : true;
 
         return (
           matchesStatus &&
-          matchesCity &&
-          matchesProvince &&
+          matchesPostalCode &&
           matchesAddress &&
           matchesUsername &&
           matchesDate &&
@@ -77,26 +89,31 @@ export default function Datasheet({ apiKey, mapState }) {
       });
 
       setFilteredPins(filtered);
-      setLoading(false); // Stop loading after filtering
+      setLoading(false);
     };
 
     applyFilter();
-  }, [filterStatus, filterCity, filterProvince, filterUsername, filterStreetName, filterDate, filterContactName, filterContactEmail, filterContactPhone, pins]);
+  }, [
+    filterStatus,
+    filterPostalCode,
+    filterUsername,
+    filterStreetName,
+    filterDate,
+    filterContactName,
+    filterContactEmail,
+    filterContactPhone,
+    pins
+  ]);
 
   const handleResetFilters = () => {
     setFilterStatus('');
-    setFilterCity('');
-    setFilterProvince('');
+    setFilterPostalCode('');
     setFilterUsername('');
     setFilterStreetName('');
     setFilterDate('');
     setFilterContactName('');
     setFilterContactEmail('');
     setFilterContactPhone('');
-  };
-
-  const handleShowAllPins = () => {
-    setFilteredPins(pins);
   };
 
   const getStatusClass = (status) => {
@@ -115,61 +132,37 @@ export default function Datasheet({ apiKey, mapState }) {
     return date.toLocaleDateString('en-US');
   };
 
-  const getImage = (pin) => {
-    return pin.location.info.image || defaultPinImage;
-  };
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <CircularProgressbar
+          value={0}
+          text="Loading..."
+          strokeWidth={5}
+          styles={{
+            root: {
+              width: '100px',
+              height: '100px',
+              position: 'absolute'
+            },
+            path: {
+              stroke: `rgba(42, 150, 50, 1)`
+            },
+            text: {
+              fill: 'black',
+              fontSize: '16px',
+              fontWeight: 'bold'
+            }
+          }}
+        />
+      </div>
+    );
+  }
 
-  if (loading) return (
-<div className="flex justify-center items-center h-screen">
-      <CircularProgressbar
-        value={0}
-        text="Loading..."
-        strokeWidth={5}
-        styles={{
-          root: {
-            width: '100px', // Increase the size for better visibility
-            height: '100px', // Increase the size for better visibility
-            position: 'absolute', // Absolute positioning so it stays in the center
-          },
-          path: {
-            stroke: `rgba(42, 150, 50, 1)`, // Set stroke opacity to 1 (fully visible)
-          },
-          text: {
-            fill: 'black', // Color for the text
-            fontSize: '16px', // Font size of the "Loading..." text
-            fontWeight: 'bold',
-          },
-        }}
-      />
-    </div>
-  );
-  
   if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="w-full overflow-x-auto p-6 bg-[#267b6684] dark:bg-gray-800">
-      {/* Modal for Introduction */}
-      {/* <Modal show={showIntroModal} onClose={() => setShowIntroModal(false)} size="md" popup>
-        <Modal.Body>
-          <div className="text-center">
-            <h3 className="m-5 text-lg font-semibold text-gray-900 dark:text-white">
-              View all reported pins on the map?
-            </h3>
-            <div className="flex justify-center mt-6">
-              <Button
-                color="success"
-                onClick={() => {
-                  handleShowAllPins();
-                  setShowIntroModal(false);
-                }}
-              >
-                Show All Pins
-              </Button>
-            </div>
-          </div>
-        </Modal.Body>
-      </Modal> */}
-
       {/* Map Section */}
       <div className="mb-6">
         <Map mapState={mapState} apiKey={apiKey} pins={filteredPins} />
@@ -185,18 +178,68 @@ export default function Datasheet({ apiKey, mapState }) {
             ))}
           </select>
 
-          <input type="text" placeholder="City" value={filterCity} onChange={(e) => setFilterCity(e.target.value)} className="p-2 border rounded" />
-          <input type="text" placeholder="Province" value={filterProvince} onChange={(e) => setFilterProvince(e.target.value)} className="p-2 border rounded" />
-          <input type="text" placeholder="Street Name" value={filterStreetName} onChange={(e) => setFilterStreetName(e.target.value)} className="p-2 border rounded" />
-          <input type="text" placeholder="Username" value={filterUsername} onChange={(e) => setFilterUsername(e.target.value)} className="p-2 border rounded" />
-          <input type="date" value={filterDate} onChange={(e) => setFilterDate(e.target.value)} className="p-2 border rounded" />
+          <input
+            type="text"
+            placeholder="Postal Code"
+            value={filterPostalCode}
+            onChange={(e) => setFilterPostalCode(e.target.value)}
+            className="p-2 border rounded"
+          />
 
-          {/* New Filters */}
-          <input type="text" placeholder="Contact Name" value={filterContactName} onChange={(e) => setFilterContactName(e.target.value)} className="p-2 border rounded" />
-          <input type="email" placeholder="Contact Email" value={filterContactEmail} onChange={(e) => setFilterContactEmail(e.target.value)} className="p-2 border rounded" />
-          <input type="text" placeholder="Contact Phone Number" value={filterContactPhone} onChange={(e) => setFilterContactPhone(e.target.value)} className="p-2 border rounded" />
+          <input
+            type="text"
+            placeholder="Street Name"
+            value={filterStreetName}
+            onChange={(e) => setFilterStreetName(e.target.value)}
+            className="p-2 border rounded"
+          />
 
-          <Button onClick={handleResetFilters} className="w-full md:w-auto text-xs py-2 px-4 bg-red-500 text-white hover:bg-red-600">
+          <input
+            type="text"
+            placeholder="Username"
+            value={filterUsername}
+            onChange={(e) => setFilterUsername(e.target.value)}
+            className="p-2 border rounded"
+          />
+
+<Datepicker
+  value={filterDate}
+  onSelectedDateChanged={(date) => {
+    const formattedDate = date?.toISOString().split('T')[0]; // YYYY-MM-DD format
+    setFilterDate(formattedDate);
+  }}
+  className="w-full p-1 border rounded bg-gray-100"
+/>
+
+
+          <input
+            type="text"
+            placeholder="Contact Name"
+            value={filterContactName}
+            onChange={(e) => setFilterContactName(e.target.value)}
+            className="p-2 border rounded"
+          />
+
+          <input
+            type="email"
+            placeholder="Contact Email"
+            value={filterContactEmail}
+            onChange={(e) => setFilterContactEmail(e.target.value)}
+            className="p-2 border rounded"
+          />
+
+          <input
+            type="text"
+            placeholder="Contact Phone Number"
+            value={filterContactPhone}
+            onChange={(e) => setFilterContactPhone(e.target.value)}
+            className="p-2 border rounded"
+          />
+
+          <Button
+            onClick={handleResetFilters}
+            className="w-full md:w-auto text-xs py-2 px-4 bg-red-500 text-white hover:bg-red-600"
+          >
             Reset Filters
           </Button>
         </div>
