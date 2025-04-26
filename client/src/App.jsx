@@ -83,6 +83,7 @@ function AppWrapper({ apiKey }) {
           {/* Public Account */}
           <Route path="/startHere" element={<StartHere />} />
           <Route path="/googleTest" element={<GoogleMapTest apiKey={apiKey} />} />
+          <Route path="/pdfTest" element={<TestPdf apiKey={apiKey}/>} />
 
           {/* User Account */}
 

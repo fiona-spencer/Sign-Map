@@ -11,7 +11,7 @@ import 'react-quill/dist/quill.snow.css';
 import { useNavigate } from 'react-router-dom';
 import { FaMapPin, FaTimes } from 'react-icons/fa';
 
-export default function CreateReport({ position, onClose, onSubmit, isSubmitting }) {
+export default function CreateReport({ apiKey, location, onClose, onSubmit, isSubmitting }) {
   const [address, setAddress] = useState('');
   const [isVerified, setIsVerified] = useState(false);
   const [publishError, setPublishError] = useState(null);
@@ -22,7 +22,7 @@ export default function CreateReport({ position, onClose, onSubmit, isSubmitting
   const [formData, setFormData] = useState({
     userEmail: '',
     userName: '',
-    position: { lat: 0, lng: 0 },
+    location: { lat: 0, lng: 0 },
     address: '',
     description: '',
     icon: 'default',
@@ -43,11 +43,10 @@ export default function CreateReport({ position, onClose, onSubmit, isSubmitting
       }));
     }
 
-    if (position && position.lat && position.lng) {
+    if (location && location.lat && location.lng) {
       const fetchAddress = async () => {
-        const lat = position.lat();
-        const lng = position.lng();
-        const apiKey = 'AIzaSyA1wOqcLSGKkhNJQYP9wH06snRuvSJvRJY';
+        const lat = location.lat();
+        const lng = location.lng();
         try {
           const res = await fetch(
             `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`
@@ -59,7 +58,7 @@ export default function CreateReport({ position, onClose, onSubmit, isSubmitting
             setFormData((prev) => ({
               ...prev,
               address: formatted,
-              position: { lat, lng },
+              location: { lat, lng },
             }));
           }
         } catch (error) {
@@ -69,7 +68,7 @@ export default function CreateReport({ position, onClose, onSubmit, isSubmitting
 
       fetchAddress();
     }
-  }, [currentUser, position]);
+  }, [currentUser, location]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -94,8 +93,8 @@ export default function CreateReport({ position, onClose, onSubmit, isSubmitting
       },
       location: {
         address: formData.address,
-        lat: formData.position.lat,
-        lng: formData.position.lng,
+        lat: formData.location.lat,
+        lng: formData.location.lng,
         info: {
           description: formData.description,
           icon: formData.icon,
@@ -183,11 +182,11 @@ export default function CreateReport({ position, onClose, onSubmit, isSubmitting
             <TextInput
               type="text"
               readOnly
-              value={`${formData.position.lat}, ${formData.position.lng}`}
+              value={`${formData.location.lat}, ${formData.location.lng}`}
+              
               addon="Lat/Lng"
               className="dark:bg-gray-700 dark:text-white"
             />
-          
           </div>
 
    {/* Contact Info */}

@@ -99,6 +99,10 @@ const GoogleMap = ({ apiKey, mapId = '42c8848d94ad7219', center = { lat: 43.7, l
     };
   }, [apiKey]);
 
+
+  //separate into two props
+
+
   useEffect(() => {
     const script = document.createElement('script');
     script.async = true;
@@ -324,7 +328,7 @@ const GoogleMap = ({ apiKey, mapId = '42c8848d94ad7219', center = { lat: 43.7, l
       )}
 
         {/* Other components */}
-        {address && !showCreateReportForm && (
+      {address && !showCreateReportForm && (
         <div className="p-4">
           <div className="flex flex-wrap gap-4">
             <button
@@ -349,7 +353,8 @@ const GoogleMap = ({ apiKey, mapId = '42c8848d94ad7219', center = { lat: 43.7, l
           <div className="fixed inset-0 justify-center items-start z-50 pt-20 overflow-y-auto pb-16">
             <div>
               <CreateReport
-                position={markerPosition}
+                apiKey={apiKey}
+                location={markerPosition}
                 address={address}
                 onClose={() => setShowCreateReportForm(false)}
                 onSubmit={handleCreateMarker}
@@ -371,5 +376,6 @@ const GoogleMap = ({ apiKey, mapId = '42c8848d94ad7219', center = { lat: 43.7, l
     </div>
   );
 };
+
 
 export default GoogleMap;
