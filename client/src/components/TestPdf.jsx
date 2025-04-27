@@ -175,7 +175,7 @@ export default function TestPdf({newRef}) {
 
 
   return (
-<div className="p-4 px-8 space-y-6 bg-white rounded-lg mt-4" id="someElementId" ref={newRef.current}>
+<div className="p-4 px-8 space-y-6 rounded-lg shadow-sm border px-6 bg-[#ffffff7d] pb-6  dark:bg-[#148249b3] shadow-xl rounded-lg mt-4" id="someElementId" ref={newRef.current}>
   {/* Grouping Toggle */}
   <div className="flex justify-between items-center">
     <div className="flex items-center gap-4">
@@ -286,42 +286,60 @@ export default function TestPdf({newRef}) {
           ))}
         </div>
       ) : (
-<div>
-  <h2 className="text-xl font-bold mb-2">Clusters (≤ {clusterSize} meters)</h2>
+<div className="max-w-2xl mx-auto">
+<h2 className="text-xl font-bold mb-4">Clusters (≤ {clusterSize} meters)</h2>
   {clusters.length > 0 ? (
     clusters.map((cluster, i) => (
-      <div key={i} ref={addToRefs} className="border border-green-400 rounded p-3 shadow-sm mb-4">
-        <div className="flex justify-between items-center mb-2">
-          <h3 className="font-semibold text-green-700">Cluster {i + 1}</h3>
+      <div
+        key={i}
+        ref={addToRefs}
+        className="border-2 border-green-500 rounded p-4 shadow-sm mb-6"
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-semibold text-xl bg-green-600 p-3 rounded-lg text-green-100">
+            Cluster {i + 1}
+          </h3>
           <Button
-  onClick={() => {
-    zoomToCluster(i);  // Ensure the correct cluster index is passed here
-    window.scrollTo({
-      top: 1450,
-      behavior: 'auto',  // Smooth scrolling animation
-    });
-  }}
-  className="text-sm border-2"
-  color="red"
->
-  <HiZoomIn className='h-5 w-5 mr-3'/> Zoom to Cluster {i + 1} {/* Display cluster number */}
-</Button>
-
+            onClick={() => {
+              zoomToCluster(i);  // Ensure the correct cluster index is passed here
+              window.scrollTo({
+                top: 1650,
+                behavior: 'smooth', // Smooth scrolling animation
+              });
+            }}
+            className="text-sm font-bold text-red-600 bg-transparent outline-none rounded-md hover:bg-red-100 transition-colors"
+            color='red'
+          >
+            <HiZoomIn className="h-5 w-5 mr-2" />
+            Zoom to Cluster {i + 1}
+          </Button>
         </div>
-        <ul className="list-disc list-inside text-sm">
+
+        <ul className="list-inside font-medium text-xs bg-gray-100 rounded-md p-2 pt-4 shadow-md hover:shadow-lg transition-shadow duration-300">
           {cluster.map((pin, j) => (
-            <li key={j}>
-              {pin.location?.info?.contactName || 'Unnamed Contact'} —
-              {pin.location?.address} ({pin.location?.status})
+            <li
+              key={j}
+              className="hover:bg-gray-200 rounded-md p-1 px-4 transition-colors duration-200"
+            >
+              <div className="font-semibold text-gray-800">
+                {pin.location?.info?.contactName || 'Unnamed Contact'}
+              </div>
+              <div className="text-gray-600">
+                {pin.location?.address || 'No address provided'}
+                <span className="text-xs text-gray-500 px-2 text-yellow-400">
+                  ({pin.location?.status || 'No status'})
+                </span>
+              </div>
             </li>
           ))}
         </ul>
       </div>
     ))
   ) : (
-    <p>No clusters found based on the selected radius.</p>
+    <p className="text-gray-600">No clusters found based on the selected radius.</p>
   )}
 </div>
+
 
       
       )}

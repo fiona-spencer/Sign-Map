@@ -85,7 +85,7 @@ export const getPins = async (req, res, next) => {
 export const updatePinStatus = async (req, res, next) => {
   try {
     const { status } = req.body; // Get the new status from the request body
-    const pin = await Pin.findById(req.params.id); // Find the pin by ID
+    const pin = await Pin.findById(req.params.pinId); // Find the pin by ID
     if (!pin) return next(errorHandler(404, 'Pin not found')); // If pin not found, throw error
 
     pin.location.status = status; // Update the pin's status

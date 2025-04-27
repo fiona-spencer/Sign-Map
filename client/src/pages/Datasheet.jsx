@@ -465,23 +465,29 @@ document.body.appendChild(container);
       )}
     </div>
     <div>
-      {/* Button to toggle the visibility */}
-      <Button color="dark" outline onClick={toggleVisibility}>
+      {/* Button to toggle visibility */}
+      <Button
+        onClick={toggleVisibility}
+        className="p-2 text-white rounded-md flex items-center"
+        color='dark'
+        outline
+      >
         {isVisible ? (
           <>
-            Hide Clustered Map <HiArrowCircleDown className='h-5 w-5 ml-2' />
-            </>
+            Hide Clustered Map <HiArrowCircleDown className="h-5 w-5 ml-2" />
+          </>
         ) : (
           <>
-            Show Clustered Map <HiArrowCircleRight className='h-5 w-5 ml-2'/>
+            Show Clustered Map <HiArrowCircleRight className="h-5 w-5 ml-2" />
           </>
         )}
       </Button>
 
-      {/* Conditionally render the div based on visibility state */}
+      {/* Conditionally render the map */}
       {isVisible && (
-        <div ref={newRef}>
-          <TestPdf newRef={newRef} /> {/* Pass printRefs to TestPdf */}
+        <div className="mt-4" ref={addNewRefs}>
+          <TestPdf newRef={newRef}/>
+         
         </div>
       )}
     </div>

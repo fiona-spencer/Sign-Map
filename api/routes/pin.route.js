@@ -15,7 +15,8 @@ router.get('/test', test);
 router.post('/createPin', verifyToken, createPin);
 router.post('/deletePin', verifyToken, deletePin);
 router.get('/getPins', getPins);
-router.put('/updatePin/:pintId/:userId', verifyToken, updatePinStatus);
+// Route for updating a pin's status
+router.put('/updatePin/:pinId', verifyToken, updatePinStatus);
 
 export default router;
 
