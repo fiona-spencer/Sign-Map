@@ -69,33 +69,56 @@ export default function TestPdf() {
     setDownloading(true);
     setProgress(0);
     console.log("Preparing PDF...");
+    
+    // Simulate a small delay for loading
     await new Promise(resolve => setTimeout(resolve, 500));
-
-    const elements = printRefs.current;
+  
+    const elements = printRefs.current; // Collect all refs
     if (!elements.length) {
       console.warn("No elements found to print.");
       setDownloading(false);
       return;
     }
-
+  
+    // Create a new PDF document
     const pdf = new jsPDF({ orientation: "portrait", unit: "px", format: "a4" });
-
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+  
+    // Start the Y position for the first element
+    let currentY = 20; // Starting position from the top of the page
+  
+    // Loop through each element in the refs and add them to the PDF
     for (let i = 0; i < elements.length; i++) {
       try {
+        // Capture the element as an image using html2canvas
         const canvas = await html2canvas(elements[i], {
-          scale: 2,
+          scale: 4,
           useCORS: true,
-          scrollY: -window.scrollY,
+          scrollY: -window.scrollY - 1000, // Adjust for scrolling
         });
-
+  
         const data = canvas.toDataURL("image/png");
         const imgProps = pdf.getImageProperties(data);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-        if (i > 0) pdf.addPage();
-        pdf.addImage(data, "PNG", 0, 0, pdfWidth, pdfHeight);
-        setProgress(Math.round(((i + 1) / elements.length) * 100));
+  
+        // Calculate the image height based on the width of the page
+        const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+  
+        // Check if the image fits on the current page
+        if (currentY + imgHeight > pdfHeight - 20) {
+          // If not, add a new page and reset the Y position
+          pdf.addPage();
+          currentY = 20; // Reset Y position to start from the top of the new page
+        }
+  
+        // Add the image to the PDF at the current Y position
+        pdf.addImage(data, "PNG", 20, currentY, pdfWidth - 40, imgHeight);
+  
+        // Update the Y position for the next element
+        currentY += imgHeight + 10; // Add some space between images
+  
+        setProgress(Math.round(((i + 1) / elements.length) * 100)); // Update progress
+  
       } catch (error) {
         console.error(`Error rendering element ${i} to canvas:`, error);
         alert("An error occurred while generating the PDF. Check the console for details.");
@@ -103,11 +126,14 @@ export default function TestPdf() {
         return;
       }
     }
-
+  
+    // Save the PDF after all elements have been added
     pdf.save("pins.pdf");
     console.log("PDF saved successfully.");
     setDownloading(false);
   };
+  
+  
 
   const zoomToCluster = (clusterIndex) => {
     console.log("zoomToCluster triggered for cluster index:", clusterIndex);
@@ -169,13 +195,28 @@ export default function TestPdf() {
             step="50"
             value={clusterSize}
             onChange={(e) => setClusterSize(Number(e.target.value))}
-            className="w-full"
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none slider"
           />
         </div>
       )}
 
-      {/* 🗺️ Map View */}
-      {filteredPins && filteredPins.length > 0 && (
+     
+
+      {/* Zoom Slider */}
+      <div className="mt-4">
+      <label className="font-semibold text-gray-700 dark:text-gray-200">Zoom Level: {mapZoom}</label>
+      <input id="default-range" 
+          type="range" 
+          min="1"
+          max="20"
+          value={mapZoom}
+          onChange={(e) => setMapZoom(Number(e.target.value))}
+          class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"/>
+      </div>
+ {/* 🗺️ Map View */}
+ {filteredPins && filteredPins.length > 0 && (
+  <div ref={addToRefs}>
+
         <MapView
           key={`${mapCenter[0]}-${mapCenter[1]}-${mapZoom}`} // Key to force re-render on zoom or center change
           center={mapCenter} // Pass the center dynamically
@@ -183,21 +224,9 @@ export default function TestPdf() {
           clusters={clusters} // Pass the clusters data
           setMapInstance={setMapInstance} // Pass the function to store the map instance
         />
+  </div>
+
       )}
-
-      {/* Zoom Slider */}
-      <div className="mt-4">
-        <label className="font-semibold text-gray-700 dark:text-gray-200">Zoom Level: {mapZoom}</label>
-        <input
-          type="range"
-          min="1"
-          max="20"
-          value={mapZoom}
-          onChange={(e) => setMapZoom(Number(e.target.value))}
-          className="w-full"
-        />
-      </div>
-
       {/* 📥 Download Button */}
       <div className="mt-4 flex items-center gap-4">
         {downloading ? (
