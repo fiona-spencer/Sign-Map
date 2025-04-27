@@ -10,7 +10,7 @@ import TestPdf from '../components/TestPdf';
 import { useRef } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { HiCloudDownload } from 'react-icons/hi';
+import { HiArrowCircleDown, HiArrowCircleLeft, HiArrowCircleRight, HiCloudDownload } from 'react-icons/hi';
 
 export default function Datasheet({ apiKey }) {
   const [pins, setPins] = useState([]);
@@ -26,7 +26,12 @@ export default function Datasheet({ apiKey }) {
   const [filterContactPhone, setFilterContactPhone] = useState('');
   const [progress, setProgress] = useState(0);
   const [downloading, setDownloading] = useState(false);
-  
+  const [isVisible, setIsVisible] = useState(false);  // State to toggle visibility
+
+  const toggleVisibility = () => {
+    setIsVisible(prevState => !prevState);  // Toggle the visibility state
+  };
+
   const filteredPins = useSelector((state) => state.global.filteredPins); // Access filteredPins from Redux store
   const dispatch = useDispatch();
 
@@ -459,9 +464,27 @@ document.body.appendChild(container);
         </div>
       )}
     </div>
-      <div ref={addNewRefs}>
-        <TestPdf newRef={newRef} /> {/* Pass printRefs to TestPdf */}
-      </div>
+    <div>
+      {/* Button to toggle the visibility */}
+      <Button color="dark" outline onClick={toggleVisibility}>
+        {isVisible ? (
+          <>
+            Hide Clustered Map <HiArrowCircleDown className='h-5 w-5 ml-2' />
+            </>
+        ) : (
+          <>
+            Show Clustered Map <HiArrowCircleRight className='h-5 w-5 ml-2'/>
+          </>
+        )}
+      </Button>
+
+      {/* Conditionally render the div based on visibility state */}
+      {isVisible && (
+        <div ref={newRef}>
+          <TestPdf newRef={newRef} /> {/* Pass printRefs to TestPdf */}
+        </div>
+      )}
+    </div>
       
       {/* Your download button */}
     </div>
