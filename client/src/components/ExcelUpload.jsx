@@ -67,7 +67,7 @@ const ExcelUpload = () => {
                 try {
                   let firstName = row["First Name"] ? row["First Name"].trim() : null;
                   let lastName = row["Last Name"] ? row["Last Name"].trim() : null;
-
+            
                   // Set default value for missing first or last name
                   if (!firstName && !lastName) {
                     firstName = "Missing Name (first)";
@@ -79,56 +79,48 @@ const ExcelUpload = () => {
                     lastName = `${firstName} (first)`;
                     firstName = "";
                   }
-
+            
                   const fullName = `${firstName} ${lastName}`.trim();
-
+            
                   let streetNumber = row["St Num"] != null ? String(row["St Num"]).trim() : "";
                   let streetName = row["St Name"] ? row["St Name"].trim() : "";
                   let city = row["City (Civic Address)"] ? row["City (Civic Address)"].trim() : "";
                   let province = row["Province (Civic Address)"] ? row["Province (Civic Address)"].trim() : "";
                   let postalCode = row["Postal Code (Civic Address)"] ? row["Postal Code (Civic Address)"].trim() : "";
-
+            
                   streetName = streetName.replace(/\s*,\s*/g, ", ");
                   city = city.replace(/\s*,\s*/g, ", ");
                   province = province.replace(/\s*,\s*/g, ", ");
                   postalCode = postalCode.replace(/\s*,\s*/g, ", ");
-
+            
                   if (streetNumber === "1st" && streetName.includes("Ave")) {
                     streetNumber = "First";
                   }
-
-                  const unitNumberMatch = streetNumber.match(/^(\d+)[\s-](\d+)$/);
-                  let unitNumber = null;
-                  if (unitNumberMatch) {
-                    unitNumber = unitNumberMatch[1];
-                    streetNumber = unitNumberMatch[2];
-                    streetName = `${unitNumber} ${streetName}`;
-                  }
-
+            
+                  const hyphenOrSpaceMatch = streetNumber.match(/^([A-Za-z-]+-\d+)(?:[\s-])?(\d+)$/);
                   let aptNum = null;
-                  const hyphenOrSpaceMatch = streetNumber.match(/^(.+?)(?:[\s-])?(\d+)$/);
                   if (hyphenOrSpaceMatch) {
-                    const prefix = hyphenOrSpaceMatch[1];
-                    const streetNumberPart = hyphenOrSpaceMatch[2];
-
+                    const prefix = hyphenOrSpaceMatch[1]; // This will be something like "B-25"
+                    const streetNumberPart = hyphenOrSpaceMatch[2]; // This will be the street number, like "9"
+            
                     if (prefix) {
-                      aptNum = prefix;
+                      aptNum = prefix; // Assign the unit number
                     }
-                    streetNumber = streetNumberPart;
+                    streetNumber = streetNumberPart; // Assign the street number
                   }
-
+            
                   let address = `${streetNumber} ${streetName}, ${city}, ${province} ${postalCode}, Canada`;
                   address = address.replace(/\s*,\s*/g, ", ").trim();
-
+            
                   const email = row["Preferred Email"] || "N/A";
                   const phone = row["Preferred Phone Number"] || "N/A";
-
+            
                   const { lat, lng } = await fetchLatLng(address);
-
+            
                   if (aptNum) {
-                    address = `${aptNum}-${streetNumber} ${streetName.replace(aptNum, "")}, ${city}, ${province} ${postalCode}, Canada`;
+                    address = `${aptNum} (apt) ${streetNumber} (st.) ${streetName}, ${city}, ${province} ${postalCode}, Canada`;
                   }
-
+            
                   return {
                     createdBy: {
                       userName: currentUser?.username || "Unknown",
@@ -159,6 +151,7 @@ const ExcelUpload = () => {
                 }
               })
             )
+            
           )
         );
 

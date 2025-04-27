@@ -42,7 +42,7 @@ export const fetchLatLng = async (address) => {
   }
 };
 
-export const batchFetchLatLng = async (addresses, batchSize = 5) => {
+export const batchFetchLatLng = async (addresses, batchSize = 10) => {
   const limit = pLimit(batchSize); // Limit the number of concurrent requests (e.g., 5 at a time)
   let allResults = [];
   let failedCount = 0;
@@ -77,6 +77,7 @@ export const batchFetchLatLng = async (addresses, batchSize = 5) => {
 
     // Flatten the result from all chunks
     allResults = chunkResults.flat();
+    
     console.log('Total entries processed:', allResults.length);
     console.log('Failed entries:', failedCount);
   } catch (error) {

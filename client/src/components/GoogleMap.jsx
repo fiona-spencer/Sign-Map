@@ -7,7 +7,6 @@ import { ReportDetailsCard } from './ReportDetailsCard';
 import { Alert } from 'flowbite-react';
 import { HiX } from 'react-icons/hi';
 import MapToPdf from './MapToPdf';
-import { Button, Modal } from 'flowbite-react';
 
 const GoogleMap = ({ apiKey, mapId = '42c8848d94ad7219', center = { lat: 43.7, lng: -79.42 },
   zoom = 12, }) => {

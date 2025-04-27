@@ -5,6 +5,7 @@ import 'react-circular-progressbar/dist/styles.css';
 import Map from './Map';
 import { useSelector, useDispatch } from 'react-redux';
 import { setFilteredPins } from '../redux/global/globalSlice'; // Import action
+import DownloadExcel from '../components/DownloadExcel';
 
 export default function Datasheet({ apiKey }) {
   const [pins, setPins] = useState([]);
@@ -170,6 +171,8 @@ export default function Datasheet({ apiKey }) {
       <div className="mb-6">
         <Map apiKey={apiKey} />
       </div>
+
+      <DownloadExcel />
 
       {/* Filter Section */}
       <div className="mb-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-300 dark:border-gray-600">
