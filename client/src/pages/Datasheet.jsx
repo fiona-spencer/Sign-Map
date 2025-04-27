@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Datepicker } from 'flowbite-react';
-import { CircularProgressbar } from 'react-circular-progressbar';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import Map from './Map';
 import { useSelector, useDispatch } from 'react-redux';
 import { setFilteredPins } from '../redux/global/globalSlice'; // Import action
 import DownloadExcel from '../components/DownloadExcel';
 import TestPdf from '../components/TestPdf';
+import { useRef } from 'react';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import { HiCloudDownload } from 'react-icons/hi';
 
 export default function Datasheet({ apiKey }) {
   const [pins, setPins] = useState([]);
@@ -20,7 +24,9 @@ export default function Datasheet({ apiKey }) {
   const [filterContactName, setFilterContactName] = useState('');
   const [filterContactEmail, setFilterContactEmail] = useState('');
   const [filterContactPhone, setFilterContactPhone] = useState('');
-
+  const [progress, setProgress] = useState(0);
+  const [downloading, setDownloading] = useState(false);
+  
   const filteredPins = useSelector((state) => state.global.filteredPins); // Access filteredPins from Redux store
   const dispatch = useDispatch();
 
@@ -42,6 +48,125 @@ export default function Datasheet({ apiKey }) {
     };
     fetchPins();
   }, [dispatch]);
+
+  const newRef = useRef([]); // Define printRefs inside Datasheet
+  const addNewRefs = (el) => {
+    if (el && !newRef.current.includes(el)) {
+      newRef.current.push(el);
+    }
+  };
+
+
+  const handleDownloadPdf = async () => {
+    setDownloading(true);
+    setProgress(0);
+    console.log("Preparing PDF with multiple pages...");
+  
+    await new Promise(resolve => setTimeout(resolve, 500));
+  
+    const elements = newRef.current;
+    if (!elements.length) {
+      console.warn("No elements found to print.");
+      setDownloading(false);
+      return;
+    }
+  
+    // Create a hidden wrapper to stack elements together
+const container = document.createElement("div");
+container.style.position = "relative"; // Change from absolute to relative positioning
+container.style.margin = "0 auto"; // Center the container horizontally
+container.style.background = "white";
+container.style.padding = "20px";
+container.style.width = `${window.innerWidth}px`; // Set the width to the user's screen width
+
+// Append clones of each element, skipping the first element
+elements.slice(1).forEach((el) => {
+  const clone = el.cloneNode(true);
+  clone.style.marginBottom = "10px";
+  container.appendChild(clone);
+});
+
+document.body.appendChild(container);
+
+  
+    // Append clones of each element
+    elements.forEach((el) => {
+      const clone = el.cloneNode(true);
+      clone.style.marginBottom = "10px";
+      container.appendChild(clone);
+    });
+  
+    document.body.appendChild(container);
+  
+    try {
+      const canvas = await html2canvas(container, {
+        scale: 2,
+        useCORS: true,
+        ignoreElements: (el) => el.tagName === 'IFRAME' || el.classList.contains('iframe-wrapper'),
+      });
+  
+      const pdf = new jsPDF({ orientation: "portrait", unit: "px", format: "a4" });
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+  
+      const imgData = canvas.toDataURL("image/png");
+  
+      // Directly set the width and height of the image to match the PDF size
+      let scaledWidth = pdfWidth;
+      let scaledHeight = pdfHeight;
+
+      // Calculate the number of pages based on the canvas height
+      const totalPages = Math.ceil(canvas.height / scaledHeight);
+  
+      // Loop through each page and add the corresponding section of the canvas
+      for (let pageNum = 0; pageNum < totalPages; pageNum++) {
+        const croppedCanvas = document.createElement("canvas");
+        const ctx = croppedCanvas.getContext("2d");
+  
+        croppedCanvas.width = canvas.width*0.8;
+        croppedCanvas.height = scaledHeight*15;
+
+  
+        // Draw the corresponding section of the original canvas to fit the page
+        ctx.drawImage(
+          canvas, 
+          0, 
+          pageNum * scaledHeight, // Crop vertically based on page number
+          canvas.width, 
+          scaledHeight, 
+          0, 
+          0, 
+          croppedCanvas.width, 
+          croppedCanvas.height
+        );
+  
+        const croppedData = croppedCanvas.toDataURL("image/png");
+  
+        // If it's the first page, add it directly
+        if (pageNum === 0) {
+          pdf.addImage(croppedData, "PNG", 0, 0, scaledWidth*2, scaledHeight*0.9);
+        } else {
+          // For subsequent pages, add a new page and add the image
+          pdf.addPage();
+          pdf.addImage(croppedData, "PNG", 0, 0, scaledWidth, scaledHeight*0.9);
+        }
+      }
+  
+      // Save the PDF after all elements have been added
+      pdf.save("clustered_pins.pdf");
+      console.log("PDF saved successfully.");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert("An error occurred while generating the PDF.");
+    } finally {
+      document.body.removeChild(container);
+      setDownloading(false);
+    }
+  };
+  
+  
+  
+
 
   useEffect(() => {
     const applyFilter = () => {
@@ -167,7 +292,10 @@ export default function Datasheet({ apiKey }) {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="w-full overflow-x-auto p-6 bg-[#267b6684] dark:bg-gray-800">
+    <div className="w-full overflow-x-auto p-6 bg-[#267b6684] dark:bg-gray-800 ">
+      <div className='text-4xl font-extrabold m-6 flex items-center gap-4  justify-center'>
+        Create and Look for your Pins
+      </div>
       {/* Map Section */}
       <div className="mb-6">
         <Map apiKey={apiKey} />
@@ -175,7 +303,10 @@ export default function Datasheet({ apiKey }) {
 
 
       {/* Filter Section */}
-      <div className="mb-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-300 dark:border-gray-600">
+      <div className='text-4xl font-extrabold mt-12 flex items-center gap-4  justify-center'>
+        Search
+      </div>
+      <div className="my-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-300 dark:border-gray-600">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="p-2 border rounded">
             <option value="">Select Status</option>
@@ -249,7 +380,9 @@ export default function Datasheet({ apiKey }) {
           </Button>
         </div>
       </div>
-
+      <div className="flex justify-center">
+  <DownloadExcel />
+</div>
       {/* Table Section */}
       <div className="overflow-x-auto bg-white dark:bg-gray-700 p-2 rounded-lg shadow-md border border-gray-300 dark:border-gray-600 max-h-96 overflow-y-auto">
         <table className="min-w-full table-auto border-collapse">
@@ -291,13 +424,47 @@ export default function Datasheet({ apiKey }) {
         </table>
 
       </div>
-      <div className="flex justify-end">
-  <DownloadExcel />
-</div>
+ 
 
-      <div className="bg-white mt-6 rounded-lg">
-      <TestPdf/>
+<div>
+      {/* Other contents of Datasheet */}
+      <div className='text-4xl font-extrabold mt-12 flex items-center gap-4  justify-center'>
+        Cluster Your Filtered Pin
       </div>
+      <div className=" mt-5 flex items-center gap-4  justify-center">
+      
+      {downloading ? (
+        <div className="w-12 h-12">
+          <CircularProgressbar
+            value={progress}
+            text={`${progress}%`}
+            styles={buildStyles({
+              textSize: '28px',
+              pathColor: '#1D4ED8',
+              textColor: '#1F2937',
+            })}
+          />
+        </div>
+      ) : (
+        <div className="px-4">
+          <Button
+            className="flex items-center gap-3 bg-green-500"
+            color="dark"
+            pill
+            onClick={handleDownloadPdf}
+          >
+            Download PDF of Grouped Pins
+            <HiCloudDownload className="h-5 w-5  ml-2" />
+          </Button>
+        </div>
+      )}
+    </div>
+      <div ref={addNewRefs}>
+        <TestPdf newRef={newRef} /> {/* Pass printRefs to TestPdf */}
+      </div>
+      
+      {/* Your download button */}
+    </div>
     </div>
   );
 }

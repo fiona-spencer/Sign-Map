@@ -42,8 +42,9 @@ export default function DownloadExcel() {
   return (
     <div className="p-4">
       <Button
-        className="flex items-center gap-2"
-        color="yellow"
+        className="flex items-center gap-2 bg-blue-500"
+        color="dark"
+        pill
         onClick={handleDownload}
         disabled={!filteredPins || filteredPins.length === 0}
       >

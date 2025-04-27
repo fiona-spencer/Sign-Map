@@ -10,7 +10,7 @@ import 'react-circular-progressbar/dist/styles.css';
 import MapView from './mapView'; // Import your MapView component
 import { HiCloudDownload, HiZoomIn,  } from 'react-icons/hi';
 
-export default function TestPdf() {
+export default function TestPdf({newRef}) {
   const { filteredPins } = useSelector((state) => state.global);
   const [clusters, setClusters] = useState([]);
   const [groupBy, setGroupBy] = useState('cluster');
@@ -28,6 +28,11 @@ export default function TestPdf() {
     }
   };
 
+  // useEffect(() => {
+  //   // Example of adding some content to printRefs (e.g., if you want to capture a ref)
+  //   // You can also conditionally capture multiple elements if needed
+  //   newRef.current.push(document.getElementById('someElementId')); // Pushing element reference
+  // }, [newRef]);
   const extractPostalCode = (address) => {
     if (!address) return 'Unknown';
     const match = address.match(/[A-Z]\d[A-Z][ ]?\d[A-Z]\d/i);
@@ -97,6 +102,7 @@ export default function TestPdf() {
           scale: 4,
           useCORS: true,
           scrollY: -window.scrollY - 1000, // Adjust for scrolling
+          ignoreElements: (element) => element.tagName === 'IFRAME' || element.classList.contains('iframe-wrapper'),
         });
   
         const data = canvas.toDataURL("image/png");
@@ -169,7 +175,7 @@ export default function TestPdf() {
 
 
   return (
-<div className="p-4 px-8 space-y-6">
+<div className="p-4 px-8 space-y-6 bg-white rounded-lg mt-4" id="someElementId" ref={newRef.current}>
   {/* Grouping Toggle */}
   <div className="flex justify-between items-center">
     <div className="flex items-center gap-4">
@@ -184,7 +190,7 @@ export default function TestPdf() {
       </select>
     </div>
 
-    {/* 📥 Download Button */}
+    {/* 📥 Download Button
     <div className="mt-4 flex items-center gap-4">
       {downloading ? (
         <div className="w-12 h-12">
@@ -211,7 +217,7 @@ export default function TestPdf() {
           </Button>
         </div>
       )}
-    </div>
+    </div> */}
 </div>
 
 
