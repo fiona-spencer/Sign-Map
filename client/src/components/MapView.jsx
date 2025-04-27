@@ -6,9 +6,9 @@ import { useRef } from 'react';
 
 const MapView = ({ center, zoom, clusters, setMapInstance }) => {
   return (
-    <div className="h-96 rounded overflow-hidden">
+    <div className="h-96 rounded overflow-hidden z-0 relative">
       <MapContainer
-        className="h-full w-full"
+        className="h-full w-full rounded-lg z-10"
         center={center}
         zoom={zoom}
         scrollWheelZoom={true}

@@ -8,6 +8,7 @@ import jsPDF from 'jspdf';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import MapView from './mapView'; // Import your MapView component
+import { HiCloudDownload, HiZoomIn,  } from 'react-icons/hi';
 
 export default function TestPdf() {
   const { filteredPins } = useSelector((state) => state.global);
@@ -168,24 +169,56 @@ export default function TestPdf() {
 
 
   return (
-    <div className="p-4 space-y-6">
-      {/* Grouping Toggle */}
-      <div className="flex items-center gap-4">
-        <label className="font-semibold text-gray-700 dark:text-gray-200">Group Pins By:</label>
-        <select
-          value={groupBy}
-          onChange={(e) => setGroupBy(e.target.value)}
-          className="border px-3 py-1 rounded text-sm dark:bg-gray-800 dark:text-white"
-        >
-          <option value="cluster">Proximity (≤ {clusterSize} m)</option>
-          <option value="postal">Postal Code</option>
-        </select>
-      </div>
+<div className="p-4 px-8 space-y-6">
+  {/* Grouping Toggle */}
+  <div className="flex justify-between items-center">
+    <div className="flex items-center gap-4">
+      <label className="font-semibold text-gray-700 dark:text-gray-200">Group Pins By:</label>
+      <select
+        value={groupBy}
+        onChange={(e) => setGroupBy(e.target.value)}
+        className="border px-3 py-1 rounded text-sm dark:bg-gray-800 dark:text-white"
+      >
+        <option value="cluster">Proximity (≤ {clusterSize} m)</option>
+        <option value="postal">Postal Code</option>
+      </select>
+    </div>
+
+    {/* 📥 Download Button */}
+    <div className="mt-4 flex items-center gap-4">
+      {downloading ? (
+        <div className="w-12 h-12">
+          <CircularProgressbar
+            value={progress}
+            text={`${progress}%`}
+            styles={buildStyles({
+              textSize: '28px',
+              pathColor: '#1D4ED8',
+              textColor: '#1F2937',
+            })}
+          />
+        </div>
+      ) : (
+        <div className="px-4">
+          <Button
+            className="flex items-center gap-3"
+            color="light"
+            
+            onClick={handleDownloadPdf}
+          >
+            Download PDF of Grouped Pins
+            <HiCloudDownload className="h-5 w-5  ml-2" />
+          </Button>
+        </div>
+      )}
+    </div>
+</div>
+
 
       {/* Cluster Size Slider */}
       {groupBy === 'cluster' && (
-        <div className="mt-2">
-          <label className="font-semibold text-gray-700 dark:text-gray-200">
+            <div className="mt-2 flex items-center justify-center">
+        <label className="font-extrabold text-red-100 bg-red-700 rounded-xl px-3 py-1 dark:text-gray-200 mr-9">
             Cluster Size (meters): {clusterSize}
           </label>
           <input
@@ -195,7 +228,7 @@ export default function TestPdf() {
             step="50"
             value={clusterSize}
             onChange={(e) => setClusterSize(Number(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none slider"
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none slider max-w-3xl"
           />
         </div>
       )}
@@ -203,15 +236,15 @@ export default function TestPdf() {
      
 
       {/* Zoom Slider */}
-      <div className="mt-4">
-      <label className="font-semibold text-gray-700 dark:text-gray-200">Zoom Level: {mapZoom}</label>
+      <div className="mt-2 flex items-center justify-center">
+      <label className="font-extrabold text-yellow-50 bg-yellow-400 rounded-xl dark:text-gray-200 mr-9 py-1 px-16">Zoom Level: {mapZoom}</label>
       <input id="default-range" 
           type="range" 
           min="1"
           max="20"
           value={mapZoom}
           onChange={(e) => setMapZoom(Number(e.target.value))}
-          class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"/>
+          class="w-full h-2 bg-gray-200 rounded-lg appearance-none slider max-w-3xl"/>
       </div>
  {/* 🗺️ Map View */}
  {filteredPins && filteredPins.length > 0 && (
@@ -227,27 +260,7 @@ export default function TestPdf() {
   </div>
 
       )}
-      {/* 📥 Download Button */}
-      <div className="mt-4 flex items-center gap-4">
-        {downloading ? (
-          <div className="w-12 h-12">
-            <CircularProgressbar
-              value={progress}
-              text={`${progress}%`}
-              styles={buildStyles({
-                textSize: '28px',
-                pathColor: '#1D4ED8',
-                textColor: '#1F2937',
-              })}
-            />
-          </div>
-        ) : (
-          <Button onClick={handleDownloadPdf} color="dark" outline>
-            Download PDF of Grouped Pins
-          </Button>
-        )}
-      </div>
-
+   
       {/* 📦 Clusters or Postal Code Groups */}
       {groupBy === 'postal' ? (
         <div>
@@ -275,12 +288,19 @@ export default function TestPdf() {
         <div className="flex justify-between items-center mb-2">
           <h3 className="font-semibold text-green-700">Cluster {i + 1}</h3>
           <Button
-            onClick={() => zoomToCluster(i)} // Ensure the correct cluster index is passed here
-            className="text-sm border-2"
-            color="red"
-          >
-            Zoom to Cluster {i + 1} {/* Display cluster number */}
-          </Button>
+  onClick={() => {
+    zoomToCluster(i);  // Ensure the correct cluster index is passed here
+    window.scrollTo({
+      top: 1450,
+      behavior: 'auto',  // Smooth scrolling animation
+    });
+  }}
+  className="text-sm border-2"
+  color="red"
+>
+  <HiZoomIn className='h-5 w-5 mr-3'/> Zoom to Cluster {i + 1} {/* Display cluster number */}
+</Button>
+
         </div>
         <ul className="list-disc list-inside text-sm">
           {cluster.map((pin, j) => (

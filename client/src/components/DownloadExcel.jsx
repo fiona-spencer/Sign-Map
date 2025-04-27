@@ -43,13 +43,12 @@ export default function DownloadExcel() {
     <div className="p-4">
       <Button
         className="flex items-center gap-2"
-        color="dark"
-        outline
+        color="yellow"
         onClick={handleDownload}
         disabled={!filteredPins || filteredPins.length === 0}
       >
-        Download Filtered Pins
-        <HiDocumentDownload className="h-5 w-5" />
+        Download Filtered Pins to Excel
+        <HiDocumentDownload className="h-5 w-5 ml-2" />
       </Button>
     </div>
   );

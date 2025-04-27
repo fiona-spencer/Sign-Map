@@ -6,6 +6,7 @@ import Map from './Map';
 import { useSelector, useDispatch } from 'react-redux';
 import { setFilteredPins } from '../redux/global/globalSlice'; // Import action
 import DownloadExcel from '../components/DownloadExcel';
+import TestPdf from '../components/TestPdf';
 
 export default function Datasheet({ apiKey }) {
   const [pins, setPins] = useState([]);
@@ -172,7 +173,6 @@ export default function Datasheet({ apiKey }) {
         <Map apiKey={apiKey} />
       </div>
 
-      <DownloadExcel />
 
       {/* Filter Section */}
       <div className="mb-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-300 dark:border-gray-600">
@@ -287,7 +287,16 @@ export default function Datasheet({ apiKey }) {
               </tr>
             ))}
           </tbody>
+
         </table>
+
+      </div>
+      <div className="flex justify-end">
+  <DownloadExcel />
+</div>
+
+      <div className="bg-white mt-6 rounded-lg">
+      <TestPdf/>
       </div>
     </div>
   );

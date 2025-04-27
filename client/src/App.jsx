@@ -16,7 +16,6 @@ import Datasheet from "./pages/Datasheet";
 import Header from "./components/Header";
 import FooterCom from "./components/Footer";
 import Search from "./components/Search";
-import TestPdf from './components/TestPdf';
 
 //Settings Navbar
 //No User
@@ -83,7 +82,6 @@ function AppWrapper({ apiKey }) {
           {/* Public Account */}
           <Route path="/startHere" element={<StartHere />} />
           <Route path="/googleTest" element={<GoogleMapTest apiKey={apiKey} />} />
-          <Route path="/pdfTest" element={<TestPdf apiKey={apiKey}/>} />
 
           {/* User Account */}
 
