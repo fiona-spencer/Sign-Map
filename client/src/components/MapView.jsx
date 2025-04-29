@@ -2,9 +2,8 @@ import React from 'react';
 import { MapContainer, TileLayer, LayersControl, LayerGroup, Circle, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet'; // Import Leaflet to use custom divIcon
 import 'leaflet/dist/leaflet.css';
-import { useRef } from 'react';
 
-const MapView = ({ center, zoom, clusters, setMapInstance }) => {
+const MapView = ({ center, zoom, clusters, clusterSize, setMapInstance }) => {
   return (
     <div
     className="h-[500px] rounded overflow-hidden z-0 relative">
@@ -31,7 +30,7 @@ const MapView = ({ center, zoom, clusters, setMapInstance }) => {
                   <Circle id="exclude-circle"
                     center={cluster[0] ? [cluster[0].location?.lat, cluster[0].location?.lng] : [43.6954, -79.3810]}
                     pathOptions={{ color: 'red', fillColor: 'pink', fillOpacity: 0.5 }}
-                    radius={500}
+                    radius={clusterSize*1.2}
                   />
                   {/* Render the cluster index as a label inside the circle */}
                   <Marker

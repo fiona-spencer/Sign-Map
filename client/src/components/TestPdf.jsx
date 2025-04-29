@@ -3,9 +3,6 @@ import { useSelector } from 'react-redux';
 import clustering from 'density-clustering';
 import { getDistance } from 'geolib';
 import { Button } from 'flowbite-react';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
-import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import MapView from './mapView'; // Import your MapView component
 import { HiCloudDownload, HiZoomIn,  } from 'react-icons/hi';
@@ -71,76 +68,6 @@ export default function TestPdf({newRef}) {
     setClusters(clustered);
   }, [filteredPins, clusterSize]);
 
-  const handleDownloadPdf = async () => {
-    setDownloading(true);
-    setProgress(0);
-    console.log("Preparing PDF...");
-    
-    // Simulate a small delay for loading
-    await new Promise(resolve => setTimeout(resolve, 500));
-  
-    const elements = printRefs.current; // Collect all refs
-    if (!elements.length) {
-      console.warn("No elements found to print.");
-      setDownloading(false);
-      return;
-    }
-  
-    // Create a new PDF document
-    const pdf = new jsPDF({ orientation: "portrait", unit: "px", format: "a4" });
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-  
-    // Start the Y position for the first element
-    let currentY = 20; // Starting position from the top of the page
-  
-    // Loop through each element in the refs and add them to the PDF
-    for (let i = 0; i < elements.length; i++) {
-      try {
-        // Capture the element as an image using html2canvas
-        const canvas = await html2canvas(elements[i], {
-          scale: 4,
-          useCORS: true,
-          scrollY: -window.scrollY - 1000, // Adjust for scrolling
-          ignoreElements: (element) => element.tagName === 'IFRAME' || element.classList.contains('iframe-wrapper'),
-        });
-  
-        const data = canvas.toDataURL("image/png");
-        const imgProps = pdf.getImageProperties(data);
-  
-        // Calculate the image height based on the width of the page
-        const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
-  
-        // Check if the image fits on the current page
-        if (currentY + imgHeight > pdfHeight - 20) {
-          // If not, add a new page and reset the Y position
-          pdf.addPage();
-          currentY = 20; // Reset Y position to start from the top of the new page
-        }
-  
-        // Add the image to the PDF at the current Y position
-        pdf.addImage(data, "PNG", 20, currentY, pdfWidth - 40, imgHeight);
-  
-        // Update the Y position for the next element
-        currentY += imgHeight + 10; // Add some space between images
-  
-        setProgress(Math.round(((i + 1) / elements.length) * 100)); // Update progress
-  
-      } catch (error) {
-        console.error(`Error rendering element ${i} to canvas:`, error);
-        alert("An error occurred while generating the PDF. Check the console for details.");
-        setDownloading(false);
-        return;
-      }
-    }
-  
-    // Save the PDF after all elements have been added
-    pdf.save("pins.pdf");
-    console.log("PDF saved successfully.");
-    setDownloading(false);
-  };
-  
-  
 
   const zoomToCluster = (clusterIndex) => {
     console.log("zoomToCluster triggered for cluster index:", clusterIndex);
@@ -261,6 +188,7 @@ export default function TestPdf({newRef}) {
           center={mapCenter} // Pass the center dynamically
           zoom={mapZoom} // Pass the zoom level dynamically
           clusters={clusters} // Pass the clusters data
+          clusterSize={clusterSize}
           setMapInstance={setMapInstance} // Pass the function to store the map instance
         />
   </div>
@@ -286,7 +214,7 @@ export default function TestPdf({newRef}) {
           ))}
         </div>
       ) : (
-<div className="max-w-2xl mx-auto">
+<div className="max-w-5xl mx-auto">
 <h2 className="text-xl font-bold mb-4">Clusters (≤ {clusterSize} meters)</h2>
   {clusters.length > 0 ? (
     clusters.map((cluster, i) => (
@@ -315,13 +243,13 @@ export default function TestPdf({newRef}) {
           </Button>
         </div>
 
-        <ul className="list-inside font-medium text-xs bg-gray-100 rounded-md p-2 pt-4 shadow-md hover:shadow-lg transition-shadow duration-300">
+        <ul className="list-insidefont-medium text-xs bg-gray-100 rounded-md p-2 pt-4 shadow-md hover:shadow-lg transition-shadow duration-300">
           {cluster.map((pin, j) => (
             <li
               key={j}
-              className="hover:bg-gray-200 rounded-md p-1 px-4 transition-colors duration-200"
+              className="hover:bg-gray-200 rounded-md flex py-1 px-2 transition-colors duration-200"
             >
-              <div className="font-semibold text-gray-800">
+              <div className="font-bold text-gray-800 pr-1">
                 {pin.location?.info?.contactName || 'Unnamed Contact'}
               </div>
               <div className="text-gray-600">

@@ -65,37 +65,28 @@ export default function Datasheet({ apiKey }) {
   const handleDownloadPdf = async () => {
     setDownloading(true);
     setProgress(0);
-    console.log("Preparing PDF with multiple pages...");
   
+    // Simulate delay
     await new Promise(resolve => setTimeout(resolve, 500));
   
     const elements = newRef.current;
-    if (!elements.length) {
+    if (!elements || !elements.length) {
       console.warn("No elements found to print.");
       setDownloading(false);
       return;
     }
   
-    // Create a hidden wrapper to stack elements together
-const container = document.createElement("div");
-container.style.position = "relative"; // Change from absolute to relative positioning
-container.style.margin = "0 auto"; // Center the container horizontally
-container.style.background = "white";
-container.style.padding = "20px";
-container.style.width = `${window.innerWidth}px`; // Set the width to the user's screen width
-
-// Append clones of each element, skipping the first element
-elements.slice(1).forEach((el) => {
-  const clone = el.cloneNode(true);
-  clone.style.marginBottom = "10px";
-  container.appendChild(clone);
-});
-
-document.body.appendChild(container);
-
+    // Create a hidden container to combine all elements
+    const container = document.createElement("div");
+    container.style.position = "absolute";
+    container.style.left = "-9999px";
+    container.style.top = "0";
+    container.style.background = "white";
+    container.style.padding = "20px";
+    container.style.width = `${window.innerWidth}px`;
   
-    // Append clones of each element
-    elements.forEach((el) => {
+    // Clone elements into the container
+    elements.forEach(el => {
       const clone = el.cloneNode(true);
       clone.style.marginBottom = "10px";
       container.appendChild(clone);
@@ -105,59 +96,32 @@ document.body.appendChild(container);
   
     try {
       const canvas = await html2canvas(container, {
-        scale: 2,
+        scale: 4,
         useCORS: true,
-        ignoreElements: (el) => el.tagName === 'IFRAME' || el.classList.contains('iframe-wrapper'),
+        ignoreElements: el =>
+          el.tagName === 'IFRAME' || el.classList.contains('iframe-wrapper'),
       });
   
       const pdf = new jsPDF({ orientation: "portrait", unit: "px", format: "a4" });
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
   
-      const imgData = canvas.toDataURL("image/png");
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+      const totalPages = Math.ceil(imgHeight / pdfHeight);
   
-      // Directly set the width and height of the image to match the PDF size
-      let scaledWidth = pdfWidth;
-      let scaledHeight = pdfHeight;
-
-      // Calculate the number of pages based on the canvas height
-      const totalPages = Math.ceil(canvas.height / scaledHeight);
+      for (let page = 0; page < totalPages; page++) {
+        if (page > 0) pdf.addPage();
   
-      // Loop through each page and add the corresponding section of the canvas
-      for (let pageNum = 0; pageNum < totalPages; pageNum++) {
-        const croppedCanvas = document.createElement("canvas");
-        const ctx = croppedCanvas.getContext("2d");
-  
-        croppedCanvas.width = canvas.width*0.8;
-        croppedCanvas.height = scaledHeight*15;
-
-  
-        // Draw the corresponding section of the original canvas to fit the page
-        ctx.drawImage(
-          canvas, 
-          0, 
-          pageNum * scaledHeight, // Crop vertically based on page number
-          canvas.width, 
-          scaledHeight, 
-          0, 
-          0, 
-          croppedCanvas.width, 
-          croppedCanvas.height
+        pdf.addImage(
+          canvas,
+          "PNG",
+          0,
+          -page * pdfHeight,
+          pdfWidth,
+          imgHeight
         );
-  
-        const croppedData = croppedCanvas.toDataURL("image/png");
-  
-        // If it's the first page, add it directly
-        if (pageNum === 0) {
-          pdf.addImage(croppedData, "PNG", 0, 0, scaledWidth*2, scaledHeight*0.9);
-        } else {
-          // For subsequent pages, add a new page and add the image
-          pdf.addPage();
-          pdf.addImage(croppedData, "PNG", 0, 0, scaledWidth, scaledHeight*0.9);
-        }
       }
   
-      // Save the PDF after all elements have been added
       pdf.save("clustered_pins.pdf");
       console.log("PDF saved successfully.");
     } catch (error) {
@@ -168,6 +132,7 @@ document.body.appendChild(container);
       setDownloading(false);
     }
   };
+  
   
   
   

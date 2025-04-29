@@ -35,7 +35,7 @@ export default function Menu() {
 
       {/* Hero Section with Carousel */}
       <div className="relative bg-[#483929] dark:bg-gray-800 shadow-lg fixed">
-        <div className="max-w-7xl mx-auto px-4 py-8 ">
+        <div className="max-w-7xl mx-auto px-4 py-6 pb-0 ">
           <h1 className="text-5xl font-bold text-center text-[#c7b098] dark:text-green-300 mb-4 ">
             Create Your Map and Share
           </h1>
@@ -111,34 +111,65 @@ export default function Menu() {
 
       {/* Info Section  */}
       <div className=' bg-[#ddddddec] dark:bg-[#121212c1]'>
-  <div className="max-w-7xl mx-auto px-10 py-10 space-y-10">
+  <div className="max-w-7xl mx-auto px-10 py-10 space-y-10 mx-auto">
 
-    {/* Submit Button */}
-    <div className="flex justify-center items-center text-center">
-      <Link to="/report">
-        <Button
-          color="dark"
-          pill
-          className="text-lg py-3 px-6 flex items-center group transition-all duration-300"
-        >
-          Create Your Custom Map
-          <HiOutlineArrowRight className="ml-2 h-5 w-5 transform transition-transform duration-100 group-hover:translate-x-5" />
-        </Button>
-      </Link>
-    </div>
+
 
 
 
 {/* Login and Authentication */}
-<section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
-      <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300 mb-2">View All Pins in a Table</h2>
-      <p className="text-gray-700 dark:text-gray-300 mb-4">
-        Use the datasheet to explore all pins in a sortable format.
+<section className="bg-[#74cd96ba] dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition transform hover:scale-105 animate-fade-in lg:mx-60">
+  {/* Conditional Welcome */}
+  {(['public', 'user', 'admin'].includes(currentUser?.userType)) && (
+    <>
+      <h2 className="text-3xl font-bold text-green-700 dark:text-blue-300 mb-2">
+        Welcome Back {currentUser.username}!
+      </h2>
+      {currentUser?.userType && (
+        <p className="text-md text-gray-800 dark:text-gray-400 mb-4">
+          You are currently signed in as: <strong>{currentUser.userType}</strong>.
+        </p>
+      )}
+    </>
+  )}
+
+  {/* Account Creation Section - only if userType is not set */}
+  {!currentUser?.userType && (
+    <>
+      <p className="text-green-700 dark:text-green-300 mb-4 font-bold text-2xl">
+        Log in or create an account to get started.
       </p>
-      <Link to="/datasheet">
-        <Button color="dark" className="text-lg py-3 px-6">View Datasheet</Button>
-      </Link>
-    </section>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">New here? Create an account:</p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <Link to="/signup">
+          <Button color="light" className="w-full">Sign Up as Public</Button>
+        </Link>
+        <Link to="/signup">
+          <Button color="light" className="w-full">Sign Up as User</Button>
+        </Link>
+        <Link to="/signup">
+          <Button color="light" className="w-full">Sign Up as Admin</Button>
+        </Link>
+      </div>
+    </>
+  )}
+
+  {/* Learn More Button - always visible */}
+  <div className="flex justify-center items-center text-center mt-6">
+    <Link to="/startHere">
+      <Button
+        color="green"
+        pill
+        className="text-lg py-3 px-6 flex items-center group transition-all duration-300 text-green-600 font-bold"
+      >
+        Learn More About Accounts
+        <HiOutlineArrowRight className="ml-2 h-5 w-5 transform transition-transform duration-100 group-hover:translate-x-5" />
+      </Button>
+    </Link>
+  </div>
+</section>
+
+
 
     {/* Info cards */}
 
@@ -149,26 +180,14 @@ export default function Menu() {
       </a>
       <FileCards />
 
-      <a href="/report" className="group flex justify-center items-center pt-4  p-3">
+      <a href="/datasheets" className="group flex justify-center items-center pt-4  p-3">
         <p className="text-5xl font-bold group-hover:bg-[#acdfcbad] group-hover:text-[#1d865cad]  rounded-lg px-8 py-3">Explore the Map</p>
         <HiOutlineArrowRight className="ml-2 h-10 w-10 transform transition-transform duration-300 group-hover:translate-x-3 group-hover:text-green-500" />
       </a>
       <MapCards />
     </div>
-    
-
-    {/* Start Here */}
-    <section className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
-      <h2 className="text-2xl font-semibold text-green-800 dark:text-green-300 mb-2">View All Pins in a Table</h2>
-      <p className="text-gray-700 dark:text-gray-300 mb-4">
-        Use the datasheet to explore all pins in a sortable format.
-      </p>
-      <Link to="/moreInfo">
-        <Button color="dark" className="text-lg py-3 px-6">View Datasheet</Button>
-      </Link>
-    </section>
-
   </div>
+
 </div>
 
 
@@ -177,6 +196,7 @@ export default function Menu() {
 {/* Contact Form */}
 <ContactForm/>
 </div>
+
 
 
 
