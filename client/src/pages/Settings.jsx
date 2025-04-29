@@ -104,9 +104,9 @@ export default function Settings() {
       return [
         { href: "/settings", label: "Profile", icon: HiUser },
         { href: "/inbox", label: "Submitted Markers", icon: HiInbox },
-        { href: "/logs", label: "Page Log", icon: HiTable },
         { href: "/database", label: "Database", icon: HiDatabase },
-        { href: "/analytics", label: "Analytics", icon: HiChartPie },
+        // { href: "/logs", label: "Page Log", icon: HiTable },
+        // { href: "/analytics", label: "Analytics", icon: HiChartPie },
         ...sharedItems,
       ];
     }

@@ -1,139 +1,162 @@
-import User from '../models/user.model.js';
-import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { errorHandler } from '../utils/error.js';
+import bcryptjs from 'bcryptjs';
+import User from '../models/user.model.js';  // Adjust the path as needed
+import { errorHandler } from '../utils/error.js';  // Adjust the path as needed
 
-// Test route to check if the API is working
-export const test = (req, res) => {
-  res.json({ message: 'API is working!' });
-};
-
-// Sign up a new user
 export const signup = async (req, res, next) => {
   const { username, email, password, userType } = req.body;
 
-  if (!username || !email || !password || !userType) {
+  // Ensure all required fields are provided
+  if (
+    !username ||
+    !email ||
+    !password ||
+    !userType ||
+    username === '' ||
+    email === '' ||
+    password === '' ||
+    userType === ''
+  ) {
     return next(errorHandler(400, 'All fields are required'));
   }
 
+  // Validate userType to be one of 'public', 'user', or 'admin'
+  const validUserTypes = ['public', 'user', 'admin'];
+  if (!validUserTypes.includes(userType)) {
+    return next(errorHandler(400, 'Invalid user type. It must be one of: public, user, or admin.'));
+  }
+
+  // Hash the password
   const hashedPassword = bcryptjs.hashSync(password, 10);
 
+  // Create a new user object
   const newUser = new User({
     username,
     email,
     password: hashedPassword,
-    userType, // userType is now taken into account
+    userType,  // Add userType to the new user
   });
 
   try {
+    // Save the new user to the database
     await newUser.save();
-    res.json('Signup successful');
+    res.status(201).json({ message: 'Signup successful' });
   } catch (error) {
-    next(error);
+    next(error);  // Handle errors (e.g., database errors)
   }
 };
 
-// Sign in a user
+
 export const signin = async (req, res, next) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
+  // Check if email and password are provided
+  if (!email || !password || email === '' || password === '') {
     return next(errorHandler(400, 'All fields are required'));
   }
 
   try {
+    // Find the user by email
     const validUser = await User.findOne({ email });
+
     if (!validUser) {
       return next(errorHandler(404, 'User not found'));
     }
 
+    // Compare the provided password with the stored hashed password
     const validPassword = bcryptjs.compareSync(password, validUser.password);
     if (!validPassword) {
       return next(errorHandler(400, 'Invalid password'));
     }
 
-    // Generate JWT with userType and id
+    // Create the JWT token, include userType along with id and isAdmin
     const token = jwt.sign(
-      { id: validUser._id, userType: validUser.userType }, // Include userType here
-      process.env.JWT_SECRET
+      {
+        id: validUser._id,
+        isAdmin: validUser.userType === 'admin',  // Check if the userType is 'admin'
+        userType: validUser.userType,  // Include the userType in the JWT payload
+      },
+      process.env.JWT_SECRET, // Use your JWT secret for signing the token
+      { expiresIn: '1h' } // Optional: Set token expiration time (e.g., 1 hour)
     );
 
+    // Destructure the user document to remove the password field
     const { password: pass, ...rest } = validUser._doc;
 
+    // Send the token as a cookie and return the user data in the response
     res
       .status(200)
-      .cookie('access_token', token, { httpOnly: true })
-      .json(rest);  // Send user info excluding password
-  } catch (error) {
-    next(error);
-  }
-};
-
-// Google authentication logic (if needed)
-export const googleAuth = async (req, res, next) => {
-  const { email, name, googlePhotoUrl, userType } = req.body;
-
-  try {
-    // Check if user already exists in the database
-    let user = await User.findOne({ email });
-
-    if (user) {
-      // If user exists, generate a JWT token and return user data (sign-in)
-      const token = jwt.sign({ id: user._id, userType: user.userType }, process.env.JWT_SECRET); // Include userType
-      const { password, ...rest } = user._doc;
-
-      return res
-        .status(200)
-        .cookie('access_token', token, { httpOnly: true })
-        .json({
-          ...rest,
-          message: 'Signed in successfully',  // Add sign-in message
-        });
-    }
-
-    // If user doesn't exist, proceed with sign-up
-    const validUserTypes = ['user', 'public'];
-    const finalUserType = validUserTypes.includes(userType) ? userType : 'public';
-
-    // Generate a random password for the new user
-    const generatedPassword =
-      Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
-    const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
-
-    // Create a new user in the database
-    const newUser = new User({
-      username: name.toLowerCase().replace(/\s+/g, '') + Math.random().toString(9).slice(-4),
-      email,
-      password: hashedPassword,
-      profilePicture: googlePhotoUrl,
-      userType: finalUserType,
-    });
-
-    // Save the new user to the database
-    await newUser.save();
-
-    // Generate a JWT token for the new user
-    const token = jwt.sign({ id: newUser._id, userType: newUser.userType }, process.env.JWT_SECRET);
-
-    const { password, ...rest } = newUser._doc;
-
-    // Send token in a cookie and return user info (excluding password)
-    return res
-      .status(200)
-      .cookie('access_token', token, { httpOnly: true })
+      .cookie('access_token', token, {
+        httpOnly: true,  // Prevent client-side access to the cookie
+      })
       .json({
-        ...rest,
-        message: 'Signed up successfully',  // Add sign-up message
+        ...rest,  // Send back the user details (without the password)
+        token,  // Send the token along with the user data (optional)
       });
+
   } catch (error) {
-    next(error);
+    next(error);  // Handle any errors that occur during the process
   }
 };
 
-// Sign out a user (clear cookies)
-export const signout = (req, res) => {
-  res
-    .clearCookie('access_token')
-    .status(200)
-    .json({ message: 'Successfully signed out' });
+
+export const google = async (req, res, next) => {
+  const { email, name, googlePhotoUrl, userType } = req.body; // Now capturing userType from the request
+  try {
+    const user = await User.findOne({ email });
+    
+    if (user) {
+      // If user exists, create a token with userType as it is
+      const token = jwt.sign(
+        { id: user._id, userType: user.userType }, // Pass the correct userType
+        process.env.JWT_SECRET
+      );
+
+      const { password, ...rest } = user._doc;
+      res
+        .status(200)
+        .cookie('access_token', token, {
+          httpOnly: true,
+        })
+        .json(rest);
+    } else {
+      // Create new user if not found
+      const generatedPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+      const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+
+      // Assign userType here from the request body (can be "user", "admin", etc.)
+      const newUser = new User({
+        username:
+          name.toLowerCase().split(' ').join('') +
+          Math.random().toString(9).slice(-4),
+        email,
+        password: hashedPassword,
+        profilePicture: googlePhotoUrl,
+        userType: userType || 'user', // Default to 'user' if no userType is provided
+      });
+
+      await newUser.save();
+
+      const token = jwt.sign(
+        {
+          id: newUser._id,
+          userType: newUser.userType, // Pass the correct userType here
+          isAdmin: newUser.userType === 'admin', // Correctly set admin flag
+        },
+        process.env.JWT_SECRET
+      );
+
+      const { password, ...rest } = newUser._doc;
+      res
+        .status(200)
+        .cookie('access_token', token, {
+          httpOnly: true,
+        })
+        .json(rest);
+    }
+  } catch (error) {
+    next(error);
+  }
 };

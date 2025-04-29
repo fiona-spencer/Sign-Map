@@ -7,10 +7,10 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    userEmail: {  // Updated from email to userEmail
+    email: {
       type: String,
       required: true,
-      unique: true,
+      unique: true
     },
     password: {
       type: String,

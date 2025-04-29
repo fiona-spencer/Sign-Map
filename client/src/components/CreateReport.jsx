@@ -20,7 +20,7 @@ export default function CreateReport({ apiKey, location, onClose, onSubmit, isSu
   const { currentUser } = useSelector((state) => state.user);
 
   const [formData, setFormData] = useState({
-    userEmail: '',
+    email: '',
     userName: '',
     location: { lat: 0, lng: 0 },
     address: '',
@@ -38,7 +38,7 @@ export default function CreateReport({ apiKey, location, onClose, onSubmit, isSu
     if (currentUser) {
       setFormData((prev) => ({
         ...prev,
-        userEmail: currentUser.email || '',
+        email: currentUser.email || '',
         userName: currentUser.username || '',
       }));
     }
@@ -89,7 +89,7 @@ export default function CreateReport({ apiKey, location, onClose, onSubmit, isSu
     const dataToSend = {
       createdBy: {
         userName: formData.userName,
-        userEmail: formData.userEmail
+        email: formData.email
       },
       location: {
         address: formData.address,
@@ -151,7 +151,7 @@ export default function CreateReport({ apiKey, location, onClose, onSubmit, isSu
             <TextInput
               type="email"
               readOnly
-              value={formData.userEmail}
+              value={formData.email}
               addon="Email"
               className="dark:bg-gray-700 dark:text-white mb-2"
             />

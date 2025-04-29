@@ -124,7 +124,7 @@ const ExcelUpload = () => {
                   return {
                     createdBy: {
                       userName: currentUser?.username || "Unknown",
-                      userEmail: currentUser?.email || "unknown@example.com",
+                      email: currentUser?.email || "unknown@example.com",
                     },
                     location: {
                       address,

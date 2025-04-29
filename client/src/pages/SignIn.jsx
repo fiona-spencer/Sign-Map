@@ -17,6 +17,7 @@ export default function SignIn() {
   };
 
   const handleSubmit = async (e) => {
+    console.log(formData.email)
     e.preventDefault();
     if (!formData.email || !formData.password) {
       return dispatch(signInFailure('Please fill all the fields'));
@@ -35,7 +36,7 @@ export default function SignIn() {
 
       if (res.ok) {
         dispatch(signInSuccess(data));
-        navigate('/map', { state: { successMessage: 'Your report has been successfully submitted!' } });
+        navigate('/', { state: { successMessage: 'Your report has been successfully submitted!' } });
       }
     } catch (error) {
       dispatch(signInFailure(error.message));

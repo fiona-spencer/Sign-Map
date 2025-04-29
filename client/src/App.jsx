@@ -88,8 +88,8 @@ function AppWrapper({ apiKey }) {
           {/* Admin Account */}
           <Route path="/database" element={<Database />} />
           <Route path="/inbox" element={<SubmittedPins />} />
-          <Route path="/logs" element={<LogPage />} />
-          <Route path="/analytics" element={<Analytics />} />
+          {/* <Route path="/logs" element={<LogPage />} />
+          <Route path="/analytics" element={<Analytics />} /> */}
         </Routes>
       </div>
       <div className="relative bottom-0 left-0 w-full z-40 bg-white shadow">

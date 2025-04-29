@@ -52,7 +52,7 @@ export default function CreatePinsFromFile({
       const dataToSendBatch = batch.map((pin) => ({
         createdBy: {
           userName: currentUser?.username,
-          userEmail: currentUser?.email,
+          email: currentUser?.email,
         },
         location: {
           ...pin.location,

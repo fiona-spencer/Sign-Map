@@ -1,25 +1,23 @@
-import { Button } from "flowbite-react";
+import { Button, Alert } from "flowbite-react";
 import { AiFillGoogleCircle } from "react-icons/ai";
 import { app } from "../firebase";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { signInSuccess } from "../redux/user/userSlice";
 import { useNavigate } from "react-router-dom";
-import { Alert } from "flowbite-react";
+import { useState } from "react";
 
 export default function OAuth({ userType }) {
+  const [error, setError] = useState(null);
   const auth = getAuth(app);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleGoogleClick = async () => {
     // Only check for userType in signup, not signin
-    if (userType && userType === "") {
-      return (
-        <Alert color="failure">
-          <span className="font-medium">Info alert!</span> Please Choose A User Type
-        </Alert>
-      );
+    if (userType === "") {
+      setError("Please choose a user type.");
+      return;
     }
 
     const provider = new GoogleAuthProvider();
@@ -28,7 +26,7 @@ export default function OAuth({ userType }) {
     try {
       const resultsFromGoogle = await signInWithPopup(auth, provider);
 
-      const res = await fetch("/api/auth/googleAuth", {
+      const res = await fetch("/api/auth/google", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -44,16 +42,22 @@ export default function OAuth({ userType }) {
       if (res.ok) {
         dispatch(signInSuccess(data));
         navigate("/");
+      } else {
+        setError(data.message || "Something went wrong during sign-in.");
       }
     } catch (error) {
       console.log("OAuth error:", error);
+      setError("Something went wrong with Google sign-in.");
     }
   };
 
   return (
-    <Button type="button" color="dark" outline onClick={handleGoogleClick}>
-      <AiFillGoogleCircle className="w-6 h-6 mr-2" />
-      Continue with Google
-    </Button>
+    <div className="">
+      {error && <Alert color="failure">{error}</Alert>}
+      <Button type="button" color="dark" className="w-full" outline onClick={handleGoogleClick}>
+        <AiFillGoogleCircle className="w-6 h-6 mr-2" />
+        Continue with Google
+      </Button>
+    </div>
   );
 }
