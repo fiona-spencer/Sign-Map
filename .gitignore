@@ -28,4 +28,4 @@ dist-ssr
 client/.env
 
 
-Private/
+Private/*.mov
