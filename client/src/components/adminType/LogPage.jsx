@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Settings from '../../pages/Settings';
 
 export default function LogPage() {
   // Sample log data - in a real application, you would fetch this from a server or API
@@ -153,6 +154,7 @@ export default function LogPage() {
           </tbody>
         </table>
       </div>
+      <Settings/>
     </div>
   );
 }
