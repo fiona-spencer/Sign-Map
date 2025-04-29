@@ -72,8 +72,8 @@ export default function Menu() {
 
       {/* Timeline Section */}
       <div className="justify-center p-9 pb-0">
-        <section className="relative bg-gradient-to-br from-yellow-300 to-[#ffdeaaf6] dark:from-purple-500 dark:to-orange-400 rounded-2xl shadow-xl p-8 mb-12 overflow-hidden max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-yellow-50 dark:text-green-300 mb-10 text-center tracking-tight">
+        <section className="relative bg-gradient-to-br from-yellow-300 to-[#ffdeaaf6] dark:from-purple-500 dark:to-orange-400 rounded-2xl shadow-xl p-6 mb-12 overflow-hidden max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-yellow-50 dark:text-green-300 mb-3 text-center tracking-tight">
             Recent Updates
           </h2>
 
@@ -118,7 +118,7 @@ export default function Menu() {
 
 
 {/* Login and Authentication */}
-<section className="bg-[#74cd96ba] dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition transform hover:scale-105 animate-fade-in lg:mx-60">
+<section className="bg-[#2499519e] dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center hover:shadow-xl transition transform hover:scale-105 animate-fade-in lg:mx-60">
   {/* Conditional Welcome */}
   {(['public', 'user', 'admin'].includes(currentUser?.userType)) && (
     <>
