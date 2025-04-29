@@ -3,6 +3,7 @@ import { Button } from 'flowbite-react';
 import { useSelector } from 'react-redux';
 import { HiDocumentDownload } from 'react-icons/hi';
 import * as XLSX from 'xlsx';
+import { BsFileEarmarkXFill } from 'react-icons/bs';
 
 export default function DownloadExcel() {
   const { filteredPins } = useSelector((state) => state.global);
@@ -49,7 +50,7 @@ export default function DownloadExcel() {
         disabled={!filteredPins || filteredPins.length === 0}
       >
         Download Filtered Pins to Excel
-        <HiDocumentDownload className="h-5 w-5 ml-2" />
+        <BsFileEarmarkXFill className="h-5 w-5 ml-2" />
       </Button>
     </div>
   );

@@ -16,7 +16,7 @@ export default function Search() {
 
   return (
     <div className="py-2 flex justify-center items-center gap-4
-      bg-[#173e28] text-white dark:bg-green-600 dark:text-white
+      bg-[#173e28] text-black dark:bg-green-600 dark:text-white
       transition-colors duration-300">
       <div className="text-white dark:text-white"></div>
       <form onSubmit={handleSubmit} className="flex items-center">

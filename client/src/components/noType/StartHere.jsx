@@ -1,5 +1,6 @@
 import CNTower from '../../assets/CNTower.jpg'
 import JsonUpload from '../json_upload'; // make sure the path is correct
+import { HiMoon, HiSun, HiDownload, HiUpload, HiMail, HiMap, HiPhone, HiDesktopComputer } from "react-icons/hi";
 import React, { useState } from 'react';
 import {
   Button,
@@ -17,7 +18,6 @@ import { HiArrowNarrowRight, HiCalendar } from "react-icons/hi";
 export default function StartHere() {
   const [hovered, setHovered] = useState(false);
 
-
   return (
     <div className="inline items-center justify-center p-6">
       <h1 className="text-3xl font-semibold text-center mb-8">Welcome! Please Sign In or Create an Account</h1>
@@ -27,54 +27,7 @@ export default function StartHere() {
 
 
       {/* Account Card Wrapper with Flex */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-center lg:px-40 px-10">
-  <div className="w-full">
-    <Card className="h-full flex flex-col justify-between bg-white shadow-lg z-20 dark:bg-gray-800 rounded-lg p-6 hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
-       <h5 className="mb-4 text-xl font-medium text-gray-500 dark:text-gray-400">Public Account</h5>
-            <ul className="my-7 space-y-5">
-              <li className="flex space-x-3">
-                <svg
-                  className="h-5 w-5 shrink-0 text-cyan-600 dark:text-cyan-500"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">
-                  View content and browse the platform
-                </span>
-              </li>
-              <li className="flex space-x-3">
-                <svg
-                  className="h-5 w-5 shrink-0 text-cyan-600 dark:text-cyan-500"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">
-                  Limited access to features
-                </span>
-              </li>
-            </ul>
-            <button
-              type="button"
-              className="inline-flex w-full justify-center rounded-lg bg-gray-600 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-900"
-            >
-              Choose Public
-            </button>
-          </Card>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 justify-center lg:px-40 px-10">
 
         {/* User Account Card Wrapper */}
         <div className="w-full">
@@ -271,6 +224,83 @@ export default function StartHere() {
         </div>
       </div>
     </div>
+    </div>
+
+    {/* Feature List Buttons */}
+    <div className="px-10 pt-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
+        {/* Dark Mode Toggle Button */}
+        <div className="flex flex-col items-center">
+          <button
+            className="p-6 rounded-lg bg-gray-800 text-white text-center w-full hover:bg-gray-900 transition-all duration-300"
+            aria-label="Toggle Dark Mode"
+          >
+            <HiMoon className="text-4xl mb-2" />
+            Dark Mode
+          </button>
+        </div>
+
+        {/* Upload and Download Files Button */}
+        <div className="flex flex-col items-center">
+          <button
+            className="p-6 rounded-lg bg-blue-700 text-white text-center w-full hover:bg-blue-800 transition-all duration-300"
+            aria-label="Upload and Download Files"
+          >
+            <div className="flex items-center justify-center mb-2">
+              <HiUpload className="text-4xl mr-2" />
+              <HiDownload className="text-4xl ml-2" />
+            </div>
+            Upload/Download Files
+          </button>
+        </div>
+
+        {/* Send Emails to Update Users Button */}
+        <div className="flex flex-col items-center">
+          <button
+            className="p-6 rounded-lg bg-green-700 text-white text-center w-full hover:bg-green-800 transition-all duration-300"
+            aria-label="Send Emails"
+          >
+            <HiMail className="text-4xl mb-2" />
+            Send Emails to Users
+          </button>
+        </div>
+
+        {/* Dynamic Map Button */}
+        <div className="flex flex-col items-center">
+          <button
+            className="p-6 rounded-lg bg-orange-600 text-white text-center w-full hover:bg-orange-700 transition-all duration-300"
+            aria-label="Dynamic Map"
+          >
+            <HiMap className="text-4xl mb-2" />
+            Dynamic Map
+          </button>
+        </div>
+
+        {/* Cluster Optimization Button */}
+        <div className="flex flex-col items-center">
+          <button
+            className="p-6 rounded-lg bg-purple-600 text-white text-center w-full hover:bg-purple-700 transition-all duration-300"
+            aria-label="Cluster Optimization"
+          >
+            <HiMap className="text-4xl mb-2" />
+            Cluster Optimization
+          </button>
+        </div>
+
+        {/* Mobile and Web View Button */}
+        <div className="flex flex-col items-center">
+          <button
+            className="p-6 rounded-lg bg-teal-600 text-white text-center w-full hover:bg-teal-700 transition-all duration-300"
+            aria-label="Mobile and Web View"
+          >
+            <div className="flex items-center justify-center mb-2">
+              <HiPhone className="text-4xl mr-2" />
+              <HiDesktopComputer className="text-4xl ml-2" />
+            </div>
+            Mobile & Web View
+          </button>
+        </div>
+      </div>
     </div>
 </div>
 

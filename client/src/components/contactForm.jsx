@@ -86,7 +86,7 @@ export default function ContactForm() {
   };
 
   return (
-    <div className="max-w-2xl p-10 bg-gradient-to-tr from-[#727171fa] via-green-00 to-green-500 rounded-2xl shadow-xl m-9 sm:mx-auto">
+    <div  className="max-w-2xl p-10 bg-gradient-to-tr from-[#727171fa] via-green-00 to-green-500 rounded-2xl shadow-xl m-9 sm:mx-auto">
       <h2 className="text-3xl font-bold text-green-100 mb-4 text-center">Contact Us</h2>
       <p className="text-center text-green-200 mb-6">Have a question or need assistance? Feel free to reach out below.</p>
       <form onSubmit={handleFormSubmit} className="space-y-5">

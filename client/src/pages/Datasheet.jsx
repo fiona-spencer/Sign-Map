@@ -10,7 +10,9 @@ import TestPdf from '../components/TestPdf';
 import { useRef } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { HiArrowCircleDown, HiArrowCircleLeft, HiArrowCircleRight, HiCloudDownload } from 'react-icons/hi';
+import { HiArrowCircleDown, HiArrowCircleRight, HiCloudDownload } from 'react-icons/hi';
+import { BsFilePdfFill } from 'react-icons/bs';
+import { Link } from 'react-router-dom';
 
 export default function Datasheet({ apiKey }) {
   const [pins, setPins] = useState([]);
@@ -27,6 +29,9 @@ export default function Datasheet({ apiKey }) {
   const [progress, setProgress] = useState(0);
   const [downloading, setDownloading] = useState(false);
   const [isVisible, setIsVisible] = useState(false);  // State to toggle visibility
+  const { currentUser } = useSelector((state) => state.user);
+  const hasAccess = currentUser?.userType === 'admin' || currentUser?.userType === 'user';
+
 
   const toggleVisibility = () => {
     setIsVisible(prevState => !prevState);  // Toggle the visibility state
@@ -262,6 +267,30 @@ export default function Datasheet({ apiKey }) {
   if (error) return <div>Error: {error}</div>;
 
   return (
+<>
+{!hasAccess && (
+      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 text-white text-center p-8">
+        <div>
+          <h2 className="text-3xl font-bold mb-4">Access Restricted</h2>
+          <p className="text-lg">You do not have permission to access this page, please create an account.</p>
+          <Link to="/signup">
+  <Button className='w-full mt-10' color='dark'>
+    Sign Up
+  </Button>
+</Link>
+          <Link to="/startHere">
+          <Button className='w-full mt-2 font-bold text-green-950 bg-[#1e915260] underline outline-none border-2' color='green'>
+          Learn More Here
+  </Button>
+</Link>
+        </div>
+      </div>
+    )}
+    <div className={`relative bg-[#F5F5F5] dark:bg-[#121212] p-8 min-h-screen ${!hasAccess ? 'pointer-events-none blur-sm' : ''}`}>
+      
+
+
+
     <div className="w-full overflow-x-auto p-6 bg-[#267b6684] dark:bg-gray-800 ">
       <div className='text-4xl font-extrabold m-6 flex items-center gap-4  justify-center'>
         Create and Look for your Pins
@@ -424,7 +453,7 @@ export default function Datasheet({ apiKey }) {
             onClick={handleDownloadPdf}
           >
             Download PDF of Grouped Pins
-            <HiCloudDownload className="h-5 w-5  ml-2" />
+            <BsFilePdfFill className="h-5 w-5  ml-2" />
           </Button>
         </div>
       )}
@@ -460,5 +489,10 @@ export default function Datasheet({ apiKey }) {
       {/* Your download button */}
     </div>
     </div>
+
+</div>
+
+</>
+
   );
 }

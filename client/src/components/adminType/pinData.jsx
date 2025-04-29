@@ -145,7 +145,7 @@ export default function PinData() {
             {pins.length > 0 ? (
               pins.map((pin) => (
                 <tr key={pin._id} className="hover:bg-gray-100 dark:hover:bg-blue-700 dark:bg-blue-950">
-                  <td className="px-2 py-1 border-b">{pin.createdBy.username}</td>
+                  <td className="px-2 py-1 border-b">{pin.createdBy?.username}</td>
                   <td className={`px-2 py-1 border text-xs ${getStatusClass(pin.location.status)}`}>
                     {pin.location.status}
                   </td>

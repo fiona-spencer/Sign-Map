@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { HiOutlineArrowRight } from "react-icons/hi";
+import { HiOutlineArrowRight, HiUserCircle, HiKey } from "react-icons/hi";
 import { Link } from 'react-router-dom';
 import { Button, Carousel } from 'flowbite-react';
 import cityImage from '../assets/city_image_small.png';
@@ -135,23 +135,58 @@ export default function Menu() {
 
   {/* Account Creation Section - only if userType is not set */}
   {!currentUser?.userType && (
-    <>
-      <p className="text-green-700 dark:text-green-300 mb-4 font-bold text-2xl">
-        Log in or create an account to get started.
-      </p>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">New here? Create an account:</p>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+<>
+  <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+    <p className="text-green-700 dark:text-green-300 mb-4 font-bold text-2xl text-center">
+      Log in or create an account to get started.
+    </p>
+    <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 text-center">
+      New here? Choose your role to create an account:
+    </p>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Sign Up as User */}
+      <div className="bg-white border-4 border-black dark:bg-green-900 p-6 rounded-lg shadow-lg transition-all duration-300 hover:shadow-2xl transform hover:scale-105">
         <Link to="/signup">
-          <Button color="light" className="w-full">Sign Up as Public</Button>
+          <Button 
+            color="light" 
+            className="w-full mb-3 text-teal-800 font-extrabold flex items-center justify-center space-x-2"
+          >
+            <HiUserCircle size={20} className='mr-2' /> 
+            <span>Sign Up as User</span>
+          </Button>
         </Link>
-        <Link to="/signup">
-          <Button color="light" className="w-full">Sign Up as User</Button>
-        </Link>
-        <Link to="/signup">
-          <Button color="light" className="w-full">Sign Up as Admin</Button>
-        </Link>
+        <ul className="text-left list-disc pl-5 text-sm text-gray-700 dark:text-gray-200 font-medium">
+          <li>Submit reports about incidents or issues</li>
+          <li>Track the status of your submissions</li>
+          <li>Receive email updates about your reports</li>
+        </ul>
       </div>
-    </>
+
+      {/* Sign Up as Admin */}
+      <div className="border-4 border-black dark:bg-gray-900 p-6 rounded-lg shadow-lg transition-all duration-300 hover:shadow-2xl transform hover:scale-105">
+        <Link to="/signup">
+          <Button 
+            color="red"
+            className="w-full mb-3 text-red-500 font-extrabold flex items-center justify-center space-x-2"
+          >
+            <HiKey size={20} className='mr-2' />
+            <span>Sign Up as Admin</span>
+          </Button>
+        </Link>
+        <ul className="text-left list-disc pl-5 text-sm font-medium text-gray-700 dark:text-gray-200">
+          <li>View and manage all reports submitted by users</li>
+          <li>Edit report statuses and details</li>
+          <li>Assign reports to departments or personnel</li>
+          <li>Delete inappropriate or resolved reports</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</>
+
+ 
   )}
 
   {/* Learn More Button - always visible */}
@@ -192,7 +227,7 @@ export default function Menu() {
 
 
 
-<div className='items-center justify-center flex'>
+<div id='contactForm' className='items-center justify-center flex'>
 {/* Contact Form */}
 <ContactForm/>
 </div>

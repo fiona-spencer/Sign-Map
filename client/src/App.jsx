@@ -11,6 +11,7 @@ import SuccessfullyCreated from "./pages/SuccessfullyCreated";
 import Profile from "./pages/Profile";
 import SearchPage from "./pages/SearchPage";
 import Datasheet from "./pages/Datasheet";
+import ContactForm from "./components/contactForm";
 
 // Components
 import Header from "./components/Header";
@@ -68,6 +69,7 @@ function AppWrapper({ apiKey }) {
           <Route path="/report" element={<Report />} />
           <Route path="/successfullyCreated" element={<SuccessfullyCreated />} />
           <Route path="/search" element={<SearchPage />} />
+          <Route path="/sendEmail" element={<ContactForm />} />
           <Route
             path="/datasheets"
             element={<Datasheet apiKey={apiKey} />}

@@ -48,7 +48,7 @@ export default function SignUp() {
   };
 
   const handleAdminAuth = () => {
-    const correctAdminPassword = 'SECRET123'; // Replace this with the actual SECRET password
+    const correctAdminPassword = process.env.ADMIN_SECRET; // Replace this with the actual SECRET password
     if (adminPasswordInput === correctAdminPassword) {
       setFormData(prev => ({ ...prev, userType: 'admin' }));
       setErrorMessage(null);
@@ -136,7 +136,7 @@ export default function SignUp() {
               className="border-green-500 focus:ring-green-500 dark:border-green-400 dark:bg-gray-700 dark:text-white"
             >
               <option value="">-- Select User Type --</option>
-              <option value="public">Public</option>
+              {/* <option value="public">Public</option> */}
               <option value="user">User</option>
               <option value="admin">Admin</option>
             </Select>

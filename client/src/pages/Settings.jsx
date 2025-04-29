@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { signoutSuccess } from '../redux/user/userSlice';
+import { useSelector, useDispatch } from 'react-redux';  // Import useDispatch
 import {
   Sidebar,
   SidebarItem,
@@ -33,6 +34,7 @@ export default function Settings() {
   const { currentUser } = useSelector((state) => state.user);
   const userType = currentUser?.userType || null;
   const username = currentUser?.username || 'Guest';
+  const dispatch = useDispatch();  // Use dispatch to handle actions
 
   useEffect(() => {
     const handleResize = () => {
@@ -65,10 +67,16 @@ export default function Settings() {
     };
   }, [dropdownOpen]);
 
+    // Handle sign out
+    const handleSignOut = () => {
+      dispatch(signoutSuccess());  // Dispatch sign out action
+      window.location.href = '/signin';  // Redirect to Sign In page after signout
+    };
+
   const sharedItems = [
     { href: "/help", label: "Help Center", icon: HiQuestionMarkCircle },
     { href: "/contactSupport", label: "Contact Support", icon: HiPhoneOutgoing },
-    { href: "/signout", label: "Sign Out", icon: HiArrowSmRight },
+    { label: "Sign Out", icon: HiArrowSmRight, action: handleSignOut }, // Add action here for sign out
   ];
 
   const menuItems = () => {
@@ -93,9 +101,9 @@ export default function Settings() {
     if (userType === 'user') {
       return [
         { href: "/settings", label: "Profile", icon: HiUser },
-        { href: "/my-pins", label: "My Pins", icon: HiStar },
-        { href: "/favourites", label: "Favourites", icon: HiStar },
-        { href: "/updates", label: "Updates", icon: HiChartPie },
+        // { href: "/my-pins", label: "My Pins", icon: HiStar },
+        // { href: "/favourites", label: "Favourites", icon: HiStar },
+        // { href: "/updates", label: "Updates", icon: HiChartPie },
         ...sharedItems,
       ];
     }
@@ -103,7 +111,7 @@ export default function Settings() {
     if (userType === 'admin') {
       return [
         { href: "/settings", label: "Profile", icon: HiUser },
-        { href: "/inbox", label: "Submitted Markers", icon: HiInbox },
+        { href: "/inbox", label: "Inbox", icon: HiInbox },
         { href: "/database", label: "Database", icon: HiDatabase },
         // { href: "/logs", label: "Page Log", icon: HiTable },
         // { href: "/analytics", label: "Analytics", icon: HiChartPie },
@@ -113,6 +121,8 @@ export default function Settings() {
 
     return [];
   };
+
+  
 
   return (
     <div
@@ -144,59 +154,53 @@ export default function Settings() {
         </Button>
       )}
 
-      
-
       {/* Mobile View: Dropdown */}
       {isMobile && (
-  <div className="p-4 truncate max-w-full">
-    <div className="w-full">
-      <Dropdown label="Settings" className="p-2" color="dark" inline>
-        {menuItems().map((item) => (
-          <Dropdown.Item
-            key={item.label}
-            icon={item.icon}
-            onClick={() => window.location.href = item.href}
-            className="text-sm"
-            color='light'
-          >
-            {item.label}
-          </Dropdown.Item>
-        ))}
-      </Dropdown>
-    </div>
-  </div>
-)}
-
+        <div className="p-4 truncate max-w-full">
+          <div className="w-full">
+            <Dropdown label="Settings" className="p-2" color="dark" inline>
+              {menuItems().map((item) => (
+                <Dropdown.Item
+                  key={item.label}
+                  icon={item.icon}
+                  onClick={item.action ? item.action : () => window.location.href = item.href}
+                  className="text-sm"
+                  color='light'
+                >
+                  {item.label}
+                </Dropdown.Item>
+              ))}
+            </Dropdown>
+          </div>
+        </div>
+      )}
 
       {/* Desktop View: Sidebar */}
       {!isMobile && sidebarOpen && (
         <Sidebar className="h-full pt-16 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 text-sm">
           <SidebarItems>
             {/* User Info */}
-{sidebarOpen && !isMobile && (
-        <div className="text-sm px-3">
-          <p><strong>User:</strong> {username}</p>
-          <p><strong>Role:</strong> {userType || 'Guest'}</p>
-        </div>
-      )}
+            {sidebarOpen && !isMobile && (
+              <div className="text-sm px-3">
+                <p><strong>User:</strong> {username}</p>
+                <p><strong>Role:</strong> {userType || 'Guest'}</p>
+              </div>
+            )}
 
             <SidebarItemGroup className="px-0 py-5">
-            {menuItems().map((item) => (
-  <SidebarItem
-    href={item.href}
-    key={item.label}
-    className={`text-md py-2 font-bold rounded transition-colors duration-150 
-      ${item.label === 'Sign Out' ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'} 
-      hover:bg-gray-300 dark:hover:bg-gray-700 flex items-center`}
-  >
-    {/* Conditionally style the icon and set its height */}
-    <item.icon className={`${item.label === 'Sign Out' ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'} mr-2 h-5 w-5 inline`} />
-    {item.label}
-  </SidebarItem>
-))}
-
-
-
+              {menuItems().map((item) => (
+                <SidebarItem
+                  href={item.href || "#"} // If there is no href, don't use it
+                  key={item.label}
+                  onClick={item.action ? item.action : null} // Handle action for SignOut
+                  className={`text-md py-2 font-bold rounded transition-colors duration-150 
+                    ${item.label === 'Sign Out' ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'} 
+                    hover:bg-gray-300 dark:hover:bg-gray-700 flex items-center`}
+                >
+                  <item.icon className={`${item.label === 'Sign Out' ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'} mr-2 h-5 w-5 inline`} />
+                  {item.label}
+                </SidebarItem>
+              ))}
             </SidebarItemGroup>
           </SidebarItems>
         </Sidebar>

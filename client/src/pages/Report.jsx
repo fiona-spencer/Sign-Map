@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import CreateReport from '../components/createReport';
-import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, TabItem, Tabs } from 'flowbite-react';
+import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, TabItem, Tabs, Button } from 'flowbite-react';
 import { HiClipboardList } from 'react-icons/hi';
 import { MdDashboard } from 'react-icons/md';
 import { HiUserCircle } from 'react-icons/hi';
@@ -8,6 +8,9 @@ import JsonUpload from '../components/json_upload';
 import CsvUpload from '../components/csv_upload';
 import FileUploadPreview from '../components/FileUploadPreview';
 import ExcelUpload from '../components/ExcelUpload';
+import { useSelector } from 'react-redux'; // Add this at the top if not imported
+import { Link } from 'react-router-dom';
+
 
 export default function Report() {
   const [address, setAddress] = useState('');
@@ -18,6 +21,9 @@ export default function Report() {
   const [activeTab, setActiveTab] = useState(0);
   const [fileReportData, setFileReportData] = useState(null);
   const [error, setError] = useState('');
+  const { currentUser } = useSelector((state) => state.user);
+const hasAccess = currentUser?.userType === 'admin' || currentUser?.userType === 'user';
+
 
   const apiKey = import.meta.env.VITE_API_KEY;
 
@@ -106,106 +112,133 @@ export default function Report() {
   };
 
   return (
+<>
+{!hasAccess && (
+      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 text-white text-center p-8">
+        <div>
+          <h2 className="text-3xl font-bold mb-4">Access Restricted</h2>
+          <p className="text-lg">You do not have permission to access this page, please create an account.</p>
+          <Link to="/signup">
+  <Button className='w-full mt-10' color='dark'>
+    Sign Up
+  </Button>
+</Link>
+          <Link to="/startHere">
+  <Button className='w-full mt-2 font-bold text-green-950 bg-[#1e915260] underline outline-none border-2' color='green'>
+    Learn More Here
+  </Button>
+</Link>
+        </div>
+      </div>
+    )}
+    <div className={`relative bg-[#F5F5F5] dark:bg-[#121212] p-8 min-h-screen ${!hasAccess ? 'pointer-events-none blur-sm' : ''}`}>
+      
+    {/* Page content here as normal */}
     <div className="bg-[#F5F5F5] dark:bg-[#121212] p-8 min-h-screen">
 
 
-      <FileUploadPreview />
+<FileUploadPreview />
 
-      <div className="mt-12">
+<div className="mt-12">
 
-        {/* Tabs Section for File Upload */}
-        <Tabs aria-label="Upload Tabs" variant="default" ref={tabsRef} onActiveTabChange={(tab) => setActiveTab(tab)}>
-          
-          {/* JSON Upload Tab */}
-          <TabItem active={activeTab === 0} title="JSON Upload" icon={HiClipboardList}>
-            <JsonUpload />
-          </TabItem>
+  {/* Tabs Section for File Upload */}
+  <Tabs aria-label="Upload Tabs" variant="default" ref={tabsRef} onActiveTabChange={(tab) => setActiveTab(tab)}>
+    
+    {/* JSON Upload Tab */}
+    <TabItem active={activeTab === 0} title="JSON Upload" icon={HiClipboardList}>
+      <JsonUpload />
+    </TabItem>
 
-          {/* CSV Upload Tab */}
-          <TabItem active={activeTab === 1} title="CSV Upload" icon={MdDashboard}>
-            <CsvUpload />
-          </TabItem>
+    {/* CSV Upload Tab */}
+    <TabItem active={activeTab === 1} title="CSV Upload" icon={MdDashboard}>
+      <CsvUpload />
+    </TabItem>
 
-          {/* Excel Upload Tab */}
-          <TabItem active={activeTab === 2} title="Excel Upload" icon={HiUserCircle}>
-            <ExcelUpload />
-          </TabItem>
+    {/* Excel Upload Tab */}
+    <TabItem active={activeTab === 2} title="Excel Upload" icon={HiUserCircle}>
+      <ExcelUpload />
+    </TabItem>
 
-          {/* Example Report Tab */}
-          <TabItem title="Example Report" icon={HiUserCircle}>
-            <div className="my-6">
-              <label htmlFor="address" className="block text-xl font-semibold text-gray-700 dark:text-gray-300 mb-3">Address</label>
-              <input
-                type="text"
-                id="address"
-                ref={addressInputRef}
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                className="p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-600 text-base text-gray-800 dark:text-gray-200 w-full focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
-                placeholder="Enter the address of the incident"
-              />
-            </div>
-
-            <CreateReport address={address} />
-          </TabItem>
-        </Tabs>
+    {/* Example Report Tab */}
+    <TabItem title="Example Report" icon={HiUserCircle}>
+      <div className="my-6">
+        <label htmlFor="address" className="block text-xl font-semibold text-gray-700 dark:text-gray-300 mb-3">Address</label>
+        <input
+          type="text"
+          id="address"
+          ref={addressInputRef}
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          className="p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-600 text-base text-gray-800 dark:text-gray-200 w-full focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+          placeholder="Enter the address of the incident"
+        />
       </div>
 
+      <CreateReport address={address} />
+    </TabItem>
+  </Tabs>
+</div>
 
-      {/* Accordion */}
-      <Accordion className="mt-10 bg-white dark:bg-[#1E1E1E] shadow-lg rounded-lg">
-        <AccordionPanel>
-          <AccordionTitle className="text-xl font-semibold bg-green-500 text-white hover:bg-green-600 rounded-md px-5 py-3 transition-colors duration-300">
-            Why Create a Report?
-          </AccordionTitle>
-          <AccordionContent className="text-gray-700 dark:text-gray-300 text-base p-4">
-            Submitting a report helps local authorities respond faster to public safety issues, infrastructure problems, or disturbances in your area.
-          </AccordionContent>
-        </AccordionPanel>
 
-        <AccordionPanel>
-          <AccordionTitle className="text-xl font-semibold bg-green-500 text-white hover:bg-green-600 rounded-md px-5 py-3 transition-colors duration-300">
-            Information You Need
-          </AccordionTitle>
-          <AccordionContent className="text-gray-700 dark:text-gray-300 p-4">
-            <ul className="list-disc pl-5 space-y-2">
-              <li><strong>Address:</strong> Exact location of the incident.</li>
-              <li><strong>Full Name:</strong> For contact and follow-up.</li>
-              <li><strong>Email:</strong> For status updates and confirmation.</li>
-              <li><strong>Phone Number:</strong> Optional, but helpful for urgent matters.</li>
-              <li><strong>Date of Incident:</strong> When it happened.</li>
-              <li><strong>Title:</strong> A short headline of the issue.</li>
-              <li><strong>Description:</strong> Full details, including context.</li>
-              <li><strong>Verification:</strong> A checkbox to confirm accuracy.</li>
-            </ul>
-          </AccordionContent>
-        </AccordionPanel>
+{/* Accordion */}
+<Accordion className="mt-10 bg-white dark:bg-[#1E1E1E] shadow-lg rounded-lg">
+  <AccordionPanel>
+    <AccordionTitle className="text-xl font-semibold bg-green-500 text-white hover:bg-green-600 rounded-md px-5 py-3 transition-colors duration-300">
+      Why Create a Report?
+    </AccordionTitle>
+    <AccordionContent className="text-gray-700 dark:text-gray-300 text-base p-4">
+      Submitting a report helps local authorities respond faster to public safety issues, infrastructure problems, or disturbances in your area.
+    </AccordionContent>
+  </AccordionPanel>
 
-        <AccordionPanel>
-          <AccordionTitle className="text-xl font-semibold bg-green-500 text-white hover:bg-green-600 rounded-md px-5 py-3 transition-colors duration-300">
-            Tips for a Good Report
-          </AccordionTitle>
-          <AccordionContent className="text-gray-700 dark:text-gray-300 p-4">
-            <ul className="list-disc pl-5 space-y-2">
-              <li>Be as detailed as possible in the description.</li>
-              <li>Include specific times or events if applicable.</li>
-              <li>Stay factual — avoid exaggeration.</li>
-              <li>If you have supporting images or videos, mention them.</li>
-            </ul>
-          </AccordionContent>
-        </AccordionPanel>
+  <AccordionPanel>
+    <AccordionTitle className="text-xl font-semibold bg-green-500 text-white hover:bg-green-600 rounded-md px-5 py-3 transition-colors duration-300">
+      Information You Need
+    </AccordionTitle>
+    <AccordionContent className="text-gray-700 dark:text-gray-300 p-4">
+      <ul className="list-disc pl-5 space-y-2">
+        <li><strong>Address:</strong> Exact location of the incident.</li>
+        <li><strong>Full Name:</strong> For contact and follow-up.</li>
+        <li><strong>Email:</strong> For status updates and confirmation.</li>
+        <li><strong>Phone Number:</strong> Optional, but helpful for urgent matters.</li>
+        <li><strong>Date of Incident:</strong> When it happened.</li>
+        <li><strong>Title:</strong> A short headline of the issue.</li>
+        <li><strong>Description:</strong> Full details, including context.</li>
+        <li><strong>Verification:</strong> A checkbox to confirm accuracy.</li>
+      </ul>
+    </AccordionContent>
+  </AccordionPanel>
 
-        <AccordionPanel>
-          <AccordionTitle className="text-xl font-semibold bg-green-500 text-white hover:bg-green-600 rounded-md px-5 py-3 transition-colors duration-300">
-            What Happens After You Submit?
-          </AccordionTitle>
-          <AccordionContent className="text-gray-700 dark:text-gray-300 p-4">
-            After submission, our team will review your report and may reach out if more information is needed. Depending on the nature of the report, it may be forwarded to local authorities or city services for resolution.
-            <br />
-            You will receive updates via the contact information you provided.
-          </AccordionContent>
-        </AccordionPanel>
-      </Accordion>
-    </div>
+  <AccordionPanel>
+    <AccordionTitle className="text-xl font-semibold bg-green-500 text-white hover:bg-green-600 rounded-md px-5 py-3 transition-colors duration-300">
+      Tips for a Good Report
+    </AccordionTitle>
+    <AccordionContent className="text-gray-700 dark:text-gray-300 p-4">
+      <ul className="list-disc pl-5 space-y-2">
+        <li>Be as detailed as possible in the description.</li>
+        <li>Include specific times or events if applicable.</li>
+        <li>Stay factual — avoid exaggeration.</li>
+        <li>If you have supporting images or videos, mention them.</li>
+      </ul>
+    </AccordionContent>
+  </AccordionPanel>
+
+  <AccordionPanel>
+    <AccordionTitle className="text-xl font-semibold bg-green-500 text-white hover:bg-green-600 rounded-md px-5 py-3 transition-colors duration-300">
+      What Happens After You Submit?
+    </AccordionTitle>
+    <AccordionContent className="text-gray-700 dark:text-gray-300 p-4">
+      After submission, our team will review your report and may reach out if more information is needed. Depending on the nature of the report, it may be forwarded to local authorities or city services for resolution.
+      <br />
+      You will receive updates via the contact information you provided.
+    </AccordionContent>
+  </AccordionPanel>
+</Accordion>
+</div>
+    {/* Overlay message if access is denied */}
+    
+  </div>
+    
+  </>
   );
 }
