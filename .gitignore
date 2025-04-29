@@ -28,5 +28,6 @@ dist-ssr
 client/.env
 
 
-Private/*.mov
+Private/
 *.mov
+client/src/assets/videos
