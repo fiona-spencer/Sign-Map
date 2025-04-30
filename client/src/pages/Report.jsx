@@ -192,7 +192,7 @@ const hasAccess = currentUser?.userType === 'admin' || currentUser?.userType ===
 
 
 {/* Accordion */}
-<Accordion className="mt-10 bg-white dark:bg-[#1E1E1E] shadow-lg rounded-lg max-w-3xl  mx-auto">
+<Accordion  className="mt-10 bg-white dark:bg-[#1E1E1E] shadow-lg rounded-lg max-w-3xl  mx-auto">
   <AccordionPanel>
     <AccordionTitle className="text-xl font-semibold bg-green-500 text-white hover:bg-green-600 rounded-md px-5 py-3 transition-colors duration-300">
       How to Preview a File?

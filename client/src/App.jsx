@@ -36,6 +36,7 @@ import GoogleMapTest from './pages/GoogleMapTest'
 
 // Redux actions
 import { setMapState } from "./redux/global/globalSlice"; // Import the global slice action
+import ReleaseNotes from "./pages/ReleaseNotes";
 
 function AppWrapper({ apiKey }) {
   const location = useLocation();
@@ -70,6 +71,7 @@ function AppWrapper({ apiKey }) {
           <Route path="/successfullyCreated" element={<SuccessfullyCreated />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/sendEmail" element={<ContactForm />} />
+          <Route path="/release" element={<ReleaseNotes />} />
           <Route
             path="/datasheets"
             element={<Datasheet apiKey={apiKey} />}

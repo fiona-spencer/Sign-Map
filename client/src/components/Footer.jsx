@@ -31,12 +31,12 @@ export default function FooterCom() {
               <Footer.Title title="Learn More" className="text-emerald-700 dark:text-white font-extrabold text-md" />
               <Footer.LinkGroup col className='mx-4'>
                 <Footer.Link
-                  href="/"
+                  href="/release"
                   target="_self"
                   rel="noopener noreferrer"
                   className="text-emerald-700 hover:text-emerald-900 dark:text-white dark:hover:text-emerald-400"
                 >
-                  Site Features
+                  Release Notes
                 </Footer.Link>
                 <Footer.Link
                   href="/startHere"
@@ -96,10 +96,10 @@ export default function FooterCom() {
         <Footer.Divider className="mb-2 border-gray-500 dark:border-gray-600" />
 
         {/* Copyright + Social Icons */}
-        <div className="flex flex-col sm:items-center sm:justify-between gap-4 text-sm text-gray-600 dark:text-gray-400 flex mt-2">
+        <div className="flex flex-col sm:items-center sm:justify-between gap-4 text-sm text-gray-600 dark:text-gray-400 flex">
   <Footer.Copyright
     href="/"
-    by="Fiona Spencer"
+    by="by Fiona Spencer"
     year={new Date().getFullYear()}
     className='text-gray-700 dark:text-white font-bold'
   />

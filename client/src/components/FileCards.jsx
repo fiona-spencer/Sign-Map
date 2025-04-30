@@ -98,7 +98,6 @@ export default function FileCards() {
               loop
               muted
               className="w-full max-w-6xl rounded-lg"
-              controls
             />
           </div>
         </Modal.Body>
