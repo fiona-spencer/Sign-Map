@@ -138,10 +138,6 @@ export default function Datasheet({ apiKey }) {
     }
   };
   
-  
-  
-  
-
 
   useEffect(() => {
     const applyFilter = () => {
@@ -286,7 +282,7 @@ export default function Datasheet({ apiKey }) {
         </div>
       </div>
     )}
-    <div className={`relative bg-[#F5F5F5] dark:bg-[#121212] p-8 min-h-screen ${!hasAccess ? 'pointer-events-none blur-sm' : ''}`}>
+    <div className={`relative bg-[#F5F5F5] dark:bg-[#121212] min-h-screen ${!hasAccess ? 'pointer-events-none blur-sm' : ''}`}>
       
 
 

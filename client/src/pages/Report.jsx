@@ -142,10 +142,32 @@ const hasAccess = currentUser?.userType === 'admin' || currentUser?.userType ===
         </div>
       </div>
     )}
-    <div className={`relative bg-[#F5F5F5] dark:bg-[#121212] p-8 min-h-screen ${!hasAccess ? 'pointer-events-none blur-sm' : ''}`}>
+    <div className={`relative bg-[#F5F5F5] dark:bg-[#121212] min-h-screen ${!hasAccess ? 'pointer-events-none blur-sm' : ''}`}>
       
     {/* Page content here as normal */}
     <div className="bg-[#F5F5F5] dark:bg-[#121212] p-8 min-h-screen">
+    <div className="mb-14 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">File Upload Instructions</h2>
+  
+  <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 space-y-2 text-sm">
+    <li><strong>Preview a file below</strong> before uploading.</li>
+    <li>You may upload files in <strong>JSON, CSV, or Excel (.xlsx)</strong> format.</li>
+    <li>Examples of valid file formats are shown below for reference.</li>
+    <li>Only valid formats will be accepted. Invalid or corrupt files will show an error.</li>
+    <li>Any missing cell values will be replaced with <code>N/A</code>.</li>
+    <li>Upon upload, file metadata is generated automatically:
+      <ul className="list-disc pl-6 pt-2">
+        <li><strong>File Name:</strong> N/A</li>
+        <li><strong>Created By:</strong> username</li>
+        <li><strong>Created At:</strong> current date</li>
+        <li><strong>Status:</strong> Pending</li>
+      </ul>
+    </li>
+    <li>After previewing, valid entries can be sent to the map for pin creation.</li>
+    <li>An example report is also provided based on data created on the map.</li>
+    <li>More information and examples are available in the section below.</li>
+  </ul>
+</div>
 
 
 <FileUploadPreview />
@@ -172,21 +194,37 @@ const hasAccess = currentUser?.userType === 'admin' || currentUser?.userType ===
 
     {/* Example Report Tab */}
     <TabItem title="Example Report" icon={HiClipboardList}>
-      <div className="my-6">
-        <label htmlFor="address" className="block text-xl font-semibold text-gray-700 dark:text-gray-300 mb-3">Address</label>
-        <input
-          type="text"
-          id="address"
-          ref={addressInputRef}
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          className="p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-600 text-base text-gray-800 dark:text-gray-200 w-full focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
-          placeholder="Enter the address of the incident"
-        />
-      </div>
+  <div className="my-6">
+    <label htmlFor="address" className="block text-xl font-semibold text-gray-700 dark:text-gray-300 mb-3">
+      Report Example
+    </label>
+    <input
+      type="text"
+      id="address"
+      ref={addressInputRef}
+      value={address}
+      onChange={(e) => setAddress(e.target.value)}
+      className="border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-600 text-base text-gray-800 dark:text-gray-200 w-full focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+      placeholder="Enter an address ..."
+    />
+  </div>
 
-      <CreateReport address={address} />
-    </TabItem>
+  <div className="relative pointer-events-none opacity-50 bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+    <CreateReport />
+
+    {/* Overlay Button */}
+    
+  </div>
+  <div className="absolute inset-0 flex items-center justify-center pointer-events-auto">
+      <a
+        href="/datasheets" // Change this route to your actual map path
+        className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg"
+      >
+        Create a report on the map
+      </a>
+    </div>
+</TabItem>
+
   </Tabs>
 </div>
 

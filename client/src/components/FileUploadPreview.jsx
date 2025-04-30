@@ -74,11 +74,11 @@ export default function FileUploadComponent() {
       <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Preview a File (JSON, CSV, or Excel Files)</h2>
       <Label
         htmlFor="dropzone-file"
-        className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+        className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-200 hover:bg-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
         onDrop={handleDrop}
         onDragOver={handleDragOver}
       >
-        <div className="flex flex-col items-center justify-center p-6">
+        <div className="flex flex-col items-center justify-center">
           <svg
             className="mb-4 h-8 w-8 text-gray-500 dark:text-gray-400"
             aria-hidden="true"
