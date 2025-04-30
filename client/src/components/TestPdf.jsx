@@ -24,7 +24,16 @@ export default function TestPdf({newRef}) {
       printRefs.current.push(el);
     }
   };
-
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 'pending': return 'bg-yellow-200 text-black';
+      case 'accepted': return 'bg-blue-500 text-white';
+      case 'in-progress': return 'bg-orange-500 text-white';
+      case 'resolved': return 'bg-green-500 text-white';
+      case 'deleted': return 'bg-red-500 text-white';
+      default: return 'bg-gray-500 text-white';
+    }
+  };
   // useEffect(() => {
   //   // Example of adding some content to printRefs (e.g., if you want to capture a ref)
   //   // You can also conditionally capture multiple elements if needed
@@ -198,21 +207,35 @@ export default function TestPdf({newRef}) {
       {/* 📦 Clusters or Postal Code Groups */}
       {groupBy === 'postal' ? (
         <div>
-          <h2 className="text-xl font-bold mb-2">Pins Grouped by Postal Code</h2>
-          {groupedPins && Object.entries(groupedPins).map(([postalCode, pins]) => (
-            <div key={postalCode} ref={addToRefs} className="border border-gray-300 rounded p-3 shadow-sm mb-4">
-              <h3 className="font-semibold text-blue-600 mb-2">Postal Code: {postalCode}</h3>
-              <ul className="list-disc list-inside text-sm">
-                {pins.map((pin, index) => (
-                  <li key={index}>
-                    {pin.location?.info?.contactName || 'Unnamed Contact'} —
-                    ({pin.location?.address}) ({pin.location?.status})
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+  <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Pins Grouped by Postal Code</h2>
+  {groupedPins && Object.entries(groupedPins).map(([postalCode, pins]) => (
+    <div
+      key={postalCode}
+      ref={addToRefs}
+      className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 shadow-md bg-white dark:bg-gray-800 mb-6"
+    >
+      <h3 className="text-lg font-semibold text-blue-600 dark:text-blue-400 mb-3">
+        Postal Code: {postalCode}
+      </h3>
+      <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300 text-sm">
+        {pins.map((pin, index) => (
+          <li key={index} className="flex flex-wrap gap-1 items-center">
+            <span className="font-bold">{pin.location?.info?.contactName || 'Unnamed Contact'} </span>
+            <span>— ({pin.location?.address})</span>
+            {pin.location?.status && (
+              <span
+                className={`ml-1 px-2 py-0.5 rounded text-xs font-semibold ${getStatusClass(pin.location.status)}`}
+              >
+                {pin.location.status}
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+</div>
+
       ) : (
 <div className="max-w-5xl mx-auto">
 <h2 className="text-xl font-bold mb-4">Clusters (≤ {clusterSize} meters)</h2>
@@ -252,12 +275,15 @@ export default function TestPdf({newRef}) {
               <div className="font-bold text-gray-800 pr-1">
                 {pin.location?.info?.contactName || 'Unnamed Contact'}
               </div>
-              <div className="text-gray-600">
-                {pin.location?.address || 'No address provided'}
-                <span className="text-xs text-gray-500 px-2 text-yellow-400">
-                  ({pin.location?.status || 'No status'})
-                </span>
-              </div>
+              <div className="text-gray-600 dark:text-gray-300">
+  {pin.location?.address || 'No address provided'}
+  {pin.location?.status && (
+    <span className={`text-xs px-2 ml-1 rounded font-medium ${getStatusClass(pin.location.status)}`}>
+      ({pin.location.status})
+    </span>
+  )}
+</div>
+
             </li>
           ))}
         </ul>

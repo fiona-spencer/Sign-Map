@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { HiOutlineArrowRight, HiUserCircle, HiKey } from "react-icons/hi";
+import { HiOutlineArrowRight, HiUserCircle, HiKey, HiCheckCircle } from "react-icons/hi";
 import { Link } from 'react-router-dom';
 import { Button, Carousel } from 'flowbite-react';
 import cityImage from '../assets/city_image_small.png';
@@ -80,28 +80,28 @@ export default function Menu() {
           <div className="space-y-8">
             {/* Timeline Item 1 */}
             <div className="flex items-start space-x-4 opacity-0 animate-fadeInUp animation-delay-0">
-              <div className="w-2.5 h-2.5 mt-1 rounded-full bg-green-500"></div>
+              <div className="w-2.5 h-2.5 mt-1 rounded-full text-gray-900"><HiCheckCircle/></div>
               <div>
                 <p className="text-lg font-semibold text-gray-800 dark:text-gray-100">Pin Submission Feature Updated</p>
-                <p className="text-sm text-gray-600 dark:text-gray-200">March 15, 2025 — Users can now attach images to reports.</p>
+                <p className="text-sm font-medium italic text-yellow-500 dark:text-gray-200">March 15, 2025 — Users can now attach images to reports.</p>
               </div>
             </div>
 
             {/* Timeline Item 2 */}
             <div className="flex items-start space-x-4 opacity-0 animate-fadeInUp animation-delay-200">
-              <div className="w-2.5 h-2.5 mt-1 rounded-full bg-green-500"></div>
+              <div className="w-2.5 h-2.5 mt-1 rounded-full text-gray-900"><HiCheckCircle/></div>
               <div>
                 <p className="text-lg font-semibold text-gray-800 dark:text-gray-100">New Admin Panel Released</p>
-                <p className="text-sm text-gray-600 dark:text-gray-200">March 20, 2025 — Robust controls for map and pin management.</p>
+                <p className="text-sm font-medium italic text-yellow-500 dark:text-gray-200">March 20, 2025 — Robust controls for map and pin management.</p>
               </div>
             </div>
 
             {/* Timeline Item 3 */}
             <div className="flex items-start space-x-4 opacity-0 animate-fadeInUp animation-delay-400">
-              <div className="w-2.5 h-2.5 mt-1 rounded-full bg-green-500"></div>
+              <div className="w-2.5 h-2.5 mt-1 rounded-full text-gray-900"><HiCheckCircle/></div>
               <div>
                 <p className="text-lg font-semibold text-gray-800 dark:text-gray-100">Search & Filter Improvements</p>
-                <p className="text-sm text-gray-600 dark:text-gray-200">April 5, 2025 — Enhanced filters for better experience.</p>
+                <p className="text-sm font-medium italic text-yellow-500 dark:text-gray-200">April 5, 2025 — Enhanced filters for better experience.</p>
               </div>
             </div>
           </div>
