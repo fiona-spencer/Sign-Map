@@ -2,9 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import CreateReport from '../components/createReport';
 import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, TabItem, Tabs, Button } from 'flowbite-react';
 import { HiClipboardList, HiUserAdd } from 'react-icons/hi';
-import {BsCodeSlash} from 'react-icons/bs'
-import { MdDashboard } from 'react-icons/md';
-import { HiUserCircle } from 'react-icons/hi';
+import {BsCodeSlash, BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx} from 'react-icons/bs'
 import JsonUpload from '../components/json_upload'; 
 import CsvUpload from '../components/csv_upload';
 import FileUploadPreview from '../components/FileUploadPreview';
@@ -158,22 +156,22 @@ const hasAccess = currentUser?.userType === 'admin' || currentUser?.userType ===
   <Tabs aria-label="Upload Tabs" variant="default" ref={tabsRef} onActiveTabChange={(tab) => setActiveTab(tab)}>
     
     {/* JSON Upload Tab */}
-    <TabItem active={activeTab === 0} title="JSON Upload" icon={HiClipboardList}>
+    <TabItem active={activeTab === 0} title="JSON Upload" icon={BsFiletypeJson}>
       <JsonUpload />
     </TabItem>
 
     {/* CSV Upload Tab */}
-    <TabItem active={activeTab === 1} title="CSV Upload" icon={MdDashboard}>
+    <TabItem active={activeTab === 1} title="CSV Upload" icon={BsFiletypeCsv}>
       <CsvUpload />
     </TabItem>
 
     {/* Excel Upload Tab */}
-    <TabItem active={activeTab === 2} title="Excel Upload" icon={HiUserCircle}>
+    <TabItem active={activeTab === 2} title="Excel Upload" icon={BsFiletypeXlsx}>
       <ExcelUpload />
     </TabItem>
 
     {/* Example Report Tab */}
-    <TabItem title="Example Report" icon={HiUserCircle}>
+    <TabItem title="Example Report" icon={HiClipboardList}>
       <div className="my-6">
         <label htmlFor="address" className="block text-xl font-semibold text-gray-700 dark:text-gray-300 mb-3">Address</label>
         <input
@@ -281,7 +279,7 @@ const hasAccess = currentUser?.userType === 'admin' || currentUser?.userType ===
     </AccordionTitle>
     <AccordionContent className="text-gray-700 dark:text-gray-300 p-4">
     <ul class="space-y-4 text-gray-700 dark:text-gray-300">
-  <li class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+  <li class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm bg-slate-100">
     <h3 class="font-semibold text-lg text-blue-600">JSON (.json)</h3>
     <p class="text-sm mt-2">
       <strong>What it is:</strong> JSON (JavaScript Object Notation) is a lightweight data-interchange format that's easy for both humans and machines to read and write. It stores data in a key-value pair structure and is commonly used for APIs, configuration files, and databases.
@@ -294,7 +292,7 @@ const hasAccess = currentUser?.userType === 'admin' || currentUser?.userType ===
     </p>
   </li>
   
-  <li class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+  <li class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm bg-slate-100">
     <h3 class="font-semibold text-lg text-blue-600">CSV (.csv)</h3>
     <p class="text-sm mt-2">
       <strong>What it is:</strong> CSV stands for Comma-Separated Values. It’s a simple text format where each row represents a new record, and commas separate the data within each row. It's commonly used for storing tabular data, like spreadsheets or database exports.
@@ -307,7 +305,7 @@ const hasAccess = currentUser?.userType === 'admin' || currentUser?.userType ===
     </p>
   </li>
   
-  <li class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+  <li class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm bg-slate-100">
     <h3 class="font-semibold text-lg text-blue-600">Excel (.xlsx)</h3>
     <p class="text-sm mt-2">
       <strong>What it is:</strong> Excel files (.xlsx) are used to store data in a spreadsheet format. This format supports multiple sheets, formulas, graphs, and other features typical of spreadsheet applications like Microsoft Excel.
@@ -329,7 +327,7 @@ const hasAccess = currentUser?.userType === 'admin' || currentUser?.userType ===
       Submit Dataset to Map
     </AccordionTitle>
     <AccordionContent className="text-gray-700 dark:text-gray-300 p-4">
-    <ul className="list-disc pl-5 text-xs sm:text-sm text-gray-700 dark:text-gray-300 space-y-1">
+    <ul className="list-disc pl-5 text-sm md:text-md text-gray-700 dark:text-gray-300 space-y-1">
   <li>
     Navigate to the upload tab for <strong>JSON</strong>, <strong>CSV</strong>, or <strong>Excel</strong> file formats and upload your dataset.
   </li>
