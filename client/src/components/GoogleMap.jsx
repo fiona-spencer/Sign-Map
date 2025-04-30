@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import 'react-quill/dist/quill.snow.css';
-import CreateReport from './createReport';
+import CreateReport from './CreateReport';
 import ShowPins from './ShowPins';
 import { ReportDetailsCard } from './ReportDetailsCard';
 import { Alert } from 'flowbite-react';

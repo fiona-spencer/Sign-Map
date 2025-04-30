@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import CreateReport from '../components/createReport';
+import CreateReport from '../components/CreateReport';
 import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, TabItem, Tabs, Button } from 'flowbite-react';
 import { HiClipboardList, HiUserAdd } from 'react-icons/hi';
 import {BsCodeSlash, BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx} from 'react-icons/bs'
