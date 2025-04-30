@@ -3,7 +3,7 @@ import { Card, Modal } from 'flowbite-react';
 
 //Images
 import mapPins from '../assets/mapPins.png'
-import createReport from '../assets/CreateReport.png'
+import createReport from '../assets/createReport.png'
 import filterMap from '../assets/filterMap.png'
 import spreedsheet from '../assets/spreedsheet.png'
 import clickImage from '../assets/clickImage.png'
