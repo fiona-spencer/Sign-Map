@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import { fetchLatLng } from "../../../api/utils/geocoding";
+
 
 export default function CreatePinsFromFile({
   parsedPins,
@@ -15,6 +17,16 @@ export default function CreatePinsFromFile({
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const createPin = async (dataToSend) => {
+    if (dataToSend.location.lat === 0 && dataToSend.location.lng === 0) {
+      try {
+        const { lat, lng } = await fetchLatLng(dataToSend.location.address);
+        dataToSend.location.lat = lat;
+        dataToSend.location.lng = lng;
+      } catch (err) {
+        throw new Error(`Geocoding failed for address: ${dataToSend.location.address}`);
+      }
+    }
+  
     const res = await fetch('/api/pin/createPin', {
       method: 'POST',
       headers: {
@@ -23,11 +35,12 @@ export default function CreatePinsFromFile({
       },
       body: JSON.stringify(dataToSend),
     });
-
+  
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Failed to create pin');
     return data;
   };
+  
 
   const createPinsInBatch = async (pinsToCreate) => {
     try {

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import { useSelector } from "react-redux";
-import { fetchLatLng } from "../../../api/utils/geocoding";
 import CreatePinsFromFile from "./CreatePinsFromFile";
 import { Alert } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
@@ -25,18 +24,12 @@ const CsvUpload = () => {
 
   
 
-  const csvString = `Populus ID,First Name,Last Name,Civic Address,St Num,St Name,City ,Province,Postal Code,City,Province,Postal Code (Mailing Address),\Phone Number,Email
+  const csvString = `Populus ID,First Name,Last Name,Civic Address,St Num,St Name,City (Civic Address),Province (Civic Address),Postal Code (Civic Address),City (Mailing Address),Province (Mailing Address),Postal Code (Mailing Address),Preferred Phone Number,Preferred Email
 2707146,Joanna,Kovats,3rd Fl-41 1st Ave,3rd Fl-41,1st Ave,Toronto,ON,M4M1W7,Toronto,ON,M4M1W7,416-992-3233,joakov_2011@yahoo.ca
 16266509,Anne,Wordsworth,76,1st Ave ,76 1st Av,ON,M4M1W8,76 1st Ave,ON,M4M1W8,647-208-7883,anwords@hotmail.com,
 16268444,Minh Phi,Duong,79 1st Ave,79,1st Ave ,Toronto,ON,M4M1W9,Toronto,ON,M4M1W9,416-462-0683,
-2072812,Michael,Evans,153 1st Ave,153,1st Ave ,Toronto,ON,M4M1X2,Toronto,ON,M4M1X2,289-259-9752,mikevans75@gmail.com
-19088137,Meeley,Chan,166 1st Ave,166,1st Ave ,Toronto,ON,M4K1B5,Toronto,ON,M4K1B5,416-385-8065,meeleyc@hotmail.com
 16267668,Lesley,Ballantyne-Smith,181,1st Ave ,181 1st Av,ON,M4M1X3,181 1st Ave,ON,M4M1X3,416-778-9534,ballantyne-smith@sympatico.ca,
 16267883,Susan,Murray,212 1st Ave,212,1st Ave ,Toronto,ON,M4M1X4,Toronto,ON,M4M1X4,437-775-1513,tamcairn@yahoo.ca
-8458500,Karine,Lavallee,217 1st Ave,217,1st Ave ,Toronto,ON,M4M1X5,Toronto,ON,M4M1X5,416-843-6222,lavallee_k@yahoo.ca
-9460702,Parrish,Balm,229 1st Ave,229,1st Ave ,Toronto,ON,M4M1X5,Toronto,ON,M4M1X5,416-300-2016,parrish.balm@tdsb.on.ca
-15976421,Barbara,Vari,177 1/2 Bain Ave ,177,45293 Bain Ave,Toronto,ON,M4K1E9,Toronto,ON,M4K1E9,416-463-5260,barbvari@me.com
-11063983,Zhao,Pan,39 1/2 Blake St ,39,45293 Blake St,Toronto,ON,M4J3E2,Toronto,ON,M4J3E2,,
 22740983,Chloe,Brushwood-Rose,243,45293 Booth Ave,243 1/2 Av Booth,ON,M4M2M7,243 1/2 Booth Ave,ON,M4M2M7,647-393-6593,brushwoodrose@gmail.com,
   ... (add more rows if desired)`;
   
@@ -134,7 +127,8 @@ const CsvUpload = () => {
                   const email = row["Preferred Email"] || "N/A";
                   const phone = row["Preferred Phone Number"] || "N/A";
             
-                  const { lat, lng } = await fetchLatLng(address);
+                  const lat = 0;
+                  const lng = 0;
             
                   if (aptNum) {
                     address = `${aptNum} (apt) ${streetNumber} (st.) ${streetName}, ${city}, ${province} ${postalCode}, Canada`;
@@ -207,8 +201,6 @@ const CsvUpload = () => {
 
   return (
     <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-     <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Example JSON</h2>
-      {/* Copy JSON Box */}
       <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Example CSV Format</h2>
 <div className="relative">
   <label htmlFor="csv-copy-text" className="sr-only">CSV Example</label>

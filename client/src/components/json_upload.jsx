@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Alert } from "flowbite-react"; // Assuming you have flowbite installed
 import { HiInformationCircle } from "react-icons/hi"; // Assuming you're using react-icons for icons
 import CreatePinsFromFile from './CreatePinsFromFile'; // Adjust the import path for CreatePinsFromFile component
+import { useSelector } from "react-redux";
 
 export default function JsonUpload() {
   const [copied, setCopied] = useState(false);
@@ -11,23 +12,26 @@ export default function JsonUpload() {
   const [isValid, setIsValid] = useState(true);
   const [error, setError] = useState(null);
   const [publishError, setPublishError] = useState(null);
-  const [currentUser, setCurrentUser] = useState({});
-
+  const { currentUser } = useSelector((state) => state.user);
   const jsonData = [
     {
-      contactName: "John Smith",
-      address: "350 Victoria St, Toronto, ON M5B 2K3, Canada",
-      contactEmail: "johnsmith@example.com",
-      contactPhoneNumber: "+1-647-555-9911",
-      image: "https://via.placeholder.com/100x100.png?text=Emily",
-    },
-    {
-      contactName: "Sally Joe",
-      address: "100 King St W, Toronto, ON M5X 1A9, Canada",
-      contactEmail: "sally.joek@example.com",
-      contactPhoneNumber: "416-555-8822",
+      "Populus ID": "2707146",
+      "First Name": "Joanna",
+      "Last Name": "Kovats",
+      "Civic Address": "3rd Fl-41 1st Ave",
+      "St Num": "3rd Fl-41",
+      "St Name": "1st Ave",
+      "City (Civic Address)": "Toronto",
+      "Province (Civic Address)": "ON",
+      "Postal Code (Civic Address)": "M4M1W7",
+      "City (Mailing Address)": "Toronto",
+      "Province (Mailing Address)": "ON",
+      "Postal Code (Mailing Address)": "M4M1W7",
+      "Preferred Phone Number": "416-992-3233",
+      "Preferred Email": "joakov_2011@yahoo.ca"
     }
-  ];
+  ]
+  ;
 
   const jsonString = JSON.stringify(jsonData, null, 2);
 
@@ -45,54 +49,82 @@ export default function JsonUpload() {
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
+  
     try {
       const text = await file.text();
       const data = JSON.parse(text);
-
-      if (!Array.isArray(data) || !data.every(item => item.contactName && item.address)) {
-        throw new Error('Invalid format. Each entry must include contactName and address.');
+  
+      if (!Array.isArray(data) || !data.every(item =>
+        item["First Name"] && item["Last Name"] && item["Civic Address"]
+      )) {
+        throw new Error('Invalid format. Missing required fields.');
       }
-
+  
       setFileTitle(file.name);
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       const pins = [];
-
+  
       for (const entry of data) {
-        const validEmail = entry.contactEmail && emailRegex.test(entry.contactEmail) ? entry.contactEmail : null;
-        const latLngData = await fetchLatLng(entry.address);
-
-        let rawDigits = entry.contactPhoneNumber?.replace(/\D/g, '');
-        if (rawDigits?.startsWith('1')) rawDigits = rawDigits.slice(1);
-
-        const formattedPhone = rawDigits?.length === 10
-          ? `${rawDigits.slice(0, 3)}-${rawDigits.slice(3, 6)}-${rawDigits.slice(6)}`
-          : null;
-
+        const firstName = entry["First Name"].trim();
+        const lastName = entry["Last Name"].trim();
+        const fullName = `${firstName} ${lastName}`.trim();
+  
+        // Extract and normalize address parts
+        let streetNumber = entry["St Num"]?.trim() || "";
+        const streetName = entry["St Name"]?.trim() || "";
+        const city = entry["City (Civic Address)"]?.trim() || "";
+        const province = entry["Province (Civic Address)"]?.trim() || "";
+        const postalCode = entry["Postal Code (Civic Address)"]?.trim() || "";
+        let aptNum = null;
+  
+        // Detect and extract apartment/unit prefix from streetNumber
+        const hyphenOrSpaceMatch = streetNumber.match(/^([A-Za-z-]+-\d+)(?:[\s-])?(\d+)$/);
+        if (hyphenOrSpaceMatch) {
+          aptNum = hyphenOrSpaceMatch[1];        // e.g., "B-25"
+          streetNumber = hyphenOrSpaceMatch[2];  // e.g., "9"
+        }
+  
+        // Format full civic address
+        let address = `${streetNumber} ${streetName}, ${city}, ${province} ${postalCode}, Canada`;
+        if (aptNum) {
+          address = `${aptNum} (apt) ${streetNumber} (st.) ${streetName}, ${city}, ${province} ${postalCode}, Canada`;
+        }
+        address = address.replace(/\s*,\s*/g, ", ").trim();
+  
+        // Process phone and email
+        const phoneRaw = entry["Preferred Phone Number"]?.replace(/\D/g, '');
+        const email = emailRegex.test(entry["Preferred Email"] || '') ? entry["Preferred Email"] : 'email error';
+        const formattedPhone = phoneRaw?.length === 10
+          ? `${phoneRaw.slice(0, 3)}-${phoneRaw.slice(3, 6)}-${phoneRaw.slice(6)}`
+          : 'phone# error';
+  
+        // Build pin
         pins.push({
+          populusId: entry["Populus ID"], // Adding Populus ID here
           createdBy: currentUser?.username || 'Unknown',
           location: {
-            address: entry.address,
-            lat: latLngData.lat || 0,
-            lng: latLngData.lng || 0,
+            address,
+            lat: 0,
+            lng: 0,
             info: {
-              title: entry.contactName,
-              contactName: entry.contactName,
-              contactEmail: validEmail || 'email error',
-              contactPhoneNumber: formattedPhone || 'phone# error',
+              title: fullName,
+              contactName: fullName,
+              contactEmail: email,
+              contactPhoneNumber: formattedPhone,
               description: 'N/A',
               icon: 'default',
-              image: entry.image?.trim() || 'N/A',
+              image: 'N/A',
+              fileName: file.name,
             },
             status: 'pending',
           },
-          phoneNumber: formattedPhone || 'phone# error',
-          email: validEmail || 'email error',
+          phoneNumber: formattedPhone,
+          email,
           createdAt: new Date().toLocaleDateString('en-US'),
           status: 'pending',
         });
       }
-
+  
       setParsedPins(pins);
       const hasError = pins.some(pin => pin.email === 'email error' || pin.phoneNumber === 'phone# error');
       setIsValid(!hasError);
@@ -105,6 +137,8 @@ export default function JsonUpload() {
       setStatusMessage('Invalid file format or data.');
     }
   };
+  
+  
 
   return (
     <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
@@ -181,35 +215,32 @@ export default function JsonUpload() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-full table-auto border border-collapse text-xs text-center">
-              <thead className="bg-gray-100 dark:bg-gray-700">
-                <tr>
-                  <th>Contact Name</th>
-                  <th>Address</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Created At</th>
-                  <th>Image</th>
-                </tr>
-              </thead>
-              <tbody>
-                {parsedPins.map((pin, idx) => (
-                  <tr key={idx} className="border-t dark:border-gray-600">
-                    <td>{pin.location.info.contactName}</td>
-                    <td>{pin.location.address}</td>
-                    <td className={pin.email === 'email error' ? 'text-red-500' : ''}>{pin.email}</td>
-                    <td className={pin.phoneNumber === 'phone# error' ? 'text-red-500' : ''}>{pin.phoneNumber}</td>
-                    <td>{pin.createdAt}</td>
-                    <td>
-                      {pin.location.info.image === 'N/A' ? 'N/A' : (
-                        <img src={pin.location.info.image} alt="Pin" className="w-12 h-12 object-cover mx-auto" />
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+  <table className="min-w-full table-auto border border-collapse text-xs text-center">
+    <thead className="bg-gray-100 dark:bg-gray-700">
+      <tr>
+        <th>Populus ID</th>
+        <th>Contact Name</th>
+        <th>Address</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Created At</th>
+      </tr>
+    </thead>
+    <tbody>
+      {parsedPins.map((pin, idx) => (
+        <tr key={idx} className="border-t dark:border-gray-600">
+          <td>{pin.populusId}</td> {/* Display Populus ID here */}
+          <td>{pin.location.info.contactName}</td>
+          <td>{pin.location.address}</td>
+          <td className={pin.email === 'email error' ? 'text-red-500' : ''}>{pin.email}</td>
+          <td className={pin.phoneNumber === 'phone# error' ? 'text-red-500' : ''}>{pin.phoneNumber}</td>
+          <td>{pin.createdAt}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
         </>
       )}
 
