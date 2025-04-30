@@ -27,6 +27,7 @@ export default function StartHere() {
       <h1 className="text-3xl font-semibold text-center mb-4">Welcome! Please Sign In or Create an Account</h1>
       <div className="flex justify-center mb-10">
           <Button
+          href='/'
             color="green"
             pill
             type="submit"
@@ -93,7 +94,7 @@ export default function StartHere() {
               <CheckItem label="Manage user and pin database (edit, delete, or send emails)" />
               <CheckItem label="Inbox acceptance to change the status of pins" />
             </ul>
-            <Button color="dark" pill className="inline-flex w-full justify-center text-white">
+            <Button href="/signup" color="dark" pill className="inline-flex w-full justify-center text-white">
               Choose Admin Plan
             </Button>
           </Card>

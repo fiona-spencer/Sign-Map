@@ -1,87 +1,181 @@
 import React, { useState } from 'react';
 import { Timeline, TimelineItem, TimelinePoint, TimelineContent, TimelineTime, TimelineTitle, TimelineBody, Button, Card } from 'flowbite-react';
-import { HiCalendar, HiArrowNarrowRight } from 'react-icons/hi';
+import { HiCalendar, HiArrowNarrowRight, HiInformationCircle, HiOutlineInformationCircle } from 'react-icons/hi';
 import CNTower from '../assets/CNTower.jpg'; // Adjust path as needed
+import { MdAddTask } from "react-icons/md";
+import dataImage from '../assets/data.jpeg'
+import collaboration from '../assets/collaboration.jpg'
+import smartCity from '../assets/smartcity.jpg'
+
+
 
 export default function ReleaseNotes() {
   const [hovered, setHovered] = useState(false);
+
+  const visionCards = [
+    {
+      title: "Empowering Data-Driven Decision Making",
+      description:
+        "We aim to simplify location-based insights through intuitive tools that turn your data into action.",
+      image: dataImage,
+    },
+    {
+      title: "Enhancing Transparency & Collaboration",
+      description:
+        "Our platform fosters trust and collaboration by enabling clear data reporting and shared access.",
+      image: collaboration,
+    },
+    {
+      title: "Building Tools for Smarter Cities",
+      description:
+        "We’re committed to helping communities thrive by making geographic data accessible and impactful.",
+      image: smartCity,
+    },
+  ];
+  
 
   return (
     <div className="px-10 pt-12">
       {/* Centered Timeline */}
       <div className="mb-12 flex justify-center">
         <div className="w-full max-w-3xl">
-          <Timeline>
-            <TimelineItem>
-              <TimelinePoint icon={HiCalendar} />
-              <TimelineContent>
-                <TimelineTime>February 2022</TimelineTime>
-                <TimelineTitle>Application UI code in Tailwind CSS</TimelineTitle>
-                <TimelineBody>
-                  Get access to over 20+ pages including a dashboard layout, charts, kanban board, calendar, and more.
-                </TimelineBody>
-                <Button color="gray" size="sm">
-                  Learn More
+          <div className="text-6xl font-extrabold pb-4">Feature Release Note</div>
+          <div className="text-3xl font-semibold pb-8">  Today is {" "}
+  {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+</div>
+        <Timeline>
+        
+{/* Initial Launch */}
+<TimelineItem className=''>
+  <TimelinePoint icon={MdAddTask}/>
+  <TimelineContent>
+    <TimelineTime>April 2025</TimelineTime>
+    <TimelineTitle>Populus ID Mapping App Launch</TimelineTitle>
+    <TimelineBody>
+      Initial release of the site with functionality to map Populus ID data and view status updates on the map.
+    </TimelineBody>
+  </TimelineContent>
+  <Button
+          href='/datasheets'
+            color="light"
+            pill
+            className="items-center group transition-all duration-300  hover:bg-green-400 dark:hover:bg-green-400"
+          >  Learn More
                   <HiArrowNarrowRight className="ml-2 h-3 w-3" />
                 </Button>
-              </TimelineContent>
-            </TimelineItem>
+</TimelineItem>
 
-            <TimelineItem>
-              <TimelinePoint icon={HiCalendar} />
-              <TimelineContent>
-                <TimelineTime>March 2022</TimelineTime>
-                <TimelineTitle>Marketing UI design in Figma</TimelineTitle>
-                <TimelineBody>
-                  Components are first designed in Figma with full parity in the Tailwind implementation.
-                </TimelineBody>
-              </TimelineContent>
-            </TimelineItem>
+{/* Feature: Cluster Analysis */}
+<TimelineItem>
+  <TimelinePoint icon={MdAddTask} />
+  <TimelineContent>
+    <TimelineTime>May 2025</TimelineTime>
+    <TimelineTitle>Cluster Analysis & Heat Mapping</TimelineTitle>
+    <TimelineBody>
+      Added visual cluster grouping of pins and interactive heatmap overlays to help analyze geographic trends.
+    </TimelineBody>
+  </TimelineContent>
+  <Button
+          href='/datasheets'
+            color="light"
+            pill
+            className=" items-center group transition-all duration-300 hover:bg-green-400 dark:hover:bg-green-400"
+          >                  Learn More
+                  <HiArrowNarrowRight className="ml-2 h-3 w-3" />
+                </Button>
+</TimelineItem>
 
-            <TimelineItem>
-              <TimelinePoint icon={HiCalendar} />
-              <TimelineContent>
-                <TimelineTime>April 2022</TimelineTime>
-                <TimelineTitle>E-Commerce UI code in Tailwind CSS</TimelineTitle>
-                <TimelineBody>
-                  Interactive elements built on top of Tailwind CSS.
-                </TimelineBody>
-              </TimelineContent>
-            </TimelineItem>
-          </Timeline>
+{/* Feature: Data Export */}
+<TimelineItem>
+  <TimelinePoint icon={MdAddTask} />
+  <TimelineContent>
+    <TimelineTime>May 2025</TimelineTime>
+    <TimelineTitle>Download Filtered Results</TimelineTitle>
+    <TimelineBody>
+      Users can now download filtered results in both Excel and PDF formats.
+    </TimelineBody>
+  </TimelineContent>
+</TimelineItem>
+
+{/* Upcoming: Site Analytics */}
+<TimelineItem>
+  <TimelinePoint icon={HiCalendar}/>
+  <TimelineContent>
+    <TimelineTime>Coming Soon</TimelineTime>
+    <TimelineTitle>Site Analytics Dashboard</TimelineTitle>
+    <TimelineBody>
+      Admins will have access to usage metrics, activity logs, and map interaction analytics.
+    </TimelineBody>
+  </TimelineContent>
+</TimelineItem>
+
+{/* Upcoming: Transactions Page */}
+<TimelineItem>
+  <TimelinePoint icon={HiCalendar} />
+  <TimelineContent>
+    <TimelineTime>Coming Soon</TimelineTime>
+    <TimelineTitle>Admin Transactions Page</TimelineTitle>
+    <TimelineBody>
+      Track and view user actions, downloads, and transactional events across the platform.
+    </TimelineBody>
+  </TimelineContent>
+</TimelineItem>
+
+{/* Upcoming: Favourites */}
+<TimelineItem>
+  <TimelinePoint icon={HiCalendar} />
+  <TimelineContent>
+    <TimelineTime>Coming Soon</TimelineTime>
+    <TimelineTitle>User Favourites Feature</TimelineTitle>
+    <TimelineBody>
+      Users will be able to mark and save favourite map items or searches for quick access.
+    </TimelineBody>
+  </TimelineContent>
+</TimelineItem>
+
+{/* Upcoming: "Your Data" Page */}
+<TimelineItem>
+  <TimelinePoint icon={HiCalendar} />
+  <TimelineContent>
+    <TimelineTime>Coming Soon</TimelineTime>
+    <TimelineTitle>Your Data Dashboard</TimelineTitle>
+    <TimelineBody>
+      Personalized view for each user showing uploaded datasets, saved reports, and recent activity.
+    </TimelineBody>
+  </TimelineContent>
+</TimelineItem>
+
+</Timeline>
+
         </div>
       </div>
 
       {/* Feature List Cards */}
-      <div className="flex flex-col items-center mt-8">
-        <div
-          className="flex flex-col items-center w-full max-w-xl group"
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => setHovered(false)}
+      <div className="flex justify-center px-6 mt-10">
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full">
+    {visionCards.map((card, index) => (
+      <div
+        key={index}
+        className="flex flex-col items-center group transition-transform duration-300 ease-in-out hover:scale-[1.02] mb-10"
+      >
+        <Card
+          className="w-full min-h-[420px]"
+          imgAlt={card.title}
+          imgSrc={card.image}
         >
-          <Card
-            className="w-full transition-transform duration-300 ease-in-out group-hover:scale-[1.02]"
-            imgAlt="CN Tower at dusk"
-            imgSrc={CNTower}
-            width={500}
-            height={500}
-          >
-            <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-              Noteworthy technology acquisitions 2021
-            </h5>
-            <p className="font-normal text-gray-700 dark:text-gray-400">
-              Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.
-            </p>
-          </Card>
-
-          <div
-            className={`overflow-hidden transition-all duration-300 ease-in-out ${
-              hovered ? 'max-h-40 opacity-100 mt-4' : 'max-h-0 opacity-0'
-            } w-full bg-white p-4 rounded-lg shadow-md dark:bg-gray-800`}
-          >
-          </div>
-        </div>
+          <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white text-center">
+            {card.title}
+          </h5>
+          <p className="font-normal text-gray-700 dark:text-gray-400 text-center">
+            {card.description}
+          </p>
+        </Card>
       </div>
+    ))}
+  </div>
+</div>
+
+
     </div>
   );
 }
