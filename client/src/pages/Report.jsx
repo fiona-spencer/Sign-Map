@@ -317,7 +317,7 @@ const hasAccess = currentUser?.userType === 'admin' || currentUser?.userType ===
     </AccordionTitle>
     <AccordionContent className="text-gray-700 dark:text-gray-300 p-4">
     <ul class="space-y-4 text-gray-700 dark:text-gray-300">
-  <li class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm bg-slate-100">
+  <li class=" dark:bg-gray-800 p-4 rounded-lg shadow-sm bg-slate-100">
     <h3 class="font-semibold text-lg text-blue-600">JSON (.json)</h3>
     <p class="text-sm mt-2">
       <strong>What it is:</strong> JSON (JavaScript Object Notation) is a lightweight data-interchange format that's easy for both humans and machines to read and write. It stores data in a key-value pair structure and is commonly used for APIs, configuration files, and databases.
@@ -330,7 +330,7 @@ const hasAccess = currentUser?.userType === 'admin' || currentUser?.userType ===
     </p>
   </li>
   
-  <li class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm bg-slate-100">
+  <li class="dark:bg-gray-800 p-4 rounded-lg shadow-sm bg-slate-100">
     <h3 class="font-semibold text-lg text-blue-600">CSV (.csv)</h3>
     <p class="text-sm mt-2">
       <strong>What it is:</strong> CSV stands for Comma-Separated Values. It’s a simple text format where each row represents a new record, and commas separate the data within each row. It's commonly used for storing tabular data, like spreadsheets or database exports.
@@ -343,7 +343,7 @@ const hasAccess = currentUser?.userType === 'admin' || currentUser?.userType ===
     </p>
   </li>
   
-  <li class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm bg-slate-100">
+  <li class=" dark:bg-gray-800 p-4 rounded-lg shadow-sm bg-slate-100">
     <h3 class="font-semibold text-lg text-blue-600">Excel (.xlsx)</h3>
     <p class="text-sm mt-2">
       <strong>What it is:</strong> Excel files (.xlsx) are used to store data in a spreadsheet format. This format supports multiple sheets, formulas, graphs, and other features typical of spreadsheet applications like Microsoft Excel.
