@@ -1,308 +1,124 @@
-import CNTower from '../../assets/CNTower.jpg'
-import JsonUpload from '../json_upload'; // make sure the path is correct
-import { HiMoon, HiSun, HiDownload, HiUpload, HiMail, HiMap, HiPhone, HiDesktopComputer } from "react-icons/hi";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import FeatureGrid from '../FeatureGrid';
 import {
   Button,
-  Timeline,
-  TimelineBody,
-  TimelineContent,
-  TimelineItem,
-  TimelinePoint,
-  TimelineTime,
-  TimelineTitle,
   Card
 } from "flowbite-react";
-import { HiArrowNarrowRight, HiCalendar } from "react-icons/hi";
+import { HiOutlineArrowRight} from 'react-icons/hi';
 
 export default function StartHere() {
   const [hovered, setHovered] = useState(false);
 
+  // Dark Mode Handler
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    // Check localStorage or system preference for dark mode on page load
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode) {
+      setDarkMode(savedMode === 'true');
+    } else {
+      setDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+    }
+  }, []);
+
   return (
-    <div className="inline items-center justify-center p-6">
-      <h1 className="text-3xl font-semibold text-center mb-8">Welcome! Please Sign In or Create an Account</h1>
-      <p className="text-lg mb-6 text-center text-gray-700">
-        To get started, please sign in or create an account. Once you're logged in, you can choose one of the following account types.
-      </p>
+    <div className="grid items-center justify-center p-6 mt-10">
+      <h1 className="text-3xl font-semibold text-center mb-4">Welcome! Please Sign In or Create an Account</h1>
+      <div className="flex justify-center mb-10">
+          <Button
+            color="green"
+            pill
+            type="submit"
+            className=" py-2 px-24 flex items-center group transition-all duration-300"
+          >
+            Go Back to Home
+            <HiOutlineArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-2" />
+          </Button>
+        </div> 
 
-
-      {/* Account Card Wrapper with Flex */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 justify-center lg:px-40 px-10">
-
-        {/* User Account Card Wrapper */}
+      {/* Account Card Wrapper */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-center lg:px-40 px-10">
+        {/* User Plan */}
         <div className="w-full">
-    <Card className="h-full flex flex-col justify-between bg-white shadow-lg z-20 dark:bg-gray-800 rounded-lg p-6 hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
-     <h5 className="mb-4 text-xl font-medium text-gray-500 dark:text-gray-400">User Account</h5>
+          <Card className="max-w-sm h-full flex flex-col justify-between shadow-lg z-20 dark:bg-gray-800 rounded-lg p-6 hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
+            <h5 className="mb-4 text-xl font-medium text-gray-500 dark:text-gray-400">User Plan</h5>
+            <div className="flex items-baseline text-gray-900 dark:text-white">
+              <span className="text-3xl font-semibold">$</span>
+              <span className="text-5xl font-extrabold tracking-tight">19</span>
+              <span className="ml-1 text-xl font-normal text-gray-500 dark:text-gray-400">/month</span>
+            </div>
+            <h2 className="italic text-sm">*free trial period</h2>
             <ul className="my-7 space-y-5">
-              <li className="flex space-x-3">
-                <svg
-                  className="h-5 w-5 shrink-0 text-cyan-600 dark:text-cyan-500"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">
-                  Access to most platform features
-                </span>
-              </li>
-              <li className="flex space-x-3">
-                <svg
-                  className="h-5 w-5 shrink-0 text-cyan-600 dark:text-cyan-500"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">
-                  Create and share content
-                </span>
-              </li>
+            <CheckItem label="Edit and save profile" />
+            <CheckItem label="Search entire dataset" />
+              <CheckItem label="Preview and upload datasets" />
+              <CheckItem label="Send data to map" />
+              <CheckItem label="Convert address to geolocation" />
+              <CheckItem label="Create reports on map" />
+              <CheckItem label="Dynamically search and filter map results" />
+              <CheckItem label="Download filtered data" />
+              <CheckItem label="Analyze clustered pins" />
+              <CheckItem label="Download PDF of clustered map" />
+              <CheckItem label="Manage user and pin database (edit, delete, or send emails)" strike />
+              <CheckItem label="Inbox acceptance to change the status of pins" strike />
             </ul>
-            <button
-              type="button"
-              className="inline-flex w-full justify-center rounded-lg bg-blue-600 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900"
-            >
-              Choose User
-            </button>
-          </Card>
-        </div>
-
-        {/* Admin Account Card Wrapper */}
-        <div className="w-full">
-    <Card className="h-full flex flex-col justify-between bg-white shadow-lg z-20 dark:bg-gray-800 rounded-lg p-6 hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
-     <h5 className="mb-4 text-xl font-medium text-gray-500 dark:text-gray-400">Admin Account</h5>
-            <ul className="my-7 space-y-5">
-              <li className="flex space-x-3">
-                <svg
-                  className="h-5 w-5 shrink-0 text-cyan-600 dark:text-cyan-500"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">
-                  Full access to the platform
-                </span>
-              </li>
-              <li className="flex space-x-3">
-                <svg
-                  className="h-5 w-5 shrink-0 text-cyan-600 dark:text-cyan-500"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">
-                  Manage users and settings
-                </span>
-              </li>
-              <li className="flex space-x-3">
-                <svg
-                  className="h-5 w-5 shrink-0 text-cyan-600 dark:text-cyan-500"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">
-                  Access advanced tools
-                </span>
-              </li>
-            </ul>
-            <button
-              type="button"
-              className="inline-flex w-full justify-center rounded-lg bg-green-600 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-200 dark:focus:ring-green-900"
-            >
-              Choose Admin
-            </button>
-          </Card>
-        </div>
-        </div>
-
-      {/* Timeline */}
-      <div className="px-10 pt-12">
-  {/* Centered Timeline */}
-  <div className="mb-12 flex justify-center">
-    <div className="w-full max-w-3xl">
-      <Timeline>
-        <TimelineItem>
-          <TimelinePoint icon={HiCalendar} />
-          <TimelineContent>
-            <TimelineTime>February 2022</TimelineTime>
-            <TimelineTitle>Application UI code in Tailwind CSS</TimelineTitle>
-            <TimelineBody>
-              Get access to over 20+ pages including a dashboard layout, charts, kanban board, calendar, and more.
-            </TimelineBody>
-            <Button color="gray" size="sm">
-              Learn More
-              <HiArrowNarrowRight className="ml-2 h-3 w-3" />
+            <Button href="/signup" color="dark" pill className="inline-flex w-full justify-center text-white">
+              Choose User Plan
             </Button>
-          </TimelineContent>
-        </TimelineItem>
+          </Card>
+        </div>
 
-        <TimelineItem>
-          <TimelinePoint icon={HiCalendar} />
-          <TimelineContent>
-            <TimelineTime>March 2022</TimelineTime>
-            <TimelineTitle>Marketing UI design in Figma</TimelineTitle>
-            <TimelineBody>
-              Components are first designed in Figma with full parity in the Tailwind implementation.
-            </TimelineBody>
-          </TimelineContent>
-        </TimelineItem>
-
-        <TimelineItem>
-          <TimelinePoint icon={HiCalendar} />
-          <TimelineContent>
-            <TimelineTime>April 2022</TimelineTime>
-            <TimelineTitle>E-Commerce UI code in Tailwind CSS</TimelineTitle>
-            <TimelineBody>
-              Interactive elements built on top of Tailwind CSS.
-            </TimelineBody>
-          </TimelineContent>
-        </TimelineItem>
-      </Timeline>
-    </div>
-  </div>
-
-
-      {/* Feature List Cards */}
-        <div className="flex flex-col items-center mt-8">
-      <div
-        className="flex flex-col items-center w-full max-w-xl group"
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-      >
-        <Card
-          className="w-full transition-transform duration-300 ease-in-out group-hover:scale-[1.02]"
-          imgAlt="CN Tower at dusk"
-          imgSrc={CNTower}
-          width={500} height={500}
-        >
-
-          <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            Noteworthy technology acquisitions 2021
-          </h5>
-          <p className="font-normal text-gray-700 dark:text-gray-400">
-            Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.
-          </p>
-        </Card>
-
-        {/* Reveal on hover with smooth animation */}
-        <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${
-            hovered ? 'max-h-40 opacity-100 mt-4' : 'max-h-0 opacity-0'
-          } w-full bg-white p-4 rounded-lg shadow-md dark:bg-gray-800`}
-        >
-          <JsonUpload />
+        {/* Admin Plan */}
+        <div className="w-full">
+          <Card className="max-w-sm h-full flex flex-col justify-between shadow-lg z-20 dark:bg-gray-800 rounded-lg p-6 hover:shadow-xl transition transform hover:scale-105 animate-fade-in">
+            <h5 className="mb-4 text-xl font-medium text-gray-500 dark:text-gray-400">Admin Plan</h5>
+            <div className="flex items-baseline text-gray-900 dark:text-white">
+              <span className="text-3xl font-semibold">$</span>
+              <span className="text-5xl font-extrabold tracking-tight">0</span>
+              <span className="ml-1 text-xl font-normal text-gray-500 dark:text-gray-400">/month</span>
+            </div>
+            <h2 className="italic text-sm">*Administrator credentials required</h2>
+            <ul className="my-7 space-y-5">
+              <CheckItem label="Edit and save profile" />
+              <CheckItem label="Search entire dataset" />
+              <CheckItem label="Preview and upload datasets" />
+              <CheckItem label="Send data to map" />
+              <CheckItem label="Convert address to geolocation" />
+              <CheckItem label="Create reports on map" />
+              <CheckItem label="Dynamically search and filter map results" />
+              <CheckItem label="Download filtered data" />
+              <CheckItem label="Analyze clustered pins" />
+              <CheckItem label="Download PDF of clustered map" />
+              <CheckItem label="Manage user and pin database (edit, delete, or send emails)" />
+              <CheckItem label="Inbox acceptance to change the status of pins" />
+            </ul>
+            <Button color="dark" pill className="inline-flex w-full justify-center text-white">
+              Choose Admin Plan
+            </Button>
+          </Card>
         </div>
       </div>
+
+      <FeatureGrid />
     </div>
-    </div>
+  );
+}
 
-    {/* Feature List Buttons */}
-    <div className="px-10 pt-12">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
-        {/* Dark Mode Toggle Button */}
-        <div className="flex flex-col items-center">
-          <button
-            className="p-6 rounded-lg bg-gray-800 text-white text-center w-full hover:bg-gray-900 transition-all duration-300"
-            aria-label="Toggle Dark Mode"
-          >
-            <HiMoon className="text-4xl mb-2" />
-            Dark Mode
-          </button>
-        </div>
+// ✅ Reusable Components
+function CheckIcon({ className = "text-cyan-600 dark:text-cyan-500" }) {
+  return (
+    <svg className={`h-5 w-5 shrink-0 ${className}`} fill="currentColor" viewBox="0 0 20 20">
+      <path fillRule="evenodd" clipRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
+    </svg>
+  );
+}
 
-        {/* Upload and Download Files Button */}
-        <div className="flex flex-col items-center">
-          <button
-            className="p-6 rounded-lg bg-blue-700 text-white text-center w-full hover:bg-blue-800 transition-all duration-300"
-            aria-label="Upload and Download Files"
-          >
-            <div className="flex items-center justify-center mb-2">
-              <HiUpload className="text-4xl mr-2" />
-              <HiDownload className="text-4xl ml-2" />
-            </div>
-            Upload/Download Files
-          </button>
-        </div>
-
-        {/* Send Emails to Update Users Button */}
-        <div className="flex flex-col items-center">
-          <button
-            className="p-6 rounded-lg bg-green-700 text-white text-center w-full hover:bg-green-800 transition-all duration-300"
-            aria-label="Send Emails"
-          >
-            <HiMail className="text-4xl mb-2" />
-            Send Emails to Users
-          </button>
-        </div>
-
-        {/* Dynamic Map Button */}
-        <div className="flex flex-col items-center">
-          <button
-            className="p-6 rounded-lg bg-orange-600 text-white text-center w-full hover:bg-orange-700 transition-all duration-300"
-            aria-label="Dynamic Map"
-          >
-            <HiMap className="text-4xl mb-2" />
-            Dynamic Map
-          </button>
-        </div>
-
-        {/* Cluster Optimization Button */}
-        <div className="flex flex-col items-center">
-          <button
-            className="p-6 rounded-lg bg-purple-600 text-white text-center w-full hover:bg-purple-700 transition-all duration-300"
-            aria-label="Cluster Optimization"
-          >
-            <HiMap className="text-4xl mb-2" />
-            Cluster Optimization
-          </button>
-        </div>
-
-        {/* Mobile and Web View Button */}
-        <div className="flex flex-col items-center">
-          <button
-            className="p-6 rounded-lg bg-teal-600 text-white text-center w-full hover:bg-teal-700 transition-all duration-300"
-            aria-label="Mobile and Web View"
-          >
-            <div className="flex items-center justify-center mb-2">
-              <HiPhone className="text-4xl mr-2" />
-              <HiDesktopComputer className="text-4xl ml-2" />
-            </div>
-            Mobile & Web View
-          </button>
-        </div>
-      </div>
-    </div>
-</div>
-
+function CheckItem({ label, strike = false }) {
+  return (
+    <li className={`flex space-x-3 ${strike ? "line-through decoration-gray-500" : ""}`}>
+      <CheckIcon className={strike ? "text-gray-400 dark:text-gray-500" : "text-cyan-600 dark:text-cyan-500"} />
+      <span className="text-base font-normal leading-tight text-gray-500 dark:text-gray-400">{label}</span>
+    </li>
   );
 }

@@ -34,6 +34,7 @@ export default function UserData() {
 
         const data = await response.json();
         setUsers(data.users);
+        console.log(data.users)
       } catch (error) {
         setError(error.message);
         console.error('Error fetching users:', error);
