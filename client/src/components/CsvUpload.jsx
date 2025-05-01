@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import { useSelector } from "react-redux";
-import CreatePinsFromFile from "./CreatePinsFromFile";
 import { Alert } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
