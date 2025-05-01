@@ -10,7 +10,7 @@ import TestPdf from '../components/TestPdf';
 import { useRef } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { HiArrowCircleDown, HiArrowCircleRight, HiCloudDownload } from 'react-icons/hi';
+import { HiArrowCircleDown, HiArrowCircleRight } from 'react-icons/hi';
 import { BsFilePdfFill } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 

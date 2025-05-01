@@ -1,18 +1,34 @@
 import React from 'react';
-import { MapContainer, TileLayer, LayersControl, LayerGroup, Circle, Marker, Popup } from 'react-leaflet';
-import L from 'leaflet'; // Import Leaflet to use custom divIcon
+import {
+  MapContainer,
+  TileLayer,
+  LayersControl,
+  LayerGroup,
+  Circle,
+  Marker,
+  Popup
+} from 'react-leaflet';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import pinIcon from '../assets/pin.png'; // ✅ Replace with your icon path
+
+// Define your custom pin icon
+const customPinIcon = L.icon({
+  iconUrl: pinIcon,
+  iconSize: [32, 32], // Width, Height
+  iconAnchor: [16, 32], // Where to "pin" the icon on the map
+  popupAnchor: [0, -32], // Where the popup appears relative to the icon
+});
 
 const MapView = ({ center, zoom, clusters, clusterSize, setMapInstance }) => {
   return (
-    <div
-    className="h-[500px] rounded overflow-hidden z-0 relative">
+    <div className="h-[500px] rounded overflow-hidden z-0 relative">
       <MapContainer
         className="h-full w-full rounded-lg z-10"
         center={center}
         zoom={zoom}
         scrollWheelZoom={true}
-        whenCreated={setMapInstance} // Set the map instance here
+        whenCreated={setMapInstance}
       >
         <TileLayer
           attribution='&copy; OpenStreetMap contributors'
@@ -23,16 +39,11 @@ const MapView = ({ center, zoom, clusters, clusterSize, setMapInstance }) => {
             clusters.map((cluster, idx) => (
               <LayersControl.Overlay key={idx} name={`Cluster ${idx + 1}`} checked>
                 <LayerGroup>
-                  {/* Circle for the cluster */}
-                  <div>
-
-                 
-                  <Circle id="exclude-circle"
+                  <Circle
                     center={cluster[0] ? [cluster[0].location?.lat, cluster[0].location?.lng] : [43.6954, -79.3810]}
                     pathOptions={{ color: 'red', fillColor: 'pink', fillOpacity: 0.5 }}
-                    radius={clusterSize*1.2}
+                    radius={clusterSize * 1.2}
                   />
-                  {/* Render the cluster index as a label inside the circle */}
                   <Marker
                     position={cluster[0] ? [cluster[0].location?.lat, cluster[0].location?.lng] : [43.6954, -79.3810]}
                     icon={L.divIcon({
@@ -41,13 +52,11 @@ const MapView = ({ center, zoom, clusters, clusterSize, setMapInstance }) => {
                       iconSize: [30, 30],
                     })}
                   />
-                   </div>
-                  {/* Render the pins inside the cluster */}
                   {cluster.map((pin, pinIdx) => {
                     const { lat, lng } = pin.location || {};
                     if (lat === 0 || lng === 0) return null;
                     return (
-                      <Marker key={pinIdx} position={[lat, lng]}>
+                      <Marker key={pinIdx} position={[lat, lng]} icon={customPinIcon}>
                         <Popup>
                           <strong>{pin.location?.info?.contactName || 'Unnamed Contact'}</strong><br />
                           {pin.location?.address}
