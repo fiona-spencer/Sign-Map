@@ -10,13 +10,13 @@ import clickImage from '../assets/clickImage.png'
 import cluster from '../assets/cluster.png'
 
 
-//Videos
-import searchVideo from '../assets/videos/search.mov'
-import reportVideo from '../assets/videos/createReport.mov'
-import clickVideo from '../assets/videos/click.mov'
-import filterVideo from '../assets/videos/filter.mov'
-import datasheetVideo from '../assets/videos/datasheet.mov'
-import clusterVideo from '../assets/videos/clusterPdf.mov'
+// //Videos
+// import searchVideo from '../assets/videos/search.mov'
+// import reportVideo from '../assets/videos/createReport.mov'
+// import clickVideo from '../assets/videos/click.mov'
+// import filterVideo from '../assets/videos/filter.mov'
+// import datasheetVideo from '../assets/videos/datasheet.mov'
+// import clusterVideo from '../assets/videos/clusterPdf.mov'
 
 
 export default function MapCards() {
@@ -27,37 +27,37 @@ export default function MapCards() {
     {
       imgSrc: mapPins,
       title: 'Search and View Map',
-      videoSrc: searchVideo,
+      // videoSrc: searchVideo,
       content: 'Dynamically view your data on the map with corresponding pins colours. Use google map to search addresses'
     },
     {
       imgSrc: createReport,
       title: 'Create a Report',
-      videoSrc: reportVideo,
+      // videoSrc: reportVideo,
       content: 'Pin a report on the map by clicking on the map or searching up an address.'
     },
     {
       imgSrc: filterMap,
       title: 'Filter the Pins and Map',
-      videoSrc: filterVideo,
+      // videoSrc: filterVideo,
       content: 'Dynamically filter pin result by: Status, Name Email, Phone Number, Postal Code, Street Name, and more ...'
     },
     {
       imgSrc: clickImage,
       title: 'Click Pin for More Info',
-      videoSrc: clickVideo,
+      // videoSrc: clickVideo,
       content: 'Click on a specific pin to open a get a more detailed review'
     },
     {
       imgSrc: spreedsheet,
       title: 'Dynamic Datasheet',
-      videoSrc: datasheetVideo,
+      // videoSrc: datasheetVideo,
       content: 'View your filtered results in a downloadable spreed sheet'
     },
     {
       imgSrc: cluster,
       title: 'Cluster Data and Export',
-      videoSrc: clusterVideo,
+      // videoSrc: clusterVideo,
       content: 'View your filtered dataset by clusters of area distance or postal code. Download the map and clustered results as a PDF'
     }
   ]);
@@ -104,13 +104,11 @@ export default function MapCards() {
 
 
 
-          {/* Hover section for extra controls or info */}
-          <div
+          {/* <div
   className={`overflow-hidden transition-all duration-300 ease-in-out ${
     hovered === index ? 'max-h-full opacity-100 mt-4 mb-10' : 'max-h-0 opacity-0'
   } w-full bg-[#13805186] p-2 rounded-lg shadow-md dark:bg-gray-800`}
 >
-  {/* Video Preview (optional, static video for now) */}
   <video
   className="w-full rounded flex"
   muted
@@ -122,7 +120,7 @@ export default function MapCards() {
   Your browser does not support the video tag.
 </video>
 
-</div>
+</div> */}
 
         </div>
       ))}

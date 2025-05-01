@@ -4,10 +4,10 @@ import previewImage from '../assets/preview.png';
 import uploadFile from '../assets/uploadFile.png';
 import submitFile from '../assets/submit.png';
 
-// Placeholder video
-import previewVideo from '../assets/videos/previewFile.mov'
-import uploadFileVideo from '../assets/videos/uploadFile.mov'
-import submitFileVideo from '../assets/videos/moveToMap.mov'
+// // Placeholder video
+// import previewVideo from '../assets/videos/previewFile.mov'
+// import uploadFileVideo from '../assets/videos/uploadFile.mov'
+// import submitFileVideo from '../assets/videos/moveToMap.mov'
 
 export default function FileCards() {
   const [hovered, setHovered] = useState(null);
@@ -19,19 +19,19 @@ export default function FileCards() {
       imgSrc: previewImage,
       title: 'Preview a File',
       content: 'Preview your dataset to confirm configuration is correct before uploading',
-      videoSrc: previewVideo
+      // videoSrc: previewVideo
     },
     {
       imgSrc: uploadFile,
       title: 'Upload a File',
       content: 'Upload a file in JSON, CSV, or Excel (.xlsx). Convert address to coordinate pins on a dynamic map with your data',
-      videoSrc: uploadFileVideo
+      // videoSrc: uploadFileVideo
     },
     {
       imgSrc: submitFile,
       title: 'Submit Data to Map',
       content: 'Send data to the dynamic map to view, submitted data will have a default status of "pending" for admin approval',
-      videoSrc: submitFileVideo
+      // videoSrc: submitFileVideo
     }
   ];
 
@@ -64,7 +64,7 @@ export default function FileCards() {
               </p>
             </Card>
 
-            {/* Hover Video Preview */}
+            {/* Hover Video Preview
             <div
               className={`overflow-hidden transition-all duration-300 ease-in-out ${
                 hovered === index ? 'max-h-full opacity-100 mt-4 mb-10' : 'max-h-0 opacity-0'
@@ -80,7 +80,7 @@ export default function FileCards() {
               >
                 Your browser does not support the video tag.
               </video>
-            </div>
+            </div> */}
           </div>
         ))}
       </div>
