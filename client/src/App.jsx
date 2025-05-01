@@ -11,12 +11,13 @@ import SuccessfullyCreated from "./pages/SuccessfullyCreated";
 import Profile from "./pages/Profile";
 import SearchPage from "./pages/SearchPage";
 import Datasheet from "./pages/Datasheet";
-import ContactForm from './components/ContactForm';
 
 // Components
 import Header from "./components/Header";
 import FooterCom from "./components/Footer";
 import Search from "./components/Search";
+import ContactForm from './components/ContactForm';
+
 
 //Settings Navbar
 //No User
