@@ -16,7 +16,7 @@ import Datasheet from "./pages/Datasheet";
 import Header from "./components/Header";
 import FooterCom from "./components/Footer";
 import Search from "./components/Search";
-import ContactForm from './components/ContactForm';
+import Contact from "./components/Contact";
 
 
 //Settings Navbar
@@ -71,7 +71,7 @@ function AppWrapper({ apiKey }) {
           <Route path="/report" element={<Report />} />
           <Route path="/successfullyCreated" element={<SuccessfullyCreated />} />
           <Route path="/search" element={<SearchPage />} />
-          <Route path="/sendEmail" element={<ContactForm />} />
+          <Route path="/sendEmail" element={<Contact />} />
           <Route path="/release" element={<ReleaseNotes />} />
           <Route
             path="/datasheets"

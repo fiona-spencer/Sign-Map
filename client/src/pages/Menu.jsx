@@ -9,9 +9,9 @@ import nightImage from '../assets/night.jpg';
 import trinityImage from '../assets/trinity.jpg';
 import islandImage from '../assets/toronto_island.jpg';
 import paiImage from '../assets/pai.jpg';
-import ContactForm from '../components/ContactForm'
 import MapCards from '../components/MapCards';
 import FileCards from '../components/FileCards';
+import Contact from '../components/Contact';
 
 
 export default function Menu() {
@@ -229,7 +229,7 @@ export default function Menu() {
 
 <div id='contactForm' className='items-center justify-center flex'>
 {/* Contact Form */}
-<ContactForm/>
+<Contact/>
 </div>
 
 
