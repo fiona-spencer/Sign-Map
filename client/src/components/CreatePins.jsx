@@ -4,7 +4,7 @@ import 'react-circular-progressbar/dist/styles.css';
 import { fetchLatLng } from "../../../api/utils/geocoding";
 
 
-export default function CreatePinsFromFile({
+export default function CreatePins({
   parsedPins,
   fileTitle,
   currentUser,

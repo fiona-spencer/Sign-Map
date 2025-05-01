@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { Alert } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
+import CreatePins from "./CreatePins";
 
 const CsvUpload = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -320,7 +321,7 @@ const CsvUpload = () => {
           </div>
 
           {parsedPins.length > 0 && isValid && !error && (
-            <CreatePinsFromFile
+            <CreatePins
               parsedPins={parsedPins}
               fileTitle={fileMeta.fileName}
               currentUser={currentUser}

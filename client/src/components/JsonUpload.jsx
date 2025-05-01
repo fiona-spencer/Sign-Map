@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Alert } from "flowbite-react"; // Assuming you have flowbite installed
 import { HiInformationCircle } from "react-icons/hi"; // Assuming you're using react-icons for icons
-import CreatePinsFromFile from './CreatePinsFromFile'; // Adjust the import path for CreatePinsFromFile component
 import { useSelector } from "react-redux";
+import CreatePins from "./CreatePins";
 
 export default function JsonUpload() {
   const [copied, setCopied] = useState(false);
@@ -247,7 +247,7 @@ export default function JsonUpload() {
 
 
       {parsedPins.length > 0 && isValid && !error && (
-        <CreatePinsFromFile
+        <CreatePins
           parsedPins={parsedPins}
           fileTitle={fileTitle}
           currentUser={currentUser}

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import * as XLSX from "xlsx";
 import { useSelector } from "react-redux";
-import CreatePinsFromFile from "./CreatePinsFromFile";
 import { Alert, Button } from "flowbite-react";
 import { HiInformationCircle } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
 import {BsFileEarmarkExcel} from 'react-icons/bs'
+import CreatePins from "./CreatePins";
 
 const ExcelUpload = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -337,7 +337,7 @@ const ExcelUpload = () => {
           </div>
 
           {parsedPins.length > 0 && isValid && !error && (
-            <CreatePinsFromFile
+            <CreatePins
               parsedPins={parsedPins}
               fileTitle={fileMeta.fileName}
               currentUser={currentUser}
