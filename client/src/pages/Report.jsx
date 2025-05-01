@@ -3,8 +3,8 @@ import CreateReport from '../components/CreateReport';
 import { Accordion, AccordionPanel, AccordionTitle, AccordionContent, TabItem, Tabs, Button } from 'flowbite-react';
 import { HiClipboardList, HiUserAdd } from 'react-icons/hi';
 import {BsCodeSlash, BsFiletypeCsv, BsFiletypeJson, BsFiletypeXlsx} from 'react-icons/bs'
-import JsonUpload from '../components/json_upload'; 
-import CsvUpload from '../components/csv_upload';
+import JsonUpload from '../components/JsonUpload'; 
+import CsvUpload from '../components/CsvUpload';
 import FileUploadPreview from '../components/FileUploadPreview';
 import ExcelUpload from '../components/ExcelUpload';
 import { useSelector } from 'react-redux'; // Add this at the top if not imported
