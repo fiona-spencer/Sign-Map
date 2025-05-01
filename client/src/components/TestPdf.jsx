@@ -4,7 +4,7 @@ import clustering from 'density-clustering';
 import { getDistance } from 'geolib';
 import { Button } from 'flowbite-react';
 import 'react-circular-progressbar/dist/styles.css';
-import MapView from './mapView'; // Import your MapView component
+import MapView from './MapView'; // Import your MapView component
 import { HiCloudDownload, HiZoomIn,  } from 'react-icons/hi';
 
 export default function TestPdf({newRef}) {
