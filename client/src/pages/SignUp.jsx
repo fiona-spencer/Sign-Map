@@ -37,12 +37,12 @@ export default function SignUp() {
     setFormData({ ...formData, userType: selectedType });
 
     // If user/public is selected, show password creation modal
-    if (selectedType === "user" || selectedType === "public") {
+    if (selectedType === "user" || selectedType === "admin") {
       setIsPasswordModalOpen(true);
     }
 
     // If admin is selected, show admin authentication modal
-    if (selectedType === "admin") {
+    if (selectedType === "admin" || selectedType == "user") {
       setIsModalOpen(true);
     }
   };
@@ -203,7 +203,7 @@ export default function SignUp() {
             </p>
             <TextInput
               type="password"
-              placeholder="Enter SECRET password"
+              placeholder="Enter verification"
               value={adminPasswordInput}
               onChange={(e) => setAdminPasswordInput(e.target.value)}
             />

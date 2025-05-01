@@ -82,7 +82,7 @@ export default function Settings() {
   const menuItems = () => {
     if (!userType) {
       return [
-        { href: "/start", label: "Start Here", icon: HiChartPie },
+        { href: "/startHere", label: "Start Here", icon: HiChartPie },
         { href: "/signin", label: "Sign In", icon: HiArrowSmRight },
         { href: "/signup", label: "Sign Up", icon: HiTable },
         ...sharedItems,
