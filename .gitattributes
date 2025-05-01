@@ -6,3 +6,4 @@ client/src/assets/videos/createReport.mov filter=lfs diff=lfs merge=lfs -text
 client/src/assets/videos/datasheet.mov filter=lfs diff=lfs merge=lfs -text
 client/src/assets/videos/filter.mov filter=lfs diff=lfs merge=lfs -text
 client/src/assets/videos/moveToMap.mov filter=lfs diff=lfs merge=lfs -text
+client/src/assets/videos/previewFile.mov filter=lfs diff=lfs merge=lfs -text
