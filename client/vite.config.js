@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
-import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
@@ -13,8 +12,8 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: path.resolve(__dirname, '../api/public'), // build output goes to backend
+    outDir: 'dist', // put output in client/dist
     emptyOutDir: true,
   },
-  base: '/', // optional; only change if serving from a subpath
+  base: '/', // only change if hosting from a subpath like /static/
 })
